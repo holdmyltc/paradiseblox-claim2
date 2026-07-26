@@ -1,20 +1,21 @@
-import Link from "next/link";
-import { SUPPORT_URL } from "@/lib/config";
-import { ThemeToggle } from "@/components/theme-toggle";
+# Update the deployed GitHub project to v5
 
-export function Header({ compact = false }: { compact?: boolean }) {
-  return (
-    <header className="nova-header">
-      <div className="nova-header-inner">
-        <Link className="nova-brand" href="/" aria-label="ParadiseBlox claim home">
-          <img src="/paradiseblox-logo.png" alt="ParadiseBlox" />
-        </Link>
-        <nav className="nova-header-actions" aria-label="Claim navigation">
-          {!compact && <a href={SUPPORT_URL} target="_blank" rel="noreferrer">Support</a>}
-          <Link href="/history">Order history</Link>
-          <ThemeToggle />
-        </nav>
-      </div>
-    </header>
-  );
-}
+Upload these changed files to the same paths in your `paradiseblox-claim2` repository:
+
+- `src/app/page.tsx`
+- `src/app/layout.tsx`
+- `src/app/globals.css`
+- `src/components/verify-form.tsx`
+- `src/components/header.tsx`
+- `src/components/theme-toggle.tsx`
+- `src/components/claim-atmosphere.tsx`
+- `public/manifest.webmanifest`
+- `CHANGELOG.md`
+
+Commit message:
+
+```text
+Rebuild Claim 2 premium responsive design
+```
+
+Vercel will automatically redeploy after the commit. Keep `NEXT_PUBLIC_DEMO_MODE=true` while reviewing the design.
