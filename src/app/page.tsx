@@ -14,8 +14,6 @@ const products = [
   ["number-nine.webp", "product-i"],
   ["house-nine.webp", "product-j"],
   ["block-pair.webp", "product-k"],
-  ["raccoon-alt.png", "product-l"],
-  ["unicorn-alt.png", "product-m"],
 ] as const;
 
 export default function HomePage() {
@@ -32,7 +30,7 @@ export default function HomePage() {
           <div className="claim-product-cloud">
             <img className="claim-center-icon" src="/paradiseblox-icon.png" alt="" />
             {products.map(([src, className]) => (
-              <img key={src} className={`claim-product ${className}`} src={`/products/${src}`} alt="" />
+              <img key={src} className={`claim-product ${className}`} src={`/${src}`} alt="" />
             ))}
           </div>
         </aside>
