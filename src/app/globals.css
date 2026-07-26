@@ -1890,3 +1890,6 @@ html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
 /* attachments sit outside the bubble */
 .message-attachments { margin-top: 6px; }
 .message-row.is-first .message-attachments:first-child { margin-top: 0; }
+
+/* brand avatar keeps its squircle; customer avatars stay round */
+.message-row.admin .message-avatar { border-radius: 9px; }
