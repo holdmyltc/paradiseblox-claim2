@@ -7,10 +7,20 @@ export function Header({ compact = false }: { compact?: boolean }) {
     <header className="nova-header">
       <div className="nova-header-inner">
         <Link className="nova-brand" href="/" aria-label="ParadiseBlox claim home">
-          <img src="/paradiseblox-logo.png" alt="ParadiseBlox" />
+          <img
+            src="/paradiseblox-wordmark.png"
+            alt="ParadiseBlox"
+            width={1277}
+            height={241}
+          />
         </Link>
+
         <nav className="nova-header-actions" aria-label="Claim navigation">
-          {!compact && <a href={SUPPORT_URL} target="_blank" rel="noreferrer">Support</a>}
+          {!compact && (
+            <a href={SUPPORT_URL} target="_blank" rel="noreferrer">
+              Support
+            </a>
+          )}
           <Link href="/history">Order history</Link>
           <ThemeToggle />
         </nav>
