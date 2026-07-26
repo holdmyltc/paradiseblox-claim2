@@ -6,8 +6,6 @@ const products = [
   ["raccoon.webp", "product-a"],
   ["unicorn.webp", "product-b"],
   ["golden-dragon.png", "product-c"],
-  ["knife.jpg", "product-d"],
-  ["ice-bow.jpg", "product-e"],
   ["giraffe.webp", "product-f"],
   ["cat.webp", "product-g"],
   ["red-elephant.webp", "product-h"],
