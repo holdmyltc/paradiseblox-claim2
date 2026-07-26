@@ -52,11 +52,18 @@ export function ChatPanel({
   const [file, setFile] = useState<File | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
-  const bottom = useRef<HTMLDivElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const pinned = useRef(true);          // is the reader at the bottom?
   const jumped = useRef(false);         // has the first jump-to-bottom happened?
   const demo = orderId === "demo-order";
+
+  // scroll ONLY the log. scrollIntoView() walks every scrollable ancestor and
+  // drags the whole page down with it — that's the customer-page bug.
+  function scrollToBottom(smooth: boolean) {
+    const el = logRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
+  }
 
   // treat "within 120px of the bottom" as still following the conversation
   function handleScroll() {
@@ -67,12 +74,11 @@ export function ChatPanel({
 
   useEffect(() => {
     if (!jumped.current) {
-      // first paint: land at the bottom instantly, no animation
-      bottom.current?.scrollIntoView();
+      scrollToBottom(false);
       jumped.current = true;
       return;
     }
-    if (pinned.current) bottom.current?.scrollIntoView({ behavior: "smooth" });
+    if (pinned.current) scrollToBottom(true);
   }, [messages]);
 
   useEffect(() => {
@@ -215,8 +221,6 @@ export function ChatPanel({
           </div>
         </div>;
       })}
-
-      <div ref={bottom} />
     </div>
 
     <div className="chat-compose">
