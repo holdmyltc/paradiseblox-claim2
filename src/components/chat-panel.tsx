@@ -34,7 +34,7 @@ function Avatar({ src, label }: { src?: string | null; label: string }) {
 
 export function ChatPanel({
   orderId, initialMessages, locked, storeStatus, mode = "customer", adminToken, onChanged,
-  customerAvatarUrl, adminAvatarUrl,
+  customerAvatarUrl, adminAvatarUrl, customerName,
 }: {
   orderId: string;
   initialMessages: ChatMessage[];
@@ -45,6 +45,7 @@ export function ChatPanel({
   onChanged?: () => void;
   customerAvatarUrl?: string | null;
   adminAvatarUrl?: string | null;
+  customerName?: string | null;
 }) {
   const [messages, setMessages] = useState(initialMessages);
   const [text, setText] = useState("");
@@ -152,7 +153,9 @@ export function ChatPanel({
         const isLast = next?.sender !== m.sender;
 
         const isMine = m.sender === "customer";
-        const name = isMine ? "You" : "ParadiseBlox";
+        // label by WHO SENT IT, not whose screen this is — correct in both
+        // the customer view and the admin dashboard
+        const name = isMine ? (customerName || "Customer") : "ParadiseBlox";
         const time = timeLabel(m.createdAt);
         const isImage = Boolean(m.attachmentUrl && m.attachmentMime?.startsWith("image/"));
         const isFile = Boolean(m.attachmentUrl && !isImage);
