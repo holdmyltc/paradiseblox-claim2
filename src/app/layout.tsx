@@ -2,7 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-body", weight: ["400", "500", "600", "700", "800", "900"] });
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "600", "700", "800"],
+});
 
 export const metadata: Metadata = {
   title: "Claim Your ParadiseBlox Order",
@@ -33,9 +37,9 @@ const themeScript = `
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={outfit.variable} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
-      <body className={outfit.variable}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
