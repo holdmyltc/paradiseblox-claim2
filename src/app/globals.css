@@ -1899,3 +1899,9 @@ html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
 /* .message-row.system already caps at 85%; don't compound it on the pill */
 .message-row.system .system-pill { max-width: 100%; }
 
+/* siblings of the chat must not be squeezed by its flex:1 */
+.app-shell:has(.delivery-shell) .confirmation-panel,
+.app-shell:has(.delivery-shell) .review-panel { flex: none; }
+
+/* reference doesn't clip at page level — let it scroll if the viewport is tiny */
+.app-shell:has(.delivery-shell) { overflow: visible; }
