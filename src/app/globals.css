@@ -1262,6 +1262,7 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
    -------------------------------------------------------------------------- */
 .claim-mascot {
   position: relative;
+  z-index: 1;                                     /* was 5 — was covering the tiles */
   left: auto;
   right: auto;
   top: auto;
@@ -1334,11 +1335,13 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
   background: rgba(251, 146, 60, .20);
 }
 
-/* the reference shows exactly TWO floating item tiles, not 13 products */
+/* the reference shows exactly TWO floating item tiles, not 13 products.
+   z-index 6 keeps them above the mascot — in the reference they win purely on
+   DOM order, but your mascot carries an explicit z-index so we need one here. */
 .claim-floating-tile,
 .claim-product {
   position: absolute;
-  z-index: 4;
+  z-index: 6;
   width: 76px;                /* 10 + 56 + 10 */
   height: 76px;
   padding: 10px;
@@ -1428,6 +1431,10 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
 }
 .claim-submit-content svg { width: 16px; height: 16px; }
 .claim-card-hint { margin-top: 16px; font-size: 11px; }
+
+/* the reference claim page has NO logo element at any breakpoint — the h1 is
+   the only masthead. Your v7 rule re-shows .claim-card-logo under 959px. */
+.claim-card-logo { display: none !important; }
 
 /* theme toggle: h-8 w-[58px], thumb h-6 w-6, travel 26px */
 .claim-theme-position { top: 16px; right: 16px; }
@@ -1554,35 +1561,89 @@ html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
   gap: 16px;                                                     /* mt-4 group spacing */
 }
 
-/* consecutive bubbles from the same sender sit 2px apart in the reference.
-   Add class="message-row stacked" to the 2nd..nth bubble of a run. */
-.message-row + .message-row.stacked { margin-top: -14px; }
-
 .message-row { max-width: 75%; align-items: flex-start; gap: 8px; }
 .message-row.system { max-width: 85%; }
 
-.message-meta { margin: 0 4px 4px; font-size: 11px; font-weight: 600; }
-.message-meta span { margin-left: 6px; font-size: 10px; }
+/* --- MESSAGE GROUPING -------------------------------------------------------
+   Decoded from the reference transcript. For a run of N consecutive messages
+   from the same sender:
+
+     first  -> spacer,  name+time header,  18px corners
+     middle -> spacer,  no header,         18px corners,  2px above
+     last   -> AVATAR,  no header,         4px tail,      2px above,
+               trailing timestamp underneath
+     single -> AVATAR,  name+time header,  4px tail,      no trailing time
+
+   Note the avatar sits on the LAST message of a run, not the first.
+
+   Markup:
+     <div class="message-row admin is-first">          <- or .customer
+       <span class="message-avatar-spacer"></span>
+       <div class="message-stack">
+         <div class="message-meta">Name <span>14:59</span></div>
+         <div class="message-bubble">hi</div>
+       </div>
+     </div>
+     <div class="message-row admin is-last">
+       <img class="message-avatar" src="...">
+       <div class="message-stack">
+         <div class="message-bubble">i mail you</div>
+         <span class="message-time">14:59</span>
+       </div>
+     </div>
+   A standalone message gets both is-first and is-last.
+   -------------------------------------------------------------------------- */
+
+/* runs sit 2px apart; .chat-log gap already gives 16px between runs */
+.message-row:not(.is-first) { margin-top: -14px; }
+
+.message-stack { display: flex; flex-direction: column; min-width: 0; }
+.message-row.admin { margin-right: auto; }
+.message-row.admin .message-stack { align-items: flex-start; }
+.message-row.customer { margin-left: auto; flex-direction: row-reverse; }
+.message-row.customer .message-stack { align-items: flex-end; }
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px;
+  padding: 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.message-meta span { margin-left: 0; font-size: 10px; font-weight: 400; }
+.message-row:not(.is-first) .message-meta { display: none; }
 
 .message-bubble {
+  display: inline-block;
   padding: 8px 14px;                                             /* px-3.5 py-2 */
   border-radius: 18px;
   font-size: 14px;
   line-height: 1.625;
   box-shadow: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 .customer .message-bubble { border-radius: 18px; box-shadow: none; }
-/* tail corner only on the LAST bubble of a run */
-.message-row:not(:has(+ .message-row.stacked)) .message-bubble { border-bottom-left-radius: 4px; }
-.message-row.customer:not(:has(+ .message-row.stacked)) .message-bubble {
-  border-bottom-left-radius: 18px;
-  border-bottom-right-radius: 4px;
-}
 
-/* per-message avatar slot (32px, offset 20px to clear the name line) */
+/* tail corner only on the last bubble of a run */
+.message-row.admin.is-last .message-bubble { border-bottom-left-radius: 4px; }
+.message-row.customer.is-last .message-bubble { border-bottom-right-radius: 4px; }
+
+/* trailing time: last of a run, but not on a standalone message */
+.message-time { margin-top: 4px; padding: 0 4px; font-size: 10px; color: var(--c-fg-3); }
+.message-row.is-first .message-time { display: none; }
+
+/* avatar slot — 32px, pushed down 20px to clear the name line */
 .message-avatar,
-.message-avatar-spacer { width: 32px; height: 32px; flex: none; margin-top: 20px; align-self: flex-start; }
-.message-avatar { border-radius: 50%; object-fit: cover; }
+.message-avatar-spacer {
+  width: 32px;
+  flex: none;
+  margin-top: 20px;
+  align-self: flex-start;
+}
+.message-avatar { height: 32px; border-radius: 50%; object-fit: cover; }
 .message-avatar-spacer { height: 0; }
 
 .system-pill {
@@ -1683,6 +1744,126 @@ html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
   flex: 1;
   min-height: 0;
   flex-direction: column;
+}
+
+
+/* ===========================================================================
+   8. MOBILE PARITY
+   Your file re-tunes chat padding, bubble sizes and max-widths across five
+   stacked blocks (860 / 700 / 620 / 430 / 390). The reference does almost
+   none of that — here is its COMPLETE list of responsive changes:
+
+     at sm (640px):  header   px-4      -> px-5
+                     main     px-3 py-3 -> px-4 py-4
+                     progress p-3       -> p-4
+                     step col 56px      -> 96px
+                     step label 9px     -> 10px
+                     connector mx-2     -> mx-3
+                     claim card p-7     -> p-8
+                     claim h1 1.9rem    -> 2.45rem
+     at md (768px):  chat image 280x200 -> 364x260
+
+   That is the entire list. Chat bubbles, gutters, radii and max-widths are
+   identical on a phone and a 27" monitor. This block pins them back.
+   =========================================================================== */
+
+@media (max-width: 639px) {
+  .nova-header { padding: 12px 16px; }
+  .page-wrap { padding: 12px; }
+  .order-layout { gap: 12px; }
+  .delivery-shell { border-radius: 16px; }
+  .progress { padding: 12px; }
+
+  .order-summary-row { min-height: 0; padding: 14px 16px; gap: 14px; }
+  .order-thumbnails { width: auto; height: 48px; }
+  .order-thumbnails img,
+  .order-thumbnails .item-placeholder { width: 48px; height: 48px; border-radius: 12px; }
+  .order-summary-title { font-size: 18px; line-height: 28px; }
+  .order-summary-meta { gap: 6px; margin-top: 2px; font-size: 12px; }
+
+  .chat-card { min-height: 0; }
+  .chat-log { padding: 16px; gap: 16px; min-height: 0; max-height: none; }
+  .chat-guidance { gap: 16px; margin: 0 0 16px; }
+
+  .message-row { max-width: 75%; gap: 8px; }
+  .message-row.system { max-width: 85%; }
+  .message-bubble { padding: 8px 14px; font-size: 14px; line-height: 1.625; border-radius: 18px; }
+  .message-meta { margin: 0 0 4px; padding: 0 4px; font-size: 11px; }
+  .message-meta span { font-size: 10px; }
+  .system-pill { max-width: 85%; padding: 10px 16px; border-radius: 16px; font-size: 11px; }
+  .system-pill-success { padding: 10px 16px; font-size: 12px; }
+
+  .chat-compose {
+    padding: 12px 16px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .compose-row {
+    min-height: 0;
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    gap: 8px;
+    padding: 6px 8px;
+    border-width: 3px;
+    border-radius: 24px;
+  }
+  .compose-input { min-height: 40px; padding: 6px 0; font-size: 16px; }
+  .file-btn, .send-btn { width: 36px; height: 36px; }
+}
+
+/* these need 0,2,0 specificity to beat your 700px / 620px blocks, which hide
+   the status pill and the third meta value on small screens. The reference
+   keeps both visible at every width. */
+.order-summary-row .status-pill { display: inline-flex; }
+.order-summary-meta span:nth-child(3) { display: inline; }
+
+
+/* ===========================================================================
+   9. THINGS THE REFERENCE HAS THAT YOUR ORDER PAGE DOESN'T
+   Not layout fixes — these are the parts that make their chat read better.
+   Each needs a small markup change.
+   =========================================================================== */
+
+/* 9a. Header carries no logo. It's: back button | user chip | account chip |
+       theme toggle, all inside max-w-5xl. Labels collapse to icons under sm. */
+@media (max-width: 639px) {
+  .nova-header .header-label-sm { display: none; }   /* "Back", "Connected", "· 69 deals" */
+}
+
+/* 9b. Chips in the header — 32px tall, pill, 1px ring, 10px horizontal */
+.nova-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  box-shadow: inset 0 0 0 1px var(--c-ring);
+}
+.nova-chip-avatar { width: 24px; height: 24px; flex: none; border-radius: 50%; font-size: 11px; font-weight: 700; }
+.nova-chip-name { max-width: 92px; font-size: 11px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nova-chip-sub { font-size: 10px; color: var(--c-fg-2); }
+.nova-chip-divider { width: 1px; height: 14px; background: var(--c-ring); }
+.nova-chip-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* 9c. Attachment stacks — 6px between images, not the bubble gap */
+.message-attachments { display: flex; flex-direction: column; gap: 6px; }
+
+/* 9d. Progress step columns are fixed-width with FLEXED connectors between
+       them, not a 4-up equal grid. This is closer to the reference geometry —
+       swap .progress-row to flex and drop the ::after connectors. */
+.progress-row.progress-flex { display: flex; align-items: flex-start; }
+.progress-row.progress-flex .progress-step { width: 56px; flex: none; }
+.progress-row.progress-flex .progress-step::after { display: none; }
+.progress-row.progress-flex .progress-connector {
+  flex: 1;
+  height: 2px;
+  margin: 13px 8px 0;
+  border-radius: 999px;
+  background: var(--c-ring);
+}
+.progress-row.progress-flex .progress-connector.done { background: var(--nova); }
+@media (min-width: 640px) {
+  .progress-row.progress-flex .progress-step { width: 96px; }
+  .progress-row.progress-flex .progress-connector { margin-left: 12px; margin-right: 12px; }
 }
 
 
