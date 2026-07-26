@@ -24,19 +24,22 @@ export default function HomePage() {
         <ThemeToggle />
       </div>
 
+      <img
+        className="claim-page-logo"
+        src="/paradiseblox-wordmark.png"
+        alt="ParadiseBlox"
+        width={1277}
+        height={241}
+      />
+
       <div className="claim-home-stage">
         <aside className="claim-home-art" aria-hidden="true">
           <div className="claim-art-glow claim-art-glow-blue" />
           <div className="claim-art-glow claim-art-glow-orange" />
-          <img
-            className="claim-art-logo"
-            src="/paradiseblox-wordmark.png"
-            alt=""
-          />
           <div className="claim-product-cloud">
             <img
-              className="claim-center-icon"
-              src="/paradiseblox-icon.png"
+              className="claim-mascot"
+              src="/paradiseblox-mascot.png"
               alt=""
             />
             {products.map(([src, className]) => (
