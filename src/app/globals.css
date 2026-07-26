@@ -1241,31 +1241,83 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
 @media (min-width: 640px) { .claim-home-stage { padding: 48px 16px; } }
 @media (min-width: 1024px) { .claim-home-stage { gap: 56px; } }
 
-/* art column is hidden until lg (1024), not 960 */
+/* art column is hidden until lg (1024), not 960.
+   width:720px + flex:none was overflowing the 992px stage and squeezing the
+   claim card below 448px between 1024–1280px. The column is now sized BY the
+   mascot, exactly like the reference. */
 .claim-home-art {
   position: relative;
   display: none;
   width: auto;
   height: auto;
-  flex: none;
+  flex: 0 0 auto;
+  min-width: 0;
 }
 @media (min-width: 1024px) { .claim-home-art { display: block; } }
 
-/* mascot sits IN FLOW at h-[28rem] and defines the column width.
-   If yours is absolutely positioned inside .claim-product-cloud, this is the
-   one place you'll need a markup change — see notes. */
+/* ---- MASCOT ----------------------------------------------------------------
+   was: 420 x 590 box, object-fit contain, bottom-anchored, absolute
+   now: 448px tall, natural width, in flow — it defines the column's footprint.
+   The 420x590 box was rendering the art up to ~590px tall (~32% oversized).
+   -------------------------------------------------------------------------- */
 .claim-mascot {
   position: relative;
   left: auto;
+  right: auto;
+  top: auto;
   bottom: auto;
+  display: block;
   width: auto;
-  height: 28rem;              /* 448px */
+  height: 28rem;                                  /* 448px — h-[28rem] */
   object-fit: contain;
+  object-position: center;
   transform: none;
   filter: drop-shadow(0 30px 45px rgba(20, 30, 60, .22));
-  animation: claimBob 8s ease-in-out infinite;
+  animation: novaBob 8s ease-in-out infinite;
+  will-change: transform;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 .claim-product-cloud { position: static; inset: auto; min-height: 0; }
+
+/* the reference bob has a slight rotation and a deeper travel than yours.
+   New name so it doesn't clobber claimBob elsewhere in your file. */
+@keyframes novaBob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-14px) rotate(-1.2deg); }
+}
+
+/* ---- Alternative: keep the mascot absolutely positioned ---------------------
+   If you can't move it into flow, delete the .claim-mascot rule above and use
+   this instead. Gives the same 448px render height and keeps the art column
+   from overflowing. The bob has to use `translate` (not `transform`) so it
+   doesn't wipe out the centering.
+
+   .claim-home-art { width: 380px; height: 470px; }
+   .claim-mascot {
+     position: absolute;
+     left: 50%;
+     bottom: 0;
+     width: 100%;
+     height: 448px;
+     object-fit: contain;
+     object-position: center bottom;
+     transform: translateX(-50%);
+     filter: drop-shadow(0 30px 45px rgba(20, 30, 60, .22));
+     animation: novaBobTranslate 8s ease-in-out infinite;
+   }
+   @keyframes novaBobTranslate {
+     0%, 100% { translate: 0 0; rotate: 0deg; }
+     50%      { translate: 0 -14px; rotate: -1.2deg; }
+   }
+   -------------------------------------------------------------------------- */
+
+/* mid-desktop: reference doesn't scale the mascot down, it just lets the gap
+   close. Only shrink below 1180 if the card starts getting squeezed. */
+@media (min-width: 1024px) and (max-width: 1180px) {
+  .claim-home-stage { gap: 32px; }
+  .claim-mascot { height: 24rem; }               /* 384px */
+}
 
 /* two blurred glows behind the mascot */
 .claim-art-glow { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
@@ -1635,5 +1687,8 @@ html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
 
 
 @media (prefers-reduced-motion: reduce) {
-  .claim-mascot, .claim-floating-tile, .claim-product { animation: none !important; }
+  .claim-mascot, .claim-floating-tile, .claim-product {
+    animation: none !important;
+    transform: none;
+  }
 }
