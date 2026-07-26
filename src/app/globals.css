@@ -1905,3 +1905,345 @@ html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
 
 /* reference doesn't clip at page level — let it scroll if the viewport is tiny */
 .app-shell:has(.delivery-shell) { overflow: visible; }
+/* ============================================================================
+   PARADISEBLOX — MOBILE CHAT FIX + LAYOUT PARITY
+   Append to the END of globals.css, after everything already there.
+
+   This SUPERSEDES Section 7 of the earlier layout-match layer. Section 7
+   forced height:100dvh on every order page; when the page also carried a
+   delivery banner, an expanded order summary and a review panel, the flex
+   budget went negative and .chat-card collapsed to zero height. That is the
+   mobile bug.
+   ============================================================================ */
+
+
+/* ===========================================================================
+   1. VIEWPORT-HEIGHT CHAT — ONLY WHEN THE BUDGET ALLOWS
+   Fixed-viewport layout is right for an ACTIVE order: the chat is the page,
+   the composer pins to the bottom. It is wrong for a COMPLETED order, which
+   is a record you scroll through and which carries a review panel.
+
+   .review-panel only renders when status is delivered or completed, so it is
+   a reliable signal for "this page has extra chrome, let it scroll".
+   =========================================================================== */
+
+/* reset Section 7 unconditionally, then re-apply it only where it works */
+.app-shell:has(.delivery-shell) {
+  height: auto;
+  min-height: 100dvh;
+  display: block;
+  overflow: visible;
+}
+.app-shell:has(.delivery-shell) .page-wrap,
+.app-shell:has(.delivery-shell) .order-layout,
+.app-shell:has(.delivery-shell) .delivery-shell,
+.app-shell:has(.delivery-shell) .chat-card {
+  display: block;
+  flex: none;
+  min-height: 0;
+}
+
+/* ACTIVE order (no review panel): true fixed-viewport chat, like the reference */
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .page-wrap,
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .order-layout,
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .delivery-shell,
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .chat-card {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .nova-header,
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .progress,
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .order-summary,
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .delivery-banner,
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .confirmation-panel {
+  flex: none;
+}
+/* floor: the chat can never be squeezed out of existence again */
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .chat-card { min-height: 260px; }
+
+/* COMPLETED / DELIVERED order: page scrolls, chat log gets a bounded window
+   so the transcript still scrolls internally instead of running for pages */
+.app-shell:has(.review-panel) .chat-log {
+  height: 58vh;
+  min-height: 300px;
+  max-height: 640px;
+  overflow-y: auto;
+}
+
+/* browsers without :has() get natural flow — never a collapsed chat */
+@supports not selector(:has(*)) {
+  .app-shell { height: auto; min-height: 100dvh; display: block; overflow: visible; }
+  .chat-log { height: 58vh; min-height: 300px; overflow-y: auto; }
+}
+
+
+/* ===========================================================================
+   2. HEADER — stop the wrap, match the reference bar
+   Reference header is 12px/16px padding, single row, never wraps. Yours wraps
+   "Order history" onto two lines at 390px, which also inflates the header and
+   steals height from the chat.
+   =========================================================================== */
+
+.nova-header-inner {
+  flex-wrap: nowrap;
+  min-height: 0;
+  gap: 10px;
+}
+.nova-brand { min-width: 0; flex: 0 1 auto; }
+.nova-brand img { width: clamp(150px, 34vw, 250px); max-height: 42px; }
+.nova-header-actions { flex: none; flex-wrap: nowrap; }
+.nova-header-actions > a { white-space: nowrap; }
+
+@media (max-width: 639px) {
+  .nova-header { padding: 10px 12px; }
+  .nova-header-inner { gap: 8px; }
+  .nova-brand img { width: min(160px, 42vw); max-height: 34px; }
+  .nova-header-actions { gap: 2px; }
+  .nova-header-actions > a { padding: 7px 8px; font-size: 11px; }
+  /* Support already hides via the `compact` prop; hide history label too */
+  .nova-header-actions > a { max-width: 84px; overflow: hidden; text-overflow: ellipsis; }
+}
+
+
+/* ===========================================================================
+   3. ORDER SUMMARY ROW — the mobile wrap disaster
+   The Roblox chip inside .order-title-line squeezes the title to ~40% width,
+   so "Order #2436" breaks across two lines and the meta stacks vertically.
+   The reference does not put an account chip in this row at all.
+   =========================================================================== */
+
+.order-summary-row {
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+.order-title-line { display: block; }        /* chip no longer competes */
+.order-heading-block { width: 100%; }
+
+.order-summary-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.order-summary-meta {
+  flex-wrap: nowrap;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.order-summary-meta span { flex: none; }
+
+@media (max-width: 639px) {
+  .order-summary-row { grid-template-columns: auto minmax(0, 1fr) auto; padding: 12px; gap: 12px; }
+  .order-summary-title { font-size: 16px; line-height: 24px; }
+  .order-summary-meta { gap: 6px; font-size: 11px; }
+  /* status pill is the one thing that can go — the progress bar above says the same */
+  .order-summary-row > .status-pill { display: none; }
+}
+
+/* the account chip moves into the header (see header.tsx) — hide the inline one */
+.order-summary-row .summary-roblox { display: none; }
+
+
+/* ===========================================================================
+   4. THUMBNAILS — reference shows max 2, yours renders 3 and overflows at 390px
+   =========================================================================== */
+.order-thumbnails img:nth-child(n + 3),
+.order-thumbnails .item-placeholder:nth-child(n + 3) { display: none; }
+
+
+/* ===========================================================================
+   5. DELIVERY BANNER — tighten so it stops eating the chat's budget
+   The reference has no banner at all; this keeps yours but at half the height.
+   =========================================================================== */
+.delivery-banner { margin: 12px 12px 0; padding: 12px 14px; border-radius: 14px; gap: 10px; }
+.delivery-check { width: 30px; height: 30px; }
+.delivery-check svg { width: 16px; height: 16px; }
+.delivery-banner-copy strong { font-size: 14px; }
+.delivery-banner-copy > span { font-size: 11.5px; line-height: 1.4; }
+.delivery-badges { margin-top: 7px; }
+
+@media (max-width: 639px) {
+  .delivery-banner { margin: 10px 10px 0; padding: 10px 12px; }
+  .delivery-banner-copy strong { font-size: 13px; }
+  .delivery-banner-copy > span { font-size: 11px; }
+  .delivery-badges { display: none; }        /* progress bar already says this */
+}
+
+
+/* ===========================================================================
+   6. COMPOSER — never let it be pushed off-screen
+   =========================================================================== */
+.chat-compose { flex: none; position: sticky; bottom: 0; z-index: 4; }
+.compose-row { min-height: 48px; }
+
+/* locked chat: the file button is a 36px spacer, don't let it look clickable */
+.chat-compose span.file-btn { background: transparent; box-shadow: none; pointer-events: none; }
+
+
+/* ===========================================================================
+   7. ADMIN — sign-in screen, matched to the Nova seller portal
+   The seller portal HTML you sent is the SIGN-IN page only, so this is the
+   only admin screen I can match with confidence.
+   =========================================================================== */
+
+.admin-auth-stage {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  text-align: center;
+}
+.admin-auth-inner { width: 100%; max-width: 448px; }
+
+.admin-auth-mark {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--nova), var(--nova-deep));
+  box-shadow: 0 12px 34px rgba(var(--nova-rgb), .34), inset 0 1px 0 rgba(255, 255, 255, .2);
+}
+.admin-auth-mark::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 26px;
+  background: rgba(var(--nova-rgb), .20);
+  filter: blur(24px);
+  z-index: -1;
+}
+.admin-auth-mark img { width: 40px; height: 40px; border-radius: 10px; }
+
+.admin-auth-stage h1 {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -.025em;
+  line-height: 1.05;
+}
+.admin-auth-stage h1 span { font-weight: 300; color: var(--nova); }
+.admin-auth-lede {
+  max-width: 360px;
+  margin: 12px auto 0;
+  color: var(--c-fg-2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.admin-auth-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 24px; }
+.admin-auth-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  box-shadow: inset 0 0 0 1px var(--c-ring);
+  color: var(--c-fg-2);
+  font-size: 11px;
+  font-weight: 600;
+}
+.admin-auth-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px rgba(52, 211, 153, .9);
+}
+
+.admin-auth-card {
+  margin-top: 32px;
+  padding: 1px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .14), transparent);
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .45);
+  text-align: left;
+}
+html[data-theme="light"] .admin-auth-card { background: linear-gradient(180deg, rgba(20, 30, 60, .12), transparent); }
+.admin-auth-card > form {
+  padding: 24px;
+  border-radius: 23px;
+  background: var(--c-bg-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+.admin-auth-card .field { margin-bottom: 14px; }
+.admin-auth-card .btn { width: 100%; min-height: 50px; border-radius: 16px; }
+.admin-auth-note { margin: 16px 0 0; color: var(--c-fg-3); font-size: 11px; line-height: 1.6; text-align: center; }
+
+@media (max-width: 620px) {
+  .admin-auth-stage { padding: 32px 14px; }
+  .admin-auth-stage h1 { font-size: 30px; }
+  .admin-auth-card > form { padding: 20px; }
+}
+
+
+/* ===========================================================================
+   8. ADMIN DASHBOARD — width + mobile height parity with the customer page
+   Not matched to the Nova seller dashboard (I have not seen that page), but
+   aligned to your own order page so the two feel like one product.
+   =========================================================================== */
+
+.dashboard-shell { width: min(1280px, calc(100% - 24px)); padding: 12px 0 40px; }
+@media (min-width: 640px) { .dashboard-shell { width: min(1280px, calc(100% - 32px)); padding: 16px 0 48px; } }
+
+.admin-grid { gap: 12px; }
+.admin-panel, .admin-detail { border-radius: 16px; }
+.admin-detail { min-height: 0; }
+.admin-body { min-height: 0; }
+
+/* the admin chat needs the same internal-scroll treatment as the customer one */
+.admin-chat { display: flex; min-height: 0; flex-direction: column; }
+.admin-chat .chat-card { display: flex; flex: 1; min-height: 0; flex-direction: column; }
+.admin-chat .chat-log { flex: 1; min-height: 0; max-height: none; overflow-y: auto; }
+
+@media (min-width: 861px) {
+  .admin-detail { display: flex; height: calc(100dvh - 104px); flex-direction: column; }
+  .admin-detail-header { flex: none; }
+  .admin-body { display: grid; flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) 310px; }
+  .admin-controls { max-height: none; overflow-y: auto; }
+  .order-list { max-height: calc(100dvh - 168px); }
+}
+
+@media (max-width: 860px) {
+  .admin-chat .chat-log { height: 55vh; min-height: 280px; }
+  .tabs { margin-bottom: 12px; }
+}
+
+/* admin chat header sits above the log and must not scroll with it */
+.chat-header { flex: none; border-radius: 0; }
+
+
+/* ===========================================================================
+   9. HEADER ACCOUNT CHIP  (see header.tsx)
+   Reference geometry: 32px tall pill, 24px avatar, 11px name / 10px sub.
+   =========================================================================== */
+.nova-chip { flex: none; }
+.nova-chip-copy { display: grid; line-height: 1.15; min-width: 0; }
+.nova-chip-fallback {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--nova), var(--nova-deep));
+}
+.nova-chip-name { color: var(--c-fg); }
+
+@media (max-width: 767px) {
+  /* below md the chip is avatar-only — the name lives in the summary anyway */
+  .nova-chip { padding: 3px; }
+  .nova-chip-copy { display: none; }
+}
