@@ -17,7 +17,16 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
   useEffect(()=>{
     if(order.id==="demo-order")return;
     let live=true;
-    const poll=async()=>{try{const r=await fetch(`/api/orders/${order.id}`,{cache:"no-store"});if(r.ok&&live){const d=await r.json();setOrder(d.order);setProofs(d.proofs)}}catch{}};
+    const poll = async () => {
+  try {
+    const r = await fetch(`/api/orders/${order.id}`, { cache: "no-store" });
+    if (!r.ok || !live) return;
+    const d = await r.json();
+    // only re-render when something actually changed
+    setOrder((prev) => JSON.stringify(prev) === JSON.stringify(d.order) ? prev : d.order);
+    setProofs((prev) => prev.length === d.proofs.length ? prev : d.proofs);
+  } catch {}
+};
     poll();
     const t=setInterval(poll,3000);
     return()=>{live=false;clearInterval(t)};
