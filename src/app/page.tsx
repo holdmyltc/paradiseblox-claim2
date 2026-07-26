@@ -1,14 +1,49 @@
 import Link from "next/link";
-import { Header } from "@/components/header";
 import { VerifyForm } from "@/components/verify-form";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ClaimAtmosphere } from "@/components/claim-atmosphere";
 
 export default function HomePage() {
   const demo = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
-  return <div className="app-shell"><Header/><main className="page-wrap">
-    <section className="card hero"><span className="eyebrow">ParadiseBlox order delivery</span><h1>Claim your order and chat with ParadiseBlox.</h1><p>Verify your order, confirm your Roblox account and keep the full delivery chat in one place.</p></section>
-    <section className="verify-grid">
-      <div className="card form-card"><h2 className="section-title">Verify your order</h2><p className="section-copy">Enter your order ID and checkout email. No email code is needed for the order you are claiming now.</p><VerifyForm/>{demo&&<Link className="btn btn-soft btn-block" href="/order/demo" style={{marginTop:10}}>Open design preview</Link>}</div>
-      <div className="card info-card"><h2 className="section-title">How it works</h2><div className="feature-list"><div className="feature"><div className="feature-icon">1</div><div><strong>Verify your Roblox account</strong><span>Check the avatar, username and user ID before delivery starts.</span></div></div><div className="feature"><div className="feature-icon">2</div><div><strong>Chat with ParadiseBlox</strong><span>Use one chat for every game and item in your order.</span></div></div><div className="feature"><div className="feature-icon">3</div><div><strong>Keep your delivery record</strong><span>Completed orders stay available as a read-only receipt.</span></div></div></div><Link href="/history" className="btn btn-blue btn-block" style={{marginTop:22}}>View previous orders</Link></div>
-    </section>
-  </main></div>;
+
+  return (
+    <main className="claim-home-page">
+      <ClaimAtmosphere />
+      <div className="claim-theme-position"><ThemeToggle /></div>
+
+      <div className="claim-home-stage">
+        <aside className="claim-home-art" aria-hidden="true">
+          <div className="claim-art-glow claim-art-glow-blue" />
+          <div className="claim-art-glow claim-art-glow-orange" />
+          <img className="claim-art-logo" src="/paradiseblox-logo.png" alt="" />
+          <div className="claim-portal">
+            <div className="claim-portal-ring claim-portal-ring-one" />
+            <div className="claim-portal-ring claim-portal-ring-two" />
+            <div className="claim-portal-core">PB</div>
+          </div>
+          <div className="claim-floating-tile claim-floating-tile-a"><span>SAB</span></div>
+          <div className="claim-floating-tile claim-floating-tile-b"><span>MM2</span></div>
+          <div className="claim-floating-tile claim-floating-tile-c"><span>GAG</span></div>
+        </aside>
+
+        <section className="claim-card-frame" aria-labelledby="claim-heading">
+          <div className="claim-card-premium">
+            <img className="claim-card-logo" src="/paradiseblox-logo.png" alt="ParadiseBlox" />
+            <div className="claim-card-heading">
+              <h1 id="claim-heading">Claim Your Order</h1>
+              <p>Enter your order details to begin.</p>
+            </div>
+
+            <VerifyForm />
+
+            <div className="claim-card-links">
+              <Link href="/history">View previous orders</Link>
+              {demo && <Link href="/order/demo">Open order preview</Link>}
+            </div>
+            <p className="claim-card-hint">Check your email for your order number</p>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
 }
