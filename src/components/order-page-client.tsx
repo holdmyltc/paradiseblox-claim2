@@ -73,7 +73,7 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
         <div className="confirmation-actions"><button className="btn btn-confirm" onClick={()=>customerAction("confirm")}>Yes, I received everything</button><button className="btn btn-soft" onClick={()=>customerAction("not_yet")}>Not yet</button></div>
       </section>}
 
-      <ChatPanel orderId={order.id} initialMessages={initialMessages} locked={order.chatLocked} storeStatus={order.storeStatus}/>
+      <ChatPanel orderId={order.id} initialMessages={initialMessages} locked={order.chatLocked} storeStatus={order.storeStatus} customerAvatarUrl={order.roblox?.avatarUrl} adminAvatarUrl="/mark.svg"/>
     </section>
 
     {(order.status === "delivered" || order.status === "completed") && <section className="card review-panel">
