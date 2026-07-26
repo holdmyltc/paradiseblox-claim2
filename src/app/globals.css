@@ -1196,3 +1196,444 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
   .claim-page-logo { display: none; }
   .claim-home-stage { padding-top: 72px; }
 }
+/* ============================================================================
+   NOVA / BUYBLOX — LAYOUT MATCH LAYER
+   Every value below is lifted from the two reference pages (Tailwind build).
+   Append this to the END of your stylesheet so it wins the cascade.
+
+   Breakpoints are Tailwind's, not yours:
+       sm = 640px    md = 768px    lg = 1024px
+   Your existing 620 / 700 / 860 / 959 blocks stay where they are; these
+   later rules override them at the same specificity.
+   ============================================================================ */
+
+:root {
+  --nv-shell: 1024px;   /* max-w-5xl  — page + header inner width */
+  --nv-card: 448px;     /* max-w-md   — claim card */
+  --nv-copy: 320px;     /* max-w-xs   — subheading measure */
+}
+
+
+/* ===========================================================================
+   1. CLAIM / LANDING PAGE                                    (reference file 1)
+   =========================================================================== */
+
+.claim-home-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* stage: max-w-5xl · px-4 py-8 · sm:py-12 · gap-6 · lg:gap-14 */
+.claim-home-stage {
+  width: 100%;
+  max-width: var(--nv-shell);
+  min-height: 0;
+  margin: 0 auto;
+  padding: 32px 16px;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+@media (min-width: 640px) { .claim-home-stage { padding: 48px 16px; } }
+@media (min-width: 1024px) { .claim-home-stage { gap: 56px; } }
+
+/* art column is hidden until lg (1024), not 960 */
+.claim-home-art {
+  position: relative;
+  display: none;
+  width: auto;
+  height: auto;
+  flex: none;
+}
+@media (min-width: 1024px) { .claim-home-art { display: block; } }
+
+/* mascot sits IN FLOW at h-[28rem] and defines the column width.
+   If yours is absolutely positioned inside .claim-product-cloud, this is the
+   one place you'll need a markup change — see notes. */
+.claim-mascot {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  width: auto;
+  height: 28rem;              /* 448px */
+  object-fit: contain;
+  transform: none;
+  filter: drop-shadow(0 30px 45px rgba(20, 30, 60, .22));
+  animation: claimBob 8s ease-in-out infinite;
+}
+.claim-product-cloud { position: static; inset: auto; min-height: 0; }
+
+/* two blurred glows behind the mascot */
+.claim-art-glow { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
+.claim-art-glow-blue {
+  left: 38%; top: 32%; right: auto; bottom: auto;
+  width: 288px; height: 288px;
+  transform: translate(-50%, -50%);
+  background: rgba(var(--nova-rgb), .25);
+}
+.claim-art-glow-orange {
+  left: 64%; top: 64%; right: auto; bottom: auto;
+  width: 240px; height: 240px;
+  transform: translate(-50%, -50%);
+  background: rgba(251, 146, 60, .20);
+}
+
+/* the reference shows exactly TWO floating item tiles, not 13 products */
+.claim-floating-tile,
+.claim-product {
+  position: absolute;
+  z-index: 4;
+  width: 76px;                /* 10 + 56 + 10 */
+  height: 76px;
+  padding: 10px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, .04);
+  box-shadow: 0 16px 34px -10px rgba(20, 30, 60, .30);
+  backdrop-filter: none;
+  filter: none;
+}
+.claim-floating-tile span,
+.claim-floating-tile img { width: 56px; height: 56px; border-radius: 0; }
+
+.claim-floating-tile-a, .product-a {
+  right: -16px; top: 40px; left: auto; bottom: auto;
+  transform: rotate(9deg);
+  animation: claimFloat 7s ease-in-out .3s infinite;
+}
+.claim-floating-tile-b, .product-b {
+  left: -20px; bottom: 96px; right: auto; top: auto;
+  transform: rotate(-11deg);
+  animation: claimFloat 7.6s ease-in-out .55s infinite;
+}
+.claim-floating-tile-c,
+.product-c, .product-d, .product-e, .product-f, .product-g,
+.product-h, .product-i, .product-j, .product-k, .product-l, .product-m,
+.claim-center-icon, .claim-art-logo, .claim-page-logo { display: none !important; }
+
+/* card frame: max-w-md · rounded-[2rem] · p-[1.5px] */
+.claim-card-frame {
+  width: 100%;
+  max-width: var(--nv-card);
+  padding: 1.5px;
+  border-radius: 32px;
+  box-shadow:
+    0 1px 1px rgba(20, 30, 60, .04),
+    0 12px 28px -10px rgba(20, 30, 60, .16),
+    0 44px 80px -28px rgba(20, 30, 60, .34);
+}
+.claim-card-premium { padding: 28px; border-radius: 30.5px; }   /* p-7 */
+@media (min-width: 640px) { .claim-card-premium { padding: 32px; } }  /* sm:p-8 */
+
+.claim-card-heading { margin-bottom: 28px; }                     /* mb-7 */
+.claim-card-heading h1 {
+  font-size: 1.9rem;                                             /* 30.4px */
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -.025em;                                       /* tracking-tight */
+}
+@media (min-width: 640px) { .claim-card-heading h1 { font-size: 2.45rem; } }
+.claim-card-heading p {
+  max-width: var(--nv-copy);
+  margin: 10px auto 0;                                           /* mt-2.5 */
+  font-size: 14px;
+  line-height: 1.625;                                            /* leading-relaxed */
+}
+
+.claim-form { gap: 16px; }                                       /* space-y-4 */
+.claim-form-group { gap: 6px; }                                  /* space-y-1.5 */
+.claim-form-group label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .05em;                                         /* tracking-wider */
+}
+.claim-field { border-radius: 16px; }                            /* rounded-2xl */
+.claim-field-icon { left: 16px; width: 18px; height: 18px; }
+.claim-field input {
+  min-height: 52px;                                              /* 14 + 24 + 14 */
+  padding: 14px 16px 14px 44px;                                  /* py-3.5 pr-4 pl-11 */
+  border-radius: 16px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.claim-submit {
+  min-height: 52px;                                              /* 16 + 20 + 16 */
+  margin-top: 4px;
+  border-radius: 16px;
+}
+.claim-submit-content {
+  gap: 8px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  letter-spacing: .025em;                                        /* tracking-wide */
+}
+.claim-submit-content svg { width: 16px; height: 16px; }
+.claim-card-hint { margin-top: 16px; font-size: 11px; }
+
+/* theme toggle: h-8 w-[58px], thumb h-6 w-6, travel 26px */
+.claim-theme-position { top: 16px; right: 16px; }
+.theme-toggle { width: 58px; height: 32px; padding: 0 4px; }
+.theme-toggle > svg { width: 14px; height: 14px; }
+.theme-toggle-thumb { width: 24px; height: 24px; left: 3px; top: 3px; }
+html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
+
+
+/* ===========================================================================
+   2. ORDER PAGE SHELL + HEADER                               (reference file 2)
+   =========================================================================== */
+
+/* header: sticky · px-4 py-3 · sm:px-5 · inner max-w-5xl */
+.nova-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: 12px 16px;
+  backdrop-filter: blur(24px);
+}
+@media (min-width: 640px) { .nova-header { padding: 12px 20px; } }
+.nova-header-inner {
+  width: 100%;
+  max-width: var(--nv-shell);
+  min-height: 0;
+  margin: 0 auto;
+  gap: 8px;
+}
+@media (min-width: 640px) { .nova-header-inner { gap: 12px; } }
+.nova-header-actions { gap: 8px; }
+.nova-header-actions > a { min-height: 32px; padding: 0 10px; font-size: 12px; }
+
+/* main: max-w-5xl · px-3 py-3 · sm:px-4 sm:py-4 */
+.page-wrap {
+  width: 100%;
+  max-width: var(--nv-shell);
+  margin: 0 auto;
+  padding: 12px;
+}
+@media (min-width: 640px) { .page-wrap { padding: 16px; } }
+.narrow { width: 100%; max-width: var(--nv-card); margin: 0 auto; padding: 12px; }
+
+.order-layout { width: 100%; max-width: none; margin: 0; gap: 12px; }
+
+.delivery-shell {
+  border-radius: 16px;                                           /* rounded-2xl */
+  box-shadow:
+    0 1px 2px rgba(20, 30, 60, .04),
+    0 18px 44px -26px rgba(20, 30, 60, .40);
+}
+.delivery-shell::before { display: none; }   /* no top hairline in reference */
+
+
+/* ===========================================================================
+   3. PROGRESS STEPS
+   =========================================================================== */
+
+.progress { padding: 12px; }
+@media (min-width: 640px) { .progress { padding: 16px; } }
+
+.progress-step { gap: 6px; font-size: 9px; letter-spacing: .025em; line-height: 1.15; }
+@media (min-width: 640px) { .progress-step { font-size: 10px; } }
+
+.progress-icon {
+  width: 28px;
+  height: 28px;
+  box-shadow: 0 0 0 4px var(--c-bg-soft);   /* keeps the connector line broken */
+}
+.progress-icon svg { width: 14px; height: 14px; }
+.progress-step::after { top: 13px; height: 2px; }
+.progress-step.current .progress-icon {
+  box-shadow: 0 0 0 4px var(--c-bg-soft), 0 0 0 5px rgba(var(--nova-rgb), .35);
+}
+
+
+/* ===========================================================================
+   4. ORDER SUMMARY ROW
+   =========================================================================== */
+
+.order-summary-row {
+  min-height: 0;
+  padding: 14px 16px;                                            /* px-4 py-3.5 */
+  gap: 14px;                                                     /* gap-3.5 */
+}
+.order-thumbnails { width: auto; height: 48px; }
+.order-thumbnails img,
+.order-thumbnails .item-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;                                           /* rounded-xl */
+  border: 2px solid var(--c-bg-soft);                            /* ring-2 ring-card */
+  box-shadow: none;
+}
+.order-thumbnails img + img,
+.order-thumbnails .item-placeholder + .item-placeholder,
+.order-thumbnails img + .item-placeholder,
+.order-thumbnails .item-placeholder + img { margin-left: -10px; }  /* -space-x-2.5 */
+
+.order-summary-title { font-size: 18px; line-height: 28px; font-weight: 700; letter-spacing: 0; }
+.order-summary-meta { gap: 6px; margin-top: 2px; font-size: 12px; }
+.order-summary-meta span + span::before { left: -4px; width: 3px; height: 3px; }
+
+.status-pill {
+  padding: 2px 10px;                                             /* px-2.5 py-0.5 */
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.summary-chevron { width: 18px; height: 18px; }
+
+
+/* ===========================================================================
+   5. CHAT LOG + MESSAGES
+   =========================================================================== */
+
+.chat-card { min-height: 0; }
+.chat-log {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  padding: 16px;                                                 /* px-4 py-4 */
+  gap: 16px;                                                     /* mt-4 group spacing */
+}
+
+/* consecutive bubbles from the same sender sit 2px apart in the reference.
+   Add class="message-row stacked" to the 2nd..nth bubble of a run. */
+.message-row + .message-row.stacked { margin-top: -14px; }
+
+.message-row { max-width: 75%; align-items: flex-start; gap: 8px; }
+.message-row.system { max-width: 85%; }
+
+.message-meta { margin: 0 4px 4px; font-size: 11px; font-weight: 600; }
+.message-meta span { margin-left: 6px; font-size: 10px; }
+
+.message-bubble {
+  padding: 8px 14px;                                             /* px-3.5 py-2 */
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.625;
+  box-shadow: none;
+}
+.customer .message-bubble { border-radius: 18px; box-shadow: none; }
+/* tail corner only on the LAST bubble of a run */
+.message-row:not(:has(+ .message-row.stacked)) .message-bubble { border-bottom-left-radius: 4px; }
+.message-row.customer:not(:has(+ .message-row.stacked)) .message-bubble {
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 4px;
+}
+
+/* per-message avatar slot (32px, offset 20px to clear the name line) */
+.message-avatar,
+.message-avatar-spacer { width: 32px; height: 32px; flex: none; margin-top: 20px; align-self: flex-start; }
+.message-avatar { border-radius: 50%; object-fit: cover; }
+.message-avatar-spacer { height: 0; }
+
+.system-pill {
+  max-width: 85%;
+  padding: 10px 16px;                                            /* px-4 py-2.5 */
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.625;
+}
+.system-pill-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  box-shadow: 0 2px 10px -4px rgba(16, 185, 129, .45);
+}
+.system-pill-success svg { width: 16px; height: 16px; flex: none; }
+
+.message-image {
+  margin-top: 6px;                                               /* gap-1.5 */
+  width: auto;
+  max-width: 280px;
+  max-height: 200px;
+  border-radius: 16px;
+  object-fit: cover;
+}
+@media (min-width: 768px) { .message-image { max-width: 364px; max-height: 260px; } }
+
+
+/* ===========================================================================
+   6. COMPOSER
+   =========================================================================== */
+
+.chat-compose {
+  padding: 12px 16px;                                            /* px-4 py-3 */
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  border-top: 0;
+  background: var(--c-bg-soft);
+  backdrop-filter: none;
+}
+.compose-row {
+  min-height: 0;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  align-items: end;
+  gap: 8px;
+  padding: 6px 8px;                                              /* px-2 py-1.5 */
+  border-width: 3px;
+  border-radius: 24px;
+  box-shadow: none;
+}
+.compose-input {
+  min-height: 40px;
+  max-height: 120px;
+  padding: 6px 0;
+  font-size: 16px;
+}
+.file-btn, .send-btn { width: 36px; height: 36px; }              /* p-2 + 20px icon */
+.send-btn { margin-bottom: 2px; }                                /* mb-0.5 */
+.send-btn svg, .file-btn svg { width: 20px; height: 20px; }
+
+
+/* ===========================================================================
+   7. OPTIONAL — full-viewport order page
+   The reference uses h-[100dvh] so the chat scrolls internally and the
+   composer is pinned. Delete this block if you want the whole page to scroll.
+   =========================================================================== */
+
+.app-shell:has(.delivery-shell) {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.app-shell:has(.delivery-shell) .page-wrap {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+.app-shell:has(.delivery-shell) .order-layout,
+.app-shell:has(.delivery-shell) .delivery-shell {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+.app-shell:has(.delivery-shell) .progress,
+.app-shell:has(.delivery-shell) .order-summary,
+.app-shell:has(.delivery-shell) .delivery-banner { flex: none; }
+.app-shell:has(.delivery-shell) .chat-card {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .claim-mascot, .claim-floating-tile, .claim-product { animation: none !important; }
+}
