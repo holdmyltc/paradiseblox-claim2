@@ -9,7 +9,6 @@ const products = [
   ["giraffe.webp", "product-f"],
   ["cat.webp", "product-g"],
   ["red-elephant.webp", "product-h"],
-  ["number-nine.webp", "product-i"],
 ] as const;
 
 export default function HomePage() {
