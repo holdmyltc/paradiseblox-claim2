@@ -11,7 +11,10 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Claim Your ParadiseBlox Order",
   description: "Verify your order, connect your Roblox account and chat with ParadiseBlox during delivery.",
-  icons: { icon: "/pb-avatar.png" },
+  icons: {
+    icon: "/pb-icon-192.png",
+    apple: "/pb-apple-touch-icon.png",
+  },
   manifest: "/manifest.webmanifest",
 };
 
@@ -21,7 +24,10 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#0b0b0f",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f8fc" },
+    { media: "(prefers-color-scheme: dark)", color: "#090a0f" },
+  ],
 };
 
 const themeScript = `
