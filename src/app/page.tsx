@@ -38,10 +38,10 @@ export default function HomePage() {
           <div className="claim-art-glow claim-art-glow-orange" />
           <div className="claim-product-cloud">
             <img
-              className="claim-mascot"
-              src="/paradiseblox-mascot.png"
-              alt=""
-            />
+  className="claim-mascot"
+  src="/paradiseblox-mascot.png"
+  alt=""
+/>
             {products.map(([src, className]) => (
               <img
                 key={src}
