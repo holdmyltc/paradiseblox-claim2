@@ -53,9 +53,27 @@ export function ChatPanel({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const bottom = useRef<HTMLDivElement>(null);
+  const logRef = useRef<HTMLDivElement>(null);
+  const pinned = useRef(true);          // is the reader at the bottom?
+  const jumped = useRef(false);         // has the first jump-to-bottom happened?
   const demo = orderId === "demo-order";
 
-  useEffect(() => { bottom.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  // treat "within 120px of the bottom" as still following the conversation
+  function handleScroll() {
+    const el = logRef.current;
+    if (!el) return;
+    pinned.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+  }
+
+  useEffect(() => {
+    if (!jumped.current) {
+      // first paint: land at the bottom instantly, no animation
+      bottom.current?.scrollIntoView();
+      jumped.current = true;
+      return;
+    }
+    if (pinned.current) bottom.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useEffect(() => {
     if (demo) return;
@@ -66,7 +84,15 @@ export function ChatPanel({
           headers: adminToken ? { Authorization: `Bearer ${adminToken}` } : undefined,
           cache: "no-store",
         });
-        if (r.ok && live) { const d = await r.json(); setMessages(d.messages); }
+        if (!r.ok || !live) return;
+        const d = await r.json();
+        // only swap state when something actually changed, otherwise every poll
+        // hands React a new array and re-triggers the scroll effect
+        setMessages((prev) => {
+          const next: ChatMessage[] = d.messages ?? [];
+          if (prev.length === next.length && prev[prev.length - 1]?.id === next[next.length - 1]?.id) return prev;
+          return next;
+        });
       } catch {}
     };
     poll();
@@ -76,6 +102,7 @@ export function ChatPanel({
 
   async function send() {
     if ((!text.trim() && !file) || sending || locked) return;
+    pinned.current = true;   // sending always scrolls you back down
     setSending(true);
     setError("");
     if (demo) {
@@ -125,7 +152,7 @@ export function ChatPanel({
       </div>
     </header>}
 
-    <div className="chat-log">
+    <div className="chat-log" ref={logRef} onScroll={handleScroll}>
       {mode === "customer" && <div className="chat-guidance" aria-label="Order safety information">
         <div className="system-pill system-pill-info">Keep everything in this chat. Never share your Roblox password.</div>
         <div className="system-pill system-pill-info">Confirm your order only after every item has arrived in-game.</div>
