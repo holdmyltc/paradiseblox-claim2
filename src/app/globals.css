@@ -864,7 +864,7 @@ html[data-theme="dark"] .claim-floating-tile { background:rgba(28,32,48,.92); bo
 }
 html[data-theme="dark"] .claim-card-frame { background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.035)); }
 .claim-card-premium { overflow:hidden; padding:30px; border-radius:30.5px; background:var(--c-bg-soft); transition:background .3s ease; }
-.claim-card-logo { display:none; width:240px; max-width:76%; height:auto; margin:0 auto 22px; filter:drop-shadow(0 10px 13px rgba(20,30,60,.12)); }
+.claim-card-logo { display:none; width:270px; max-width:82%; height:auto; margin:0 auto 22px; object-fit:contain; filter:drop-shadow(0 10px 13px rgba(20,30,60,.12)); }
 .claim-card-heading { margin-bottom:26px; text-align:center; }
 .claim-card-heading h1 { margin:0; color:var(--c-fg); font-size:39px; font-weight:800; line-height:1.05; letter-spacing:-1.6px; }
 .claim-card-heading p { max-width:320px; margin:10px auto 0; color:var(--c-fg-2); font-size:14px; line-height:1.6; }
@@ -899,7 +899,7 @@ html[data-theme="dark"] .claim-card-frame { background:linear-gradient(180deg,rg
 .nova-header { position:relative; z-index:20; border-bottom:1px solid var(--c-line); background:color-mix(in srgb,var(--c-bg-soft) 82%,transparent); backdrop-filter:blur(18px); }
 .nova-header-inner { width:min(1080px,calc(100% - 30px)); min-height:82px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:20px; }
 .nova-brand { display:flex; align-items:center; text-decoration:none; }
-.nova-brand img { width:min(260px,36vw); height:auto; filter:drop-shadow(0 7px 9px rgba(20,30,60,.10)); }
+.nova-brand img { display:block; width:clamp(220px,22vw,310px); height:auto; max-height:56px; object-fit:contain; filter:drop-shadow(0 7px 9px rgba(20,30,60,.10)); }
 .nova-header-actions { display:flex; align-items:center; gap:8px; }
 .nova-header-actions > a { min-height:38px; padding:9px 13px; border-radius:999px; color:var(--c-fg-2); text-decoration:none; font-size:12px; font-weight:750; transition:color .2s ease,background .2s ease; }
 .nova-header-actions > a:hover { color:var(--c-fg); background:var(--c-surface); }
@@ -962,7 +962,7 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
   .claim-home-stage { min-height:100dvh; padding:68px 14px 24px; align-items:center; }
   .claim-card-frame { max-width:430px; border-radius:29px; }
   .claim-card-premium { padding:25px 20px 23px; border-radius:27.5px; }
-  .claim-card-logo { width:225px; margin-bottom:19px; }
+  .claim-card-logo { width:min(255px,76vw); margin-bottom:20px; }
   .claim-card-heading { margin-bottom:23px; }
   .claim-card-heading h1 { font-size:31px; letter-spacing:-1.1px; }
   .claim-card-heading p { margin-top:8px; font-size:13px; }
@@ -971,7 +971,7 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
   .claim-submit { min-height:55px; }
   .claim-card-links { flex-direction:column; align-items:center; gap:8px; }
   .nova-header-inner { width:calc(100% - 20px); min-height:68px; }
-  .nova-brand img { width:min(185px,48vw); }
+  .nova-brand img { width:min(210px,54vw); max-height:42px; }
   .nova-header-actions { gap:3px; }
   .nova-header-actions > a { padding:8px 9px; font-size:10.5px; }
   .nova-header-actions > a:first-child { display:none; }
@@ -983,7 +983,7 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
   .claim-home-stage { padding-left:9px; padding-right:9px; }
   .claim-card-premium { padding-left:17px; padding-right:17px; }
   .claim-card-heading h1 { font-size:28px; }
-  .claim-card-logo { width:205px; }
+  .claim-card-logo { width:min(225px,74vw); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1039,8 +1039,6 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
 .product-m { right: 23%; top: 42%; width: 58px; height: 58px; animation-delay:.25s; }
 
 .claim-card-links { display: none !important; }
-.claim-card-logo { content: url('/brand/paradiseblox-wordmark.png'); }
-.nova-brand img { content: url('/brand/paradiseblox-wordmark.png'); }
 
 .chat-compose {
   width: 100%;
@@ -1070,11 +1068,45 @@ html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface)
 .file-btn, .send-btn { flex: none; }
 
 @media (max-width: 959px) {
-  .claim-card-logo { width: min(300px, 82vw); }
+  .claim-card-logo { width:min(275px,80vw); }
 }
 @media (max-width: 620px) {
-  .claim-card-logo { width: min(270px, 78vw); margin-bottom: 20px; }
+  .claim-card-logo { width:min(250px,76vw); margin-bottom:20px; }
   .chat-compose { padding-left: 7px; padding-right: 7px; }
   .compose-row { grid-template-columns: 42px minmax(0,1fr) 44px; gap: 5px; padding: 5px; }
   .compose-input { padding-left: 7px; padding-right: 5px; }
+}
+
+
+/* Claim 2 v7 logo fixes */
+.claim-art-logo,
+.claim-card-logo,
+.nova-brand img {
+  object-fit: contain;
+}
+
+.claim-card-logo,
+.nova-brand img {
+  aspect-ratio: 1277 / 241;
+}
+
+@media (max-width: 959px) {
+  .claim-card-logo {
+    display: block;
+    width: min(270px, 78vw);
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto 22px;
+  }
+}
+
+@media (max-width: 620px) {
+  .claim-card-premium {
+    padding-top: 24px;
+  }
+
+  .claim-card-logo {
+    width: min(245px, 72vw);
+    margin-bottom: 18px;
+  }
 }
