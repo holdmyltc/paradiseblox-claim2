@@ -1,0 +1,6 @@
+import { NextResponse } from "next/server";
+import { getProofs } from "@/lib/messages";
+import { requireAdmin, supabaseAdmin } from "@/lib/supabase/server";
+import { uploadPrivateFile } from "@/lib/storage";
+export async function GET(request:Request,{params}:{params:Promise<{orderId:string}>}){if(!await requireAdmin(request))return NextResponse.json({error:"Unauthorized"},{status:403});const{orderId}=await params;return NextResponse.json({proofs:await getProofs(orderId)});}
+export async function POST(request:Request,{params}:{params:Promise<{orderId:string}>}){try{const admin=await requireAdmin(request);if(!admin)return NextResponse.json({error:"Unauthorized"},{status:403});const{orderId}=await params;const form=await request.formData();const file=form.get("file");if(!(file instanceof File)||!file.size)return NextResponse.json({error:"Choose a proof file"},{status:400});const uploaded=await uploadPrivateFile("delivery-proofs",orderId,file);await supabaseAdmin().from("delivery_proofs").insert({order_id:orderId,uploaded_by:admin.user.id,note:String(form.get("note")||"").trim()||null,file_path:uploaded.path,file_name:uploaded.name,mime_type:uploaded.mime});return NextResponse.json({proofs:await getProofs(orderId)});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Upload failed"},{status:400})}}
