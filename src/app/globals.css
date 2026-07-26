@@ -1893,3 +1893,9 @@ html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
 
 /* brand avatar keeps its squircle; customer avatars stay round */
 .message-row.admin .message-avatar { border-radius: 9px; }
+/* JS controls smoothness per-call; CSS smooth overrides behavior:"auto" */
+.chat-log { scroll-behavior: auto; }
+
+/* .message-row.system already caps at 85%; don't compound it on the pill */
+.message-row.system .system-pill { max-width: 100%; }
+
