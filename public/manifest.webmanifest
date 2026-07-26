@@ -1,11 +1,13 @@
 {
-  "name": "ParadiseBlox Claim 2",
+  "name": "ParadiseBlox Claim",
   "short_name": "PB Claim",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b0b0f",
-  "theme_color": "#0b0b0f",
+  "background_color": "#090a0f",
+  "theme_color": "#090a0f",
   "icons": [
-    { "src": "/mark.svg", "sizes": "any", "type": "image/svg+xml" }
+    { "src": "/pb-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pb-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/pb-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
