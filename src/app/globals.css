@@ -1873,3 +1873,20 @@ html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
     transform: none;
   }
 }
+/* system rows are never part of a run — exclude them from run-stacking */
+.message-row:not(.is-first):not(.system) { margin-top: -14px; }
+.message-row.system { margin-top: 0; }
+
+/* avatar fallback when there's no image */
+.message-avatar-fallback {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--nova), var(--nova-deep));
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* attachments sit outside the bubble */
+.message-attachments { margin-top: 6px; }
+.message-row.is-first .message-attachments:first-child { margin-top: 0; }
