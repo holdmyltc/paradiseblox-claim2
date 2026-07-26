@@ -11,7 +11,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Claim Your ParadiseBlox Order",
   description: "Verify your order, connect your Roblox account and chat with ParadiseBlox during delivery.",
-  icons: { icon: "/mark.svg" },
+  icons: { icon: "/pb-avatar.png" },
   manifest: "/manifest.webmanifest",
 };
 
