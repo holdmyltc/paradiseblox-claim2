@@ -28,20 +28,6 @@ function ItemDescription({ item }: { item: PublicOrderItem }) {
   </div>;
 }
 
-function SummaryRoblox({ order }: { order: PublicOrder }) {
-  if (!order.roblox) return null;
-  return <div className="summary-roblox" aria-label="Verified Roblox account">
-    {order.roblox.avatarUrl
-      ? <img className="summary-roblox-avatar" src={order.roblox.avatarUrl} alt="Roblox avatar"/>
-      : <div className="summary-roblox-avatar summary-avatar-fallback">{order.roblox.displayName.slice(0,1).toUpperCase()}</div>}
-    <div className="summary-roblox-copy">
-      <strong>{order.roblox.displayName}</strong>
-      <span>@{order.roblox.username}</span>
-      <span>User ID {order.roblox.userId}</span>
-    </div>
-  </div>;
-}
-
 export function OrderOverview({ order, proofs = [] }: { order: PublicOrder; proofs?: DeliveryProof[] }) {
   const groups = groupedItems(order);
   const status = statusContent(order);
@@ -64,22 +50,21 @@ export function OrderOverview({ order, proofs = [] }: { order: PublicOrder; proo
       </div>
     </section>
 
-    <details className="order-summary" open>
+    {/* NOT `open` — the reference ships this collapsed. An expanded summary on a
+        390px phone eats ~350px, which is what starved the chat of height. */}
+    <details className="order-summary">
       <summary className="order-summary-row">
         <div className="order-thumbnails" aria-hidden="true">
-          {order.items.slice(0,3).map((item) => item.imageUrl ? <img key={item.id} src={item.imageUrl} alt=""/> : <span key={item.id} className="item-placeholder"/>)}
+          {order.items.slice(0,2).map((item) => item.imageUrl ? <img key={item.id} src={item.imageUrl} alt=""/> : <span key={item.id} className="item-placeholder"/>)}
         </div>
         <div className="order-summary-copy">
-          <div className="order-title-line">
-            <div className="order-heading-block">
-              <div className="order-summary-title">Order {order.orderNumber}</div>
-              <div className="order-summary-meta" aria-label={`${itemCount} items, ${price}, ${date}`}>
-                <span>{itemCount} item{itemCount === 1 ? "" : "s"}</span>
-                <span>{price}</span>
-                <span>{date}</span>
-              </div>
+          <div className="order-heading-block">
+            <div className="order-summary-title">Order {order.orderNumber}</div>
+            <div className="order-summary-meta" aria-label={`${itemCount} items, ${price}, ${date}`}>
+              <span>{itemCount} item{itemCount === 1 ? "" : "s"}</span>
+              <span>{price}</span>
+              <span>{date}</span>
             </div>
-            <SummaryRoblox order={order}/>
           </div>
         </div>
         <span className={`status-pill ${order.status === "in_progress" ? "status-progress" : `status-${order.status}`}`}>{statusLabel(order.status)}</span>
