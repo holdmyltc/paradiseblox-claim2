@@ -30,7 +30,7 @@ export default function HomePage() {
           <div className="claim-art-glow claim-art-glow-orange" />
           <img className="claim-art-logo" src="/paradiseblox-wordmark.png" alt="" />
           <div className="claim-product-cloud">
-            <img className="claim-center-icon" src="/brand/paradiseblox-icon.png" alt="" />
+            <img className="claim-center-icon" src="/paradiseblox-icon.png" alt="" />
             {products.map(([src, className]) => (
               <img key={src} className={`claim-product ${className}`} src={`/products/${src}`} alt="" />
             ))}
