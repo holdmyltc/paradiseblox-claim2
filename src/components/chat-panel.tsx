@@ -2,10 +2,16 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChatMessage, StoreStatus } from "@/lib/types";
 
+// Keyword matching against server-generated strings is brittle: change the
+// wording server-side and a pill silently changes colour. "preparing" and
+// "delivered" are here because the newer copy drops the word "delivering".
+const TONE_SUCCESS = ["verified", "ready", "preparing", "delivering", "delivered", "received", "complete"];
+const TONE_WARNING = ["not yet", "offline", "cancel", "refund"];
+
 function systemTone(body: string) {
   const text = body.toLowerCase();
-  if (text.includes("verified") || text.includes("ready") || text.includes("delivering") || text.includes("received")) return "success";
-  if (text.includes("not yet") || text.includes("offline")) return "warning";
+  if (TONE_WARNING.some((word) => text.includes(word))) return "warning";
+  if (TONE_SUCCESS.some((word) => text.includes(word))) return "success";
   return "info";
 }
 
@@ -147,7 +153,7 @@ export function ChatPanel({
   return <section className={mode === "customer" ? "chat-card customer-chat" : "card chat-card admin-chat-card"}>
     {mode === "admin" && <header className="chat-header">
       <div className="chat-identity">
-        <div className="chat-avatar">PB</div>
+        <img className="chat-avatar" src={adminAvatarUrl || "/pb-avatar.png"} alt="" />
         <div>
           <div className="chat-title">ParadiseBlox Delivery Team</div>
           <div className="chat-sub">
