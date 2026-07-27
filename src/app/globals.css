@@ -2247,3 +2247,71 @@ html[data-theme="light"] .admin-auth-card { background: linear-gradient(180deg, 
   .nova-chip { padding: 3px; }
   .nova-chip-copy { display: none; }
 }
+/* ============================================================================
+   CANCELLED / REFUNDED ORDER STATES
+   Append to the END of globals.css.
+   ============================================================================ */
+
+/* --- status pill (order summary row, admin list, history list) ------------ */
+.status-cancelled { color: #b42318; background: #fee4e2; }
+.status-refunded  { color: #854708; background: #fef0c7; }
+html[data-theme="dark"] .status-cancelled { color: #fda29b; background: rgba(180, 35, 24, .18); }
+html[data-theme="dark"] .status-refunded  { color: #fec84b; background: rgba(133, 71, 8, .22); }
+
+/* --- terminal progress bar (replaces the 4 steps) ------------------------- */
+.progress-terminal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 12px;
+}
+.progress-terminal-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 50%;
+  color: #b42318;
+  background: #fee4e2;
+}
+.progress-terminal-icon svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.progress-terminal-label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--c-fg-2);
+}
+html[data-theme="dark"] .progress-terminal-icon { color: #fda29b; background: rgba(180, 35, 24, .18); }
+
+/* --- banner tone ---------------------------------------------------------- */
+.delivery-banner-cancelled { border-color: #fda29b; background: linear-gradient(105deg, #fef3f2, #fffbfa); }
+.delivery-banner-cancelled .delivery-check { color: #b42318; background: rgba(180, 35, 24, .10); }
+.delivery-banner-cancelled .delivery-banner-copy strong { color: #b42318; }
+html[data-theme="dark"] .delivery-banner-cancelled { border-color: rgba(180,35,24,.4); background: rgba(180, 35, 24, .10); }
+html[data-theme="dark"] .delivery-banner-cancelled .delivery-banner-copy strong { color: #fda29b; }
+
+/* --- admin: destructive controls sit apart from the happy path ------------ */
+.control-stack .btn-danger { margin-top: 4px; }
+.control-divider {
+  margin: 12px 0 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--c-line);
+  color: var(--c-fg-3);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+/* --- admin chat header avatar is now an <img>, not a text div ------------- */
+img.chat-avatar { object-fit: cover; border-radius: 10px; background: rgba(255,255,255,.12); }
