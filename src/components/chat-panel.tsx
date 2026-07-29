@@ -155,7 +155,7 @@ export function ChatPanel({
       <div className="chat-identity">
         <img className="chat-avatar" src={adminAvatarUrl || "/pb-avatar.png"} alt="" />
         <div>
-          <div className="chat-title">ParadiseBlox Delivery Team</div>
+          <div className="chat-title">ParadiseBlox </div>
           <div className="chat-sub">
             <span className={`online-dot ${storeStatus === "busy" ? "busy-dot" : storeStatus === "offline" ? "offline-dot" : ""}`} />
             {statusText}
@@ -171,7 +171,7 @@ export function ChatPanel({
       </div>}
 
       {messages.length === 0 && <div className="empty-state">
-        Send a message when you are ready. ParadiseBlox can read it while the store is offline.
+        Send a message when you are ready. ParadiseBlox will be with you shortly.
       </div>}
 
       {messages.map((m, i) => {
