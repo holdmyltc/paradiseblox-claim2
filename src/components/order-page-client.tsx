@@ -94,7 +94,7 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
     </section>
 
     {(order.status === "delivered" || order.status === "completed") && <section className="card review-panel">
-      <div><div className="trustpilot-label">Trustpilot</div><h2>How was your experience?</h2><p>Leave us an honest review and get a 10% off discount code!</p></div>
+      <div><div className="trustpilot-label">Trustpilot</div><h2>How was your experience with ParadiseBlox?</h2><p>Leave us an honest review and get a 10% off discount code!</p></div>
       <a className="btn trustpilot-btn" href={order.trustpilotUrl} target="_blank" rel="noreferrer">Leave a review</a>
     </section>}
   </div>;
