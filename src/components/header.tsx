@@ -7,6 +7,10 @@ import type { RobloxProfile } from "@/lib/types";
  * `account` renders the verified-Roblox chip in the header, the way the
  * reference does. It used to live inside the order summary row, where on a
  * 390px screen it squeezed the order number onto two lines.
+ *
+ * The history link carries two labels: the full one on desktop, a short one on
+ * phones. Truncating with an ellipsis produced "Order hist..." which read as a
+ * bug rather than a design choice.
  */
 export function Header({ compact = false, account }: { compact?: boolean; account?: RobloxProfile | null }) {
   return (
@@ -30,9 +34,12 @@ export function Header({ compact = false, account }: { compact?: boolean; accoun
           )}
 
           {!compact && (
-            <a href={SUPPORT_URL} target="_blank" rel="noreferrer">Support</a>
+            <a className="nova-support-link" href={SUPPORT_URL} target="_blank" rel="noreferrer">Support</a>
           )}
-          <Link href="/history">Order history</Link>
+          <Link href="/history">
+            <span className="nav-full">Order history</span>
+            <span className="nav-short">History</span>
+          </Link>
           <ThemeToggle />
         </nav>
       </div>
