@@ -2539,3 +2539,110 @@ img.chat-avatar { object-fit: cover; border-radius: 10px; background: rgba(255,2
 /* the tray lives inside the admin control stack too — keep it from stretching */
 .control-stack .attachment-tray { margin-top: 6px; }
 .control-stack .attachment-chip { max-width: 100%; }
+/* ============================================================================
+   CONTRAST FIX + LIGHT DEFAULT SUPPORT
+   Append to the END of globals.css (after mobile-polish.css).
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   1. THE ROOT CAUSE OF "TEXT DISAPPEARS IN DARK MODE"
+
+   The original stylesheet defines --ink, --muted, --line, --surface once in
+   :root and never redefines them for dark mode. So `color: var(--ink)`
+   (#14172a, near-black) renders on a near-black background — invisible.
+   27 declarations across the file depend on these.
+
+   Remapping them onto the theme-aware tokens fixes every one at once.
+   --------------------------------------------------------------------------- */
+html[data-theme="dark"] {
+  --ink: #f6f7fb;          /* was #14172a */
+  --muted: #aeb6c8;        /* was #65708a */
+  --line: rgba(255,255,255,.09);
+  --surface: #11131b;      /* was #ffffff */
+  --blue: #5a72ff;
+  --blue-dark: #7657f5;
+  --blue-soft: rgba(90,114,255,.14);
+}
+
+/* ---------------------------------------------------------------------------
+   2. SYSTEM PILLS AND BANNERS — hardcoded light palettes
+   Readable, but a white slab in a dark chat looks broken. These give them
+   dark-mode equivalents that keep the same colour meaning.
+   --------------------------------------------------------------------------- */
+html[data-theme="dark"] .system-pill-info {
+  color: #b8ccff;
+  background: rgba(37, 99, 235, .16);
+}
+html[data-theme="dark"] .system-pill-success {
+  color: #7cebc4;
+  background: rgba(6, 185, 133, .14);
+  border-color: rgba(6, 185, 133, .3);
+  box-shadow: none;
+}
+html[data-theme="dark"] .system-pill-success svg { color: #34d399; }
+html[data-theme="dark"] .system-pill-warning {
+  color: #fbd57e;
+  background: rgba(229, 164, 0, .15);
+  border-color: rgba(229, 164, 0, .3);
+}
+
+html[data-theme="dark"] .delivery-banner {
+  border-color: rgba(6, 185, 133, .28);
+  background: rgba(6, 185, 133, .10);
+}
+html[data-theme="dark"] .delivery-banner-copy strong { color: #7cebc4; }
+html[data-theme="dark"] .delivery-banner-copy > span { color: var(--c-fg-2); }
+html[data-theme="dark"] .delivery-check { color: #34d399; background: rgba(6, 185, 133, .16); }
+html[data-theme="dark"] .delivery-banner::after { background: rgba(255,255,255,.03); }
+html[data-theme="dark"] .mini-badge {
+  color: var(--c-fg-2);
+  background: rgba(255,255,255,.05);
+  border-color: var(--c-line);
+}
+html[data-theme="dark"] .delivery-banner-delivered { border-color: rgba(37,99,235,.3); background: rgba(37,99,235,.10); }
+html[data-theme="dark"] .delivery-banner-delivered .delivery-banner-copy strong { color: #b8ccff; }
+html[data-theme="dark"] .delivery-banner-ready { border-color: rgba(255,109,0,.3); background: rgba(255,109,0,.09); }
+html[data-theme="dark"] .delivery-banner-ready .delivery-banner-copy strong { color: #ffb37a; }
+
+/* status pills */
+html[data-theme="dark"] .status-paid,
+html[data-theme="dark"] .status-progress { color: #b8ccff; background: rgba(37,99,235,.18); }
+html[data-theme="dark"] .status-delivered { color: #dcc0ff; background: rgba(147,51,234,.18); }
+html[data-theme="dark"] .status-completed { color: #7cebc4; background: rgba(6,185,133,.16); }
+
+/* boxes */
+html[data-theme="dark"] .notice-box { color: #b8ccff; background: rgba(37,99,235,.12); border-color: rgba(37,99,235,.28); }
+html[data-theme="dark"] .success-box { color: #7cebc4; background: rgba(6,185,133,.12); border-color: rgba(6,185,133,.28); }
+html[data-theme="dark"] .error-box   { color: #ffa8a8; background: rgba(223,59,71,.12); border-color: rgba(223,59,71,.30); }
+html[data-theme="dark"] .attachment-notice { color: var(--c-fg-2); background: var(--c-surface); }
+html[data-theme="dark"] .read-only { color: var(--c-fg-2); background: var(--c-surface); }
+html[data-theme="dark"] .empty-state { color: var(--c-fg-2); }
+html[data-theme="dark"] .btn-soft { color: var(--c-fg); background: var(--c-surface-2); border-color: var(--c-line); }
+
+/* review panel was a light gradient in both themes */
+html[data-theme="dark"] .review-panel { background: var(--c-bg-soft); border-color: rgba(6,185,133,.25); }
+html[data-theme="dark"] .review-panel h2 { color: var(--c-fg); }
+html[data-theme="dark"] .review-panel p { color: var(--c-fg-2); }
+
+/* low-contrast greys that were tuned for a white page */
+html[data-theme="dark"] .detail-kicker,
+html[data-theme="dark"] .order-summary-meta,
+html[data-theme="dark"] .item-qty,
+html[data-theme="dark"] .small { color: var(--c-fg-2); }
+
+/* ---------------------------------------------------------------------------
+   3. EXPANDED SUMMARY WAS PUSHING THE COMPOSER OFF-SCREEN
+   On an active order the shell is a fixed 100dvh with overflow:hidden. Opening
+   the item list added height that got clipped rather than scrolled, taking the
+   composer with it. Give the detail panel its own scroll instead.
+   --------------------------------------------------------------------------- */
+.app-shell:has(.delivery-shell):not(:has(.review-panel)) .order-summary[open] .order-details-grid {
+  max-height: 30vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (max-width: 639px) {
+  .app-shell:has(.delivery-shell):not(:has(.review-panel)) .order-summary[open] .order-details-grid {
+    max-height: 26vh;
+  }
+}
