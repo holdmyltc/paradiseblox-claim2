@@ -2315,75 +2315,115 @@ html[data-theme="dark"] .delivery-banner-cancelled .delivery-banner-copy strong 
 
 /* --- admin chat header avatar is now an <img>, not a text div ------------- */
 img.chat-avatar { object-fit: cover; border-radius: 10px; background: rgba(255,255,255,.12); }
-import { NextResponse } from "next/server";
-import { getOrderById } from "@/lib/orders";
-import { canAccessOrder, readCustomerSession } from "@/lib/session";
-import { getMessages, toChatMessage } from "@/lib/messages";
-import { requireAdmin, supabaseAdmin } from "@/lib/supabase/server";
-import { uploadPrivateFile } from "@/lib/storage";
+/* ============================================================================
+   CHAT RESPONSIVENESS
+   Append to the END of globals.css.
+   ============================================================================ */
 
-async function access(request: Request, orderId: string) {
-  const order = await getOrderById(orderId);
-  if (!order) return null;
-  const admin = await requireAdmin(request);
-  if (admin) return { order, sender: "admin" as const, admin };
-  const session = await readCustomerSession();
-  if (canAccessOrder(session, order.id, order.email)) return { order, sender: "customer" as const, admin: null };
-  return null;
+/* --- pending / failed message states -------------------------------------- */
+.message-row.is-pending .message-bubble,
+.message-row.is-pending .message-image { opacity: .58; }
+.message-row.is-pending .message-bubble { transition: opacity .18s ease; }
+.message-row.is-failed .message-bubble { opacity: .5; box-shadow: inset 0 0 0 1px rgba(223, 59, 71, .5); }
+
+.message-retry {
+  margin-top: 4px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 8px;
+  color: #df3b47;
+  background: rgba(223, 59, 71, .10);
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.message-retry:hover { background: rgba(223, 59, 71, .18); }
+
+/* --- scroll smoothness ----------------------------------------------------- */
+.chat-log {
+  overscroll-behavior: contain;      /* don't chain scroll to the page */
+  -webkit-overflow-scrolling: touch; /* momentum on iOS */
+  contain: layout paint;             /* isolate the log from page reflow */
 }
 
-export async function GET(request: Request, { params }: { params: Promise<{ orderId: string }> }) {
-  const { orderId } = await params;
-  const a = await access(request, orderId);
-  if (!a) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+/* Stop the entry animation re-running when React re-renders the list. Only
+   genuinely new rows animate; existing rows stay put. */
+.message-row { animation: none; }
+.message-row.is-pending { animation: messageIn .22s ease both; }
 
-  const db = supabaseAdmin();
-  const now = new Date().toISOString();
+/* Reserve avatar space so images landing don't shift the column */
+.message-avatar { background: var(--c-surface-2); }
 
-  // Read receipts are fire-and-forget. This UPDATE ran on every poll — roughly
-  // 24 writes a minute per open tab, almost always matching zero rows — and the
-  // response was waiting on it. Nothing in the payload depends on the result.
-  const markRead = a.sender === "admin"
-    ? db.from("messages").update({ read_by_admin_at: now }).eq("order_id", orderId).eq("sender", "customer").is("read_by_admin_at", null)
-    : db.from("messages").update({ read_by_customer_at: now }).eq("order_id", orderId).eq("sender", "admin").is("read_by_customer_at", null);
-  void Promise.resolve(markRead).catch((e) => console.error("read receipt failed", e));
+/* The composer repaints on every keystroke; keep it off the main layout */
+.chat-compose { contain: layout; }
 
-  return NextResponse.json({ messages: await getMessages(orderId) });
+/* Images: give the browser a box before the file arrives, so the log doesn't
+   jump as attachments load in */
+.message-image { background: var(--c-surface); min-height: 60px; }
+
+
+/* ============================================================================
+   MULTI-FILE ATTACHMENT TRAY  (chat composer + admin delivery proof)
+   ============================================================================ */
+.attachment-tray {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 4px;
 }
-
-export async function POST(request: Request, { params }: { params: Promise<{ orderId: string }> }) {
-  try {
-    const { orderId } = await params;
-    const a = await access(request, orderId);
-    if (!a) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    if (a.order.chat_locked) return NextResponse.json({ error: "This chat is read-only" }, { status: 409 });
-
-    const form = await request.formData();
-    const body = String(form.get("body") || "").trim();
-    const file = form.get("file");
-    if (!body && !(file instanceof File)) return NextResponse.json({ error: "Write a message or attach a file" }, { status: 400 });
-
-    let attachment: any = {};
-    if (file instanceof File && file.size) attachment = await uploadPrivateFile("chat-attachments", orderId, file);
-
-    const db = supabaseAdmin();
-    // `.select().single()` hands back the inserted row, so we skip the old
-    // getMessages(orderId).at(-1) — which re-read and re-signed the entire
-    // thread just to return one message.
-    const { data, error } = await db.from("messages").insert({
-      order_id: orderId,
-      sender: a.sender,
-      // an image-only message now stays empty instead of showing a literal
-      // "Attachment" bubble above the picture
-      body: body || "",
-      attachment_path: attachment.path || null,
-      attachment_name: attachment.name || null,
-      attachment_mime: attachment.mime || null,
-    }).select("id,sender,body,created_at,attachment_path,attachment_name,attachment_mime").single();
-    if (error) throw error;
-
-    return NextResponse.json({ message: await toChatMessage(data) });
-  } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : "Message failed" }, { status: 400 });
-  }
+.attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 190px;
+  padding: 4px 6px 4px 4px;
+  border-radius: 10px;
+  background: var(--c-surface-2);
+  box-shadow: inset 0 0 0 1px var(--c-ring);
+  font-size: 11px;
 }
+.attachment-chip img {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--c-surface);
+}
+.attachment-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--c-fg-2);
+}
+.attachment-chip button {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--c-fg-2);
+  background: transparent;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+.attachment-chip button:hover { color: var(--c-fg); background: var(--c-ring); }
+
+.attachment-clear {
+  border: 0;
+  background: none;
+  color: var(--nova);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 2px;
+}
+.attachment-clear:hover { text-decoration: underline; }
+
+/* the tray lives inside the admin control stack too — keep it from stretching */
+.control-stack .attachment-tray { margin-top: 6px; }
+.control-stack .attachment-chip { max-width: 100%; }
