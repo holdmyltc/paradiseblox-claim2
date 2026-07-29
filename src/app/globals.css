@@ -2646,3 +2646,143 @@ html[data-theme="dark"] .small { color: var(--c-fg-2); }
     max-height: 26vh;
   }
 }
+/* ============================================================================
+   ADMIN CONTROL PANEL POLISH
+   Append to the END of globals.css.
+   ============================================================================ */
+
+/* --- native file input looked unstyled next to everything else ------------- */
+.control-stack input[type="file"],
+.admin-controls input[type="file"] {
+  padding: 7px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.control-stack input[type="file"]::file-selector-button,
+.admin-controls input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--c-fg);
+  background: var(--c-surface-2);
+  box-shadow: inset 0 0 0 1px var(--c-ring);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .18s ease;
+}
+.control-stack input[type="file"]::file-selector-button:hover,
+.admin-controls input[type="file"]::file-selector-button:hover {
+  background: var(--c-surface);
+}
+
+/* --- a locked composer shouldn't look ready for input --------------------- */
+.chat-compose:has(textarea:disabled) .compose-row {
+  border-color: var(--c-ring);
+  background: var(--c-surface);
+  opacity: .72;
+}
+.chat-compose:has(textarea:disabled) .send-btn { opacity: .35; }
+
+/* --- danger button needs to read as the last resort ----------------------- */
+.control-stack .btn-danger {
+  background: transparent;
+  color: #df3b47;
+  box-shadow: inset 0 0 0 1.5px rgba(223, 59, 71, .45);
+}
+.control-stack .btn-danger:hover:not(:disabled) {
+  color: #fff;
+  background: #df3b47;
+  box-shadow: none;
+}
+.control-stack .btn-danger:disabled { opacity: .4; }
+
+/* --- admin detail header on a phone --------------------------------------- */
+@media (max-width: 639px) {
+  .admin-detail-header { padding: 12px; gap: 8px; }
+  .admin-detail-header .small { font-size: 10.5px; word-break: break-all; }
+  .tabs .btn { min-height: 40px; font-size: 13px; }
+  .dashboard-shell { width: calc(100% - 16px); padding-top: 8px; }
+}
+
+/* ============================================================================
+   MOBILE POLISH — header, progress, empty item art
+   Append to the END of globals.css (after admin-polish.css).
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   1. HEADER — "Order hist..." was being ellipsised by my own max-width rule.
+   Drop the truncation; swap to a short label and hide Support on small screens
+   instead. Needs the updated header.tsx for .nav-full / .nav-short.
+   --------------------------------------------------------------------------- */
+.nova-header-actions > a { max-width: none; overflow: visible; text-overflow: clip; }
+.nav-short { display: none; }
+
+@media (max-width: 639px) {
+  .nova-support-link { display: none; }      /* Support lives in the footer/email anyway */
+  .nav-full { display: none; }
+  .nav-short { display: inline; }
+  .nova-header-actions > a { padding: 7px 9px; font-size: 12px; }
+}
+
+/* very narrow: wordmark shrinks rather than pushing the toggle off */
+@media (max-width: 400px) {
+  .nova-brand img { width: min(132px, 36vw); max-height: 30px; }
+  .nova-header-actions { gap: 4px; }
+}
+
+/* ---------------------------------------------------------------------------
+   2. PROGRESS — the current-step pulse ring was wide enough on a phone to sit
+   on top of the step label underneath it.
+   --------------------------------------------------------------------------- */
+@media (max-width: 639px) {
+  .progress-step.current .progress-icon {
+    box-shadow: 0 0 0 3px var(--c-bg-soft), 0 0 0 4px rgba(var(--nova-rgb), .35);
+  }
+  .progress-icon { box-shadow: 0 0 0 3px var(--c-bg-soft); }
+  .progress-step { gap: 8px; }               /* clear the ring */
+  .progress-step > span:last-child { position: relative; z-index: 1; }
+}
+
+/* ---------------------------------------------------------------------------
+   3. MISSING ITEM ART — .item-image and .item-placeholder carried hardcoded
+   light backgrounds (#fff, #edf1f7, #eef1f6) with no dark-mode variant, so any
+   item without an image rendered as a glaring white square.
+   --------------------------------------------------------------------------- */
+html[data-theme="dark"] .item-image,
+html[data-theme="dark"] div.item-image,
+html[data-theme="dark"] .order-thumbnails .item-placeholder {
+  background: var(--c-surface-2);
+  border-color: var(--c-line);
+}
+html[data-theme="dark"] .order-thumbnails img { border-color: var(--c-bg-soft); }
+
+/* the shimmer sweep was white-on-white in dark mode */
+html[data-theme="dark"] .item-placeholder::after,
+html[data-theme="dark"] .item-image:not(img)::after {
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, .07) 45%, transparent 70%);
+}
+
+/* an item with no art gets a neutral glyph instead of an empty slab */
+div.item-image:not(:has(img))::before,
+.order-thumbnails .item-placeholder::before {
+  content: "";
+  position: absolute;
+  inset: 28%;
+  border-radius: 3px;
+  background: currentColor;
+  opacity: .14;
+}
+
+/* ---------------------------------------------------------------------------
+   4. LOCKED COMPOSER — shouldn't look ready for input
+   (duplicated from admin-polish.css so this file stands alone)
+   --------------------------------------------------------------------------- */
+.chat-compose:has(textarea:disabled) .compose-row {
+  border-color: var(--c-ring);
+  background: var(--c-surface);
+  opacity: .72;
+}
+.chat-compose:has(textarea:disabled) .send-btn { opacity: .35; }
