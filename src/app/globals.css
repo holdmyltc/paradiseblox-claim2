@@ -2427,3 +2427,115 @@ img.chat-avatar { object-fit: cover; border-radius: 10px; background: rgba(255,2
 /* the tray lives inside the admin control stack too — keep it from stretching */
 .control-stack .attachment-tray { margin-top: 6px; }
 .control-stack .attachment-chip { max-width: 100%; }
+/* ============================================================================
+   CHAT RESPONSIVENESS
+   Append to the END of globals.css.
+   ============================================================================ */
+
+/* --- pending / failed message states -------------------------------------- */
+.message-row.is-pending .message-bubble,
+.message-row.is-pending .message-image { opacity: .58; }
+.message-row.is-pending .message-bubble { transition: opacity .18s ease; }
+.message-row.is-failed .message-bubble { opacity: .5; box-shadow: inset 0 0 0 1px rgba(223, 59, 71, .5); }
+
+.message-retry {
+  margin-top: 4px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 8px;
+  color: #df3b47;
+  background: rgba(223, 59, 71, .10);
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.message-retry:hover { background: rgba(223, 59, 71, .18); }
+
+/* --- scroll smoothness ----------------------------------------------------- */
+.chat-log {
+  overscroll-behavior: contain;      /* don't chain scroll to the page */
+  -webkit-overflow-scrolling: touch; /* momentum on iOS */
+  contain: layout paint;             /* isolate the log from page reflow */
+}
+
+/* Stop the entry animation re-running when React re-renders the list. Only
+   genuinely new rows animate; existing rows stay put. */
+.message-row { animation: none; }
+.message-row.is-pending { animation: messageIn .22s ease both; }
+
+/* Reserve avatar space so images landing don't shift the column */
+.message-avatar { background: var(--c-surface-2); }
+
+/* The composer repaints on every keystroke; keep it off the main layout */
+.chat-compose { contain: layout; }
+
+/* Images: give the browser a box before the file arrives, so the log doesn't
+   jump as attachments load in */
+.message-image { background: var(--c-surface); min-height: 60px; }
+
+
+/* ============================================================================
+   MULTI-FILE ATTACHMENT TRAY  (chat composer + admin delivery proof)
+   ============================================================================ */
+.attachment-tray {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+.attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 190px;
+  padding: 4px 6px 4px 4px;
+  border-radius: 10px;
+  background: var(--c-surface-2);
+  box-shadow: inset 0 0 0 1px var(--c-ring);
+  font-size: 11px;
+}
+.attachment-chip img {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--c-surface);
+}
+.attachment-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--c-fg-2);
+}
+.attachment-chip button {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--c-fg-2);
+  background: transparent;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+.attachment-chip button:hover { color: var(--c-fg); background: var(--c-ring); }
+
+.attachment-clear {
+  border: 0;
+  background: none;
+  color: var(--nova);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 2px;
+}
+.attachment-clear:hover { text-decoration: underline; }
+
+/* the tray lives inside the admin control stack too — keep it from stretching */
+.control-stack .attachment-tray { margin-top: 6px; }
+.control-stack .attachment-chip { max-width: 100%; }
