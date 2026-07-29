@@ -77,7 +77,7 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
       <OrderOverview order={order} proofs={proofs}/>
 
       {order.status==="delivered"&&<section className="confirmation-panel">
-        <div><h2>Did you receive your complete order?</h2><p>Check every item in-game before you confirm.</p></div>
+        <div><h2>Did you receive your order?</h2><p>Check every item in-game before you confirm.</p></div>
         {error&&<div className="error-box">{error}</div>}
         <div className="confirmation-actions"><button className="btn btn-confirm" onClick={()=>customerAction("confirm")}>Yes, I received everything</button><button className="btn btn-soft" onClick={()=>customerAction("not_yet")}>Not yet</button></div>
       </section>}
@@ -94,7 +94,7 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
     </section>
 
     {(order.status === "delivered" || order.status === "completed") && <section className="card review-panel">
-      <div><div className="trustpilot-label">Trustpilot</div><h2>How was your experience?</h2><p>Your review helps other customers learn about ParadiseBlox.</p></div>
+      <div><div className="trustpilot-label">Trustpilot</div><h2>How was your experience?</h2><p>Leave us an honest review and get a 10% off discount code!</p></div>
       <a className="btn trustpilot-btn" href={order.trustpilotUrl} target="_blank" rel="noreferrer">Leave a review</a>
     </section>}
   </div>;
