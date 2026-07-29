@@ -16,6 +16,11 @@ function ItemDescription({ item }: { item: PublicOrderItem }) {
   </div>;
 }
 
+/**
+ * Admin-side order panel. The Trustpilot review card was removed: it is
+ * customer-facing copy and served no purpose in the operator's dashboard.
+ * It still renders on the customer order page via .review-panel.
+ */
 export function OrderSidebar({ order, proofs = [] }: { order: PublicOrder; proofs?: DeliveryProof[] }) {
   return <aside className="sidebar">
     <section className="card side-card">
@@ -30,6 +35,5 @@ export function OrderSidebar({ order, proofs = [] }: { order: PublicOrder; proof
       {Object.entries(groupedItems(order)).map(([game, items]) => <div className="item-group" key={game}><div className="game-label">{game}</div>{items.map((item) => <div className="item-row" key={item.id}>{item.imageUrl ? <img className="item-image" src={item.imageUrl} alt="" /> : <div className="item-image" />}<ItemDescription item={item}/><div className="item-qty">x{item.quantity}</div></div>)}</div>)}
     </section>
     {proofs.length > 0 && <section className="card side-card"><h3 className="side-title">Delivery proof</h3><div className="proof-grid">{proofs.map((p) => p.mimeType.startsWith("image/") ? <a href={p.fileUrl} target="_blank" rel="noreferrer" key={p.id}><img className="proof-thumb" src={p.fileUrl} alt={p.note || "Delivery proof"}/></a> : <a className="btn btn-soft" href={p.fileUrl} target="_blank" rel="noreferrer" key={p.id}>Open proof</a>)}</div></section>}
-    {(order.status === "delivered" || order.status === "completed") && <section className="card review-card"><div className="review-stars">Trustpilot</div><h3 className="side-title" style={{marginTop:8}}>How was your experience with ParadiseBlox?</h3><p className="section-copy">Leave us an honest review and get a 10% off discount code!</p><a className="btn btn-block" style={{background:"#00b67a",color:"white"}} href={order.trustpilotUrl} target="_blank" rel="noreferrer">Review us on Trustpilot</a></section>}
   </aside>;
 }
