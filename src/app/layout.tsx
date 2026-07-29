@@ -24,18 +24,19 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f8fc" },
-    { media: "(prefers-color-scheme: dark)", color: "#090a0f" },
-  ],
+  themeColor: "#f7f8fc",
 };
 
+/**
+ * Light is the default. We deliberately ignore prefers-color-scheme: a visitor
+ * whose phone is in dark mode still lands on the light theme, and only gets
+ * dark if they choose it with the toggle.
+ */
 const themeScript = `
 (function(){
   try {
     var saved = localStorage.getItem('claim2_theme');
-    var preferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', saved || preferred);
+    document.documentElement.setAttribute('data-theme', saved === 'dark' ? 'dark' : 'light');
   } catch (error) {
     document.documentElement.setAttribute('data-theme', 'light');
   }
