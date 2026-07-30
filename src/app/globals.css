@@ -293,3 +293,298 @@
   .admin-controls { padding: 10px; gap: 8px; }
   .ctl-card { padding: 12px; }
 }
+/* ============================================================================
+   ADMIN DASHBOARD REDESIGN
+   Append to the END of globals.css (after contrast-fix.css).
+   Supersedes the admin blocks in admin-polish.css where they overlap.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   1. THE ORDER LIST WAS HARDCODED DARK
+   .admin-panel used #111827 / #f8fafc regardless of theme, so in light mode a
+   black sidebar sat next to a white detail pane. Now it follows the tokens.
+   --------------------------------------------------------------------------- */
+.admin-panel {
+  color: var(--c-fg);
+  background: var(--c-bg-soft);
+  border: 1px solid var(--c-line);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(20,30,60,.04), 0 18px 44px -26px rgba(20,30,60,.28);
+}
+.admin-toolbar {
+  padding: 12px;
+  gap: 8px;
+  border-bottom: 1px solid var(--c-line);
+}
+.admin-input, .admin-select {
+  min-height: 38px;
+  flex: 1 1 140px;
+  color: var(--c-fg);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+}
+
+.order-list { padding: 8px; }
+.order-list-item {
+  color: var(--c-fg);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  padding: 11px 12px;
+  margin-bottom: 6px;
+  transition: border-color .16s ease, background .16s ease;
+}
+.order-list-item:hover { border-color: rgba(var(--nova-rgb), .4); }
+.order-list-item.active {
+  border-color: var(--nova);
+  background: rgba(var(--nova-rgb), .08);
+  box-shadow: inset 3px 0 0 var(--nova);
+}
+.order-list-top { font-size: 13px; font-weight: 800; align-items: center; }
+.order-list-top span:last-child {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  box-shadow: inset 0 0 0 1px var(--c-ring);
+  color: var(--c-fg-2);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.order-list-last { color: var(--c-fg-2); font-size: 11px; margin-top: 6px; }
+
+/* ---------------------------------------------------------------------------
+   2. DETAIL HEADER
+   --------------------------------------------------------------------------- */
+.admin-detail {
+  background: var(--c-bg-soft);
+  border: 1px solid var(--c-line);
+  border-radius: 16px;
+}
+.admin-detail-header {
+  padding: 14px 16px;
+  background: transparent;
+  border-bottom: 1px solid var(--c-line);
+}
+.admin-detail-header strong { font-size: 15px; }
+.admin-detail-header .small { color: var(--c-fg-2); font-size: 11px; }
+
+/* ---------------------------------------------------------------------------
+   3. CONTROL STACK — was a wall of identical full-width buttons.
+   Group them, shrink the secondary ones, let the primary action stand out.
+   --------------------------------------------------------------------------- */
+.admin-controls { padding: 14px; }
+.admin-controls .side-card { padding: 14px; border-radius: 14px; }
+.admin-controls .side-title { margin-bottom: 10px; font-size: 15px; }
+
+.control-stack { gap: 8px; }
+.control-stack .btn { min-height: 42px; border-radius: 11px; font-size: 13px; }
+.control-stack .field { margin: 2px 0; gap: 5px; }
+.control-stack .field label { font-size: 11px; font-weight: 700; color: var(--c-fg-2); }
+.control-stack .input { min-height: 40px; padding: 9px 11px; font-size: 13px; border-radius: 10px; }
+
+.control-divider {
+  margin: 10px 0 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--c-line);
+  color: var(--c-fg-3);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.control-stack > .control-divider:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+
+/* destructive actions read as outlines, not solid slabs */
+.control-stack .btn-danger {
+  background: transparent;
+  color: #df3b47;
+  box-shadow: inset 0 0 0 1.5px rgba(223,59,71,.45);
+}
+.control-stack .btn-danger:hover:not(:disabled) { color: #fff; background: #df3b47; box-shadow: none; }
+.control-stack .btn-danger:disabled { opacity: .35; }
+
+/* file picker */
+.control-stack input[type="file"] { padding: 7px 8px; font-size: 12px; cursor: pointer; }
+.control-stack input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--c-fg);
+  background: var(--c-surface-2);
+  box-shadow: inset 0 0 0 1px var(--c-ring);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------------
+   4. LAYOUT — desktop columns, phone stacking
+   --------------------------------------------------------------------------- */
+.dashboard-shell { width: min(1320px, calc(100% - 24px)); padding: 14px 0 40px; }
+.admin-grid { grid-template-columns: 300px minmax(0, 1fr); gap: 12px; }
+
+@media (min-width: 1100px) {
+  .admin-grid { grid-template-columns: 320px minmax(0, 1fr); }
+  .admin-body { grid-template-columns: minmax(0, 1fr) 320px; }
+}
+
+@media (min-width: 861px) {
+  .admin-panel, .admin-detail { height: calc(100dvh - 96px); }
+  .admin-panel { display: flex; flex-direction: column; }
+  .admin-toolbar { flex: none; }
+  .order-list { flex: 1; min-height: 0; max-height: none; overflow-y: auto; }
+  .admin-detail { display: flex; flex-direction: column; }
+  .admin-detail-header { flex: none; }
+  .admin-body { display: grid; flex: 1; min-height: 0; }
+  .admin-controls { max-height: none; overflow-y: auto; }
+}
+
+@media (max-width: 860px) {
+  .dashboard-shell { width: calc(100% - 16px); padding: 10px 0 32px; }
+  .tabs { gap: 6px; margin-bottom: 10px; }
+  .tabs .btn { min-height: 40px; border-radius: 11px; font-size: 13px; }
+  .admin-panel, .admin-detail { height: auto; }
+  .order-list { max-height: none; }
+  .admin-chat .chat-log { height: 52vh; min-height: 260px; }
+  .admin-controls { padding: 12px; }
+}
+
+@media (max-width: 480px) {
+  .admin-toolbar { flex-direction: column; }
+  .admin-input, .admin-select { flex: none; width: 100%; }
+  .admin-detail-header { padding: 12px; }
+  .admin-detail-header .small { word-break: break-all; }
+  .admin-chat .chat-log { height: 48vh; }
+}
+
+/* the admin chat header shouldn't scroll with the log */
+.chat-header { flex: none; border-radius: 0; }
+.admin-chat { display: flex; min-height: 0; flex-direction: column; }
+.admin-chat .chat-card { display: flex; flex: 1; min-height: 0; flex-direction: column; }
+.admin-chat .chat-log { flex: 1; min-height: 0; overflow-y: auto; }
+
+
+/* ============================================================================
+   STATUS-AWARE CONTROL CARDS  (replaces the old flat .control-stack)
+   ============================================================================ */
+.admin-controls { display: grid; gap: 10px; padding: 12px; align-content: start; }
+
+.ctl-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background: var(--c-bg-soft);
+}
+.ctl-title {
+  margin: 0 0 2px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--c-fg-3);
+}
+.ctl-card .btn { min-height: 42px; border-radius: 11px; font-size: 13px; width: 100%; }
+.ctl-card .input { min-height: 40px; padding: 9px 11px; font-size: 13px; border-radius: 10px; }
+
+.ctl-field { display: grid; gap: 5px; }
+.ctl-field > label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-fg-2);
+}
+.ctl-field > label span {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--c-fg-3);
+}
+
+.ctl-hint { margin: 0; color: var(--c-fg-3); font-size: 11px; line-height: 1.5; }
+
+/* destructive action reads as an outline until you commit to it */
+.ctl-card .btn-danger {
+  background: transparent;
+  color: #df3b47;
+  box-shadow: inset 0 0 0 1.5px rgba(223, 59, 71, .45);
+}
+.ctl-card .btn-danger:hover:not(:disabled) { color: #fff; background: #df3b47; box-shadow: none; }
+.ctl-card .btn-danger:disabled { opacity: .4; }
+
+.ctl-card input[type="file"] { padding: 7px 8px; font-size: 12px; cursor: pointer; }
+.ctl-card input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--c-fg);
+  background: var(--c-surface-2);
+  box-shadow: inset 0 0 0 1px var(--c-ring);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* the sidebar cards should match the control cards, not float separately */
+.admin-controls .sidebar { display: grid; gap: 10px; }
+.admin-controls .side-card {
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--c-line);
+  background: var(--c-bg-soft);
+  box-shadow: none;
+}
+.admin-controls .side-title {
+  margin: 0 0 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--c-fg-3);
+}
+
+/* ---- order list rows -------------------------------------------------------- */
+.order-list-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.order-list-status,
+.order-list-unread {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.order-list-unread { color: #fff; background: var(--nova); }
+
+.order-list-last { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.order-list-user { flex: none; font-weight: 700; color: var(--c-fg-2); }
+.order-list-games {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--c-fg-3);
+}
+
+/* ---- detail header ---------------------------------------------------------- */
+.admin-detail-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.admin-detail-id { min-width: 0; }
+.admin-detail-id .small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 480px) {
+  .admin-detail-id .small { white-space: normal; word-break: break-all; }
+  .admin-controls { padding: 10px; gap: 8px; }
+  .ctl-card { padding: 12px; }
+}
