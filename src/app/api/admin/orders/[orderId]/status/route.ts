@@ -52,7 +52,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
     /* ---------- remove claim: unlink Roblox, send them back to step one ------
        Chat history and delivery proofs are deliberately kept: the order still
        happened, and the transcript is the audit trail if anything is disputed. */
-    if ("action" in input && input.action === "reset_claim") {
+    if ("action" in input) {
       await db.from("orders").update({
         roblox_user_id: null,
         roblox_username: null,
