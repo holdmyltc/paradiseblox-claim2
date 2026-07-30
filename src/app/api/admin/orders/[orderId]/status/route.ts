@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin, supabaseAdmin } from "@/lib/supabase/server";
 import { getOrderById, publicOrder } from "@/lib/orders";
-import { addSystemMessage, getProofs } from "@/lib/messages";
+import { addSystemMessage } from "@/lib/messages";
 import { sendCompletionReceipt } from "@/lib/receipt";
 
 /**
@@ -21,7 +21,8 @@ const statusSchema = z.object({
   reason: z.string().optional(),
 });
 const lockSchema = z.object({ chatLocked: z.boolean() });
-const schema = z.union([statusSchema, lockSchema]);
+const resetSchema = z.object({ action: z.literal("reset_claim") });
+const schema = z.union([statusSchema, lockSchema, resetSchema]);
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ orderId: string }> }) {
   try {
@@ -48,10 +49,29 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
       return NextResponse.json({ order: publicOrder(await getOrderById(orderId)) });
     }
 
-    /* ---------- guards ---------- */
-    if (input.status === "delivered" && (await getProofs(orderId)).length === 0)
-      return NextResponse.json({ error: "Upload delivery proof before marking the order delivered" }, { status: 409 });
+    /* ---------- remove claim: unlink Roblox, send them back to step one ------
+       Chat history and delivery proofs are deliberately kept: the order still
+       happened, and the transcript is the audit trail if anything is disputed. */
+    if ("action" in input && input.action === "reset_claim") {
+      await db.from("orders").update({
+        roblox_user_id: null,
+        roblox_username: null,
+        roblox_display_name: null,
+        roblox_avatar_url: null,
+        status: "paid",
+        delivered_at: null,
+        completed_at: null,
+        completed_by: null,
+        admin_completion_reason: null,
+        chat_locked: false,
+        updated_at: now,
+      }).eq("id", orderId);
+      await addSystemMessage(orderId, "ParadiseBlox removed this claim. Verify your Roblox account again to continue with your order.");
+      return NextResponse.json({ order: publicOrder(await getOrderById(orderId)) });
+    }
 
+    /* ---------- guards ---------- */
+    // proof is optional: plenty of deliveries don't need a screenshot
     if (input.status === "completed" && (!input.reason?.trim() || order.status !== "delivered"))
       return NextResponse.json({ error: "A completion reason is required after delivery" }, { status: 409 });
 
