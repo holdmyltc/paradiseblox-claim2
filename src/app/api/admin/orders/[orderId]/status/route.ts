@@ -21,8 +21,7 @@ const statusSchema = z.object({
   reason: z.string().optional(),
 });
 const lockSchema = z.object({ chatLocked: z.boolean() });
-const resetSchema = z.object({ action: z.literal("reset_claim") });
-const schema = z.union([statusSchema, lockSchema, resetSchema]);
+const schema = z.union([statusSchema, lockSchema]);
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ orderId: string }> }) {
   try {
@@ -46,27 +45,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
           ? "ParadiseBlox closed this chat. The delivery record stays available."
           : "ParadiseBlox reopened this chat. You can send a message again."
       );
-      return NextResponse.json({ order: publicOrder(await getOrderById(orderId)) });
-    }
-
-    /* ---------- remove claim: unlink Roblox, send them back to step one ------
-       Chat history and delivery proofs are deliberately kept: the order still
-       happened, and the transcript is the audit trail if anything is disputed. */
-    if ("action" in input) {
-      await db.from("orders").update({
-        roblox_user_id: null,
-        roblox_username: null,
-        roblox_display_name: null,
-        roblox_avatar_url: null,
-        status: "paid",
-        delivered_at: null,
-        completed_at: null,
-        completed_by: null,
-        admin_completion_reason: null,
-        chat_locked: false,
-        updated_at: now,
-      }).eq("id", orderId);
-      await addSystemMessage(orderId, "ParadiseBlox removed this claim. Verify your Roblox account again to continue with your order.");
       return NextResponse.json({ order: publicOrder(await getOrderById(orderId)) });
     }
 
@@ -101,13 +79,20 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
     }
 
     if (input.status === "cancelled") {
-      // reusing admin_completion_reason as the audit field — see note below
+      // reusing admin_completion_reason as the audit field
       updates.admin_completion_reason = input.reason?.trim();
       updates.delivered_at = null;
       updates.completed_at = null;
       updates.completed_by = null;
-      // deliberately NOT locking: a customer whose order was just cancelled
-      // usually has questions. Lock it manually if you want it closed.
+      // wipe the Roblox link: if the customer re-verifies they start clean
+      updates.roblox_user_id = null;
+      updates.roblox_username = null;
+      updates.roblox_display_name = null;
+      updates.roblox_avatar_url = null;
+      // A cancelled order is finished for both sides: the admin list hides it
+      // and the customer's claim page 404s, so leaving the chat open would be
+      // a room nobody can enter. No receipt email is sent for a cancellation.
+      updates.chat_locked = true;
       system = `ParadiseBlox cancelled this order. Reason: ${input.reason?.trim()}`;
     }
 
