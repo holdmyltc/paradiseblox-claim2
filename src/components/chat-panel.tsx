@@ -209,9 +209,12 @@ export function ChatPanel({
     void deliver(message.body, message.retryFile || null, message.id);
   }
 
-  function addFiles(list: FileList | null) {
-    if (!list?.length) return;
-    setFiles((prev) => [...prev, ...Array.from(list)]);
+  /* FileList is a LIVE reference to the input element. React runs the state
+     updater during render, so if we clear input.value first the list is already
+     empty by the time Array.from() runs. Copy to a real array immediately. */
+  function addFiles(picked: File[]) {
+    if (!picked.length) return;
+    setFiles((prev) => [...prev, ...picked]);
   }
 
   const statusText = storeStatus === "online"
@@ -225,7 +228,7 @@ export function ChatPanel({
       <div className="chat-identity">
         <img className="chat-avatar" src={adminAvatarUrl || "/pb-avatar.png"} alt="" />
         <div>
-          <div className="chat-title">ParadiseBlox </div>
+          <div className="chat-title">ParadiseBlox Delivery Team</div>
           <div className="chat-sub">
             <span className={`online-dot ${storeStatus === "busy" ? "busy-dot" : storeStatus === "offline" ? "offline-dot" : ""}`} />
             {statusText}
@@ -241,7 +244,7 @@ export function ChatPanel({
       </div>}
 
       {messages.length === 0 && <div className="empty-state">
-        Send a message when you are ready. Delivery Staff will be with your shortly.
+        Send a message when you are ready. ParadiseBlox can read it while the store is offline.
       </div>}
 
       {messages.map((m, i) => {
@@ -315,7 +318,7 @@ export function ChatPanel({
             type="file"
             multiple
             accept="image/png,image/jpeg,image/webp,image/gif,video/mp4"
-            onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }}
+            onChange={(e) => { const picked = Array.from(e.target.files || []); e.target.value = ""; addFiles(picked); }}
           />
         </label>}
         {locked && <span className="file-btn" aria-hidden="true" />}
