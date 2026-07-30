@@ -3088,3 +3088,20 @@ html[data-theme="dark"] .small { color: var(--c-fg-2); }
   .admin-controls { padding: 10px; gap: 8px; }
   .ctl-card { padding: 12px; }
 }
+/* ADMIN GRID — MOBILE WIDTH FIX */
+.admin-grid { grid-template-columns: 1fr; }
+
+@media (min-width: 861px) {
+  .admin-grid { grid-template-columns: 300px minmax(0, 1fr); }
+}
+@media (min-width: 1100px) {
+  .admin-grid { grid-template-columns: 320px minmax(0, 1fr); }
+}
+
+@media (max-width: 860px) {
+  .admin-body { grid-template-columns: 1fr; }
+  .admin-chat { border-right: 0; }
+}
+
+.dashboard-shell { max-width: 100%; overflow-x: clip; }
+.admin-panel, .admin-detail, .admin-body, .admin-controls { min-width: 0; }
