@@ -109,3 +109,37 @@ function maskEmail(email: string) {
   if (!domain) return email;
   return `${name.slice(0, 2)}${"*".repeat(Math.max(2, name.length - 2))}@${domain}`;
 }
+/* ============================================================================
+   ADD THIS to the bottom of src/lib/orders.ts
+   ============================================================================ */
+
+/**
+ * A cancelled order is dead: hidden from the admin list, and its claim page
+ * 404s. But the customer is allowed to start over — order number + email in the
+ * claim form gives them a clean slate.
+ *
+ * Call this from /api/orders/verify AFTER the email matches and BEFORE the
+ * session is issued. It's a no-op on any other status, so it's safe to call
+ * unconditionally.
+ */
+export async function reclaimIfCancelled(orderId: string) {
+  const db = supabaseAdmin();
+  const { data } = await db.from("orders").select("status").eq("id", orderId).maybeSingle();
+  if (data?.status !== "cancelled") return false;
+
+  await db.from("orders").update({
+    status: "paid",
+    roblox_user_id: null,
+    roblox_username: null,
+    roblox_display_name: null,
+    roblox_avatar_url: null,
+    delivered_at: null,
+    completed_at: null,
+    completed_by: null,
+    admin_completion_reason: null,
+    chat_locked: false,
+    updated_at: new Date().toISOString(),
+  }).eq("id", orderId);
+
+  return true;
+}
