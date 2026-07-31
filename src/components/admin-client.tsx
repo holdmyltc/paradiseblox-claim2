@@ -268,8 +268,8 @@ export function AdminClient() {
                   <section className="ctl-card">
                     <h3 className="ctl-title">Delivery</h3>
 
-                    {s.status === "paid" && (
-                      <button className="btn btn-blue" onClick={() => changeStatus("in_progress")} disabled={busy}>Start delivery</button>
+                    {isOpen && (
+                      <button className="btn btn-blue" onClick={() => changeStatus("in_progress")} disabled={busy}>{s.status === "paid" ? "Start delivery" : "Send \u201cpreparing\u201d update"}</button>
                     )}
 
                     {isOpen && <>
