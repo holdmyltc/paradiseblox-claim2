@@ -133,6 +133,7 @@ export function publicOrder(order: any): PublicOrder {
     completedBy: order.completed_by,
     storeStatus: order.store_status,
     trustpilotUrl: TRUSTPILOT_URL,
+    claimRequestedAt: order.claim_link_sent_at || null,
   };
 }
 
