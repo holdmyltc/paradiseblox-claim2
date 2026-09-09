@@ -37,6 +37,8 @@ export type PublicOrder = {
   storeStatus: StoreStatus;
   trustpilotUrl: string;
   unreadCount?: number;
+  claimRequestedAt?: string | null;
+  email?: string;
 };
 
 export type ChatMessage = {
