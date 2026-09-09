@@ -39,7 +39,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ ord
     const { orderId } = await params;
     const a = await access(request, orderId);
     if (!a) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    if (a.order.chat_locked) return NextResponse.json({ error: "This chat is read-only" }, { status: 409 });
+    if (a.order.chat_locked && a.sender !== "admin") return NextResponse.json({ error: "This chat is read-only" }, { status: 409 });
 
     const form = await request.formData();
     const body = String(form.get("body") || "").trim();
