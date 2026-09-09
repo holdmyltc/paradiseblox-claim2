@@ -74,7 +74,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
       updates.completed_at = now;
       updates.completed_by = "admin";
       updates.admin_completion_reason = input.reason?.trim();
-      updates.chat_locked = true;                       // completion closes the chat
       system = `ParadiseBlox completed the order on behalf of the customer. Reason: ${input.reason?.trim()}`;
     }
 
