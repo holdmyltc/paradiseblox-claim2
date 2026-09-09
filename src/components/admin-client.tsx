@@ -169,7 +169,8 @@ export function AdminClient() {
     <div className="app-shell">
       <div className="admin-auth-stage">
         <div className="admin-auth-inner">
-          <div className="admin-auth-mark"><img src="/pb-avatar.png" alt="" /></div>
+                    <div className="admin-auth-mark"><img src="/pb-avatar.png" alt="" /></div>
+          <div className="claim-theme-position"><ThemeToggle /></div>
           <h1>ParadiseBlox <span>Admin</span></h1>
           <p className="admin-auth-lede">Manage deliveries, chat with customers, and track every order in one place.</p>
           <div className="admin-auth-card">
@@ -190,8 +191,9 @@ export function AdminClient() {
   const isOpen = s ? s.status === "paid" || s.status === "in_progress" : false;
 
   return (
-    <div className="app-shell">
+        <div className="app-shell">
       <div className="dashboard-shell">
+        <div className="claim-theme-position"><ThemeToggle /></div>
         <div className="tabs">
           <button className={`btn ${mobileTab === "orders" ? "btn-blue" : "btn-soft"}`} onClick={() => setMobileTab("orders")}>Orders</button>
           <button className={`btn ${mobileTab === "detail" ? "btn-blue" : "btn-soft"}`} onClick={() => setMobileTab("detail")} disabled={!s}>Order chat</button>
@@ -225,10 +227,11 @@ export function AdminClient() {
                       ? <span className="order-list-unread">{o.unreadCount} new</span>
                       : <span className={`order-list-status status-${o.status === "in_progress" ? "progress" : o.status}`}>{STATUS_LABEL[o.status] || o.status}</span>}
                   </div>
-                  <div className="order-list-last">
+                                    <div className="order-list-last">
                     <span className="order-list-user">@{o.roblox?.username || "not linked"}</span>
                     <span className="order-list-games">{o.items.map((i) => i.game).filter((v, i, a) => a.indexOf(v) === i).join(", ")}</span>
                   </div>
+                  {o.claimRequestedAt && <div className="small">{new Date(o.claimRequestedAt).toLocaleString("en-US")}</div>}
                 </button>
               ))}
               {!filtered.length && <div className="empty-state">No orders in this view.</div>}
@@ -238,9 +241,10 @@ export function AdminClient() {
           <main className={`admin-detail ${mobileTab === "detail" ? "mobile-show" : ""}`}>
             {s ? <>
               <div className="admin-detail-header">
-                <div className="admin-detail-id">
+                                <div className="admin-detail-id">
                   <strong>{s.orderNumber}</strong>
-                  <div className="small">{s.emailMasked} · @{s.roblox?.username || "not linked"}</div>
+                  <div className="small">{s.email || s.emailMasked} · @{s.roblox?.username || "not linked"}</div>
+                  {s.claimRequestedAt && <div className="small">Requested {new Date(s.claimRequestedAt).toLocaleString("en-US")}</div>}
                 </div>
                 <span className={`status-pill status-${s.status === "in_progress" ? "progress" : s.status}`}>{STATUS_LABEL[s.status] || s.status}</span>
               </div>
@@ -251,7 +255,7 @@ export function AdminClient() {
                     key={s.id}
                     orderId={s.id}
                     initialMessages={messages}
-                    locked={s.chatLocked}
+                    locked={false}
                     storeStatus={storeStatus}
                     mode="admin"
                     adminToken={token}
