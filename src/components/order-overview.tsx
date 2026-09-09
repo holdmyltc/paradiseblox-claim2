@@ -11,7 +11,7 @@ function statusContent(order: PublicOrder) {
   if (order.status === "completed") return { title:"Order Complete", copy:"Your delivery record and chat are saved below.", tone:"complete" };
   if (order.status === "delivered") return { title:"Your Order Was Marked Delivered", copy:"Check your items, then confirm when everything has arrived.", tone:"delivered" };
   if (order.status === "paid") return { title:"Order Ready", copy:"Link your Roblox account so ParadiseBlox can start your delivery.", tone:"ready" };
-  return { title:"Preparing Your Order", copy:"Chat with us below while we prepare and deliver your items in-game.", tone:"active" };
+    return { title:"Preparing Your Order", copy:"", tone:"active" };
 }
 
 function statusLabel(status: PublicOrder["status"]) {
@@ -41,7 +41,7 @@ export function OrderOverview({ order, proofs = [] }: { order: PublicOrder; proo
       <div className="delivery-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-9"/></svg></div>
       <div className="delivery-banner-copy">
         <strong>{status.title}</strong>
-        <span>{status.copy}</span>
+        {status.copy && <span>{status.copy}</span>}
         <div className="delivery-badges">
           <span className="mini-badge"><i className={`store-dot store-dot-${order.storeStatus}`}/>{order.storeStatus === "online" ? "Online" : order.storeStatus === "busy" ? "Busy" : "Offline"}</span>
           <span className="mini-badge">{itemCount} item{itemCount === 1 ? "" : "s"}</span>
