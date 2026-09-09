@@ -4,6 +4,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import type { ChatMessage, DeliveryProof, PublicOrder, StoreStatus } from "@/lib/types";
 import { ChatPanel } from "@/components/chat-panel";
 import { OrderSidebar } from "@/components/order-sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const STATUS_LABEL: Record<string, string> = {
   paid: "Paid",
