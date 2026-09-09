@@ -11,5 +11,5 @@ export async function GET(request: Request, { params }: { params: Promise<{ orde
   const admin = await requireAdmin(request);
   const session = admin ? null : await readCustomerSession();
   if (!admin && !canAccessOrder(session, order.id, order.email)) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-  return NextResponse.json({ order: publicOrder(order), proofs: await getProofs(order.id) });
+  return NextResponse.json({ order: { ...publicOrder(order), ...(admin ? { email: order.email } : {}) }, proofs: await getProofs(order.id) });
 }
