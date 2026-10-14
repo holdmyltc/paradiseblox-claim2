@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ChatMessage, StoreStatus } from "@/lib/types";
+import { supabaseBrowser } from "@/lib/supabase/client";
 
 /** A message that exists locally but the server hasn't confirmed yet. */
 type LocalMessage = ChatMessage & { pending?: boolean; failed?: boolean; retryFile?: File | null };
@@ -89,6 +89,7 @@ export function ChatPanel({
       const r = await fetch(`/api/orders/${orderId}/messages`, {
         headers: adminToken ? { Authorization: `Bearer ${adminToken}` } : undefined,
         cache: "no-store",
+        signal: AbortSignal.timeout(10000),
       });
       if (!r.ok) return;
       const d = await r.json();
@@ -135,6 +136,20 @@ export function ChatPanel({
     document.addEventListener("visibilitychange", onVisible);
     return () => { live = false; clearTimeout(timer); document.removeEventListener("visibilitychange", onVisible); };
   }, [poll, demo]);
+  
+  /* ---------- instant updates ---------- */
+  useEffect(() => {
+    if (demo) return;
+    const sb = supabaseBrowser();
+    const channel = sb
+      .channel(`order-${orderId}`)
+      .on("broadcast", { event: "ping" }, () => {
+        lastActivity.current = Date.now();
+        poll();
+      })
+      .subscribe();
+    return () => { sb.removeChannel(channel); };
+  }, [orderId, poll, demo]);
 
   /* ---------- sending ---------- */
   async function deliver(body: string, attachment: File | null, tempId: string) {
@@ -149,7 +164,11 @@ export function ChatPanel({
       });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || "Message could not be sent");
-      setMessages((prev) => prev.map((m) => (m.id === tempId ? d.message : m)));
+            setMessages((prev) =>
+        prev.some((m) => m.id === d.message.id)
+          ? prev.filter((m) => m.id !== tempId)
+          : prev.map((m) => (m.id === tempId ? d.message : m))
+      );
       onChanged?.();
       return true;
     } catch (e) {
