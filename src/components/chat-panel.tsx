@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import type { ChatMessage, StoreStatus } from "@/lib/types";
+import { supabaseBrowser } from "@/lib/supabase/client";
 
 /** A message that exists locally but the server hasn't confirmed yet. */
 type LocalMessage = ChatMessage & { pending?: boolean; failed?: boolean; retryFile?: File | null };
