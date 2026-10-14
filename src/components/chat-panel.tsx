@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { supabaseBrowser } from "@/lib/supabase/client";
 import type { ChatMessage, StoreStatus } from "@/lib/types";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
