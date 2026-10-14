@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
-import { getOrderById } from "@/lib/orders";
 import { canAccessOrder, readCustomerSession } from "@/lib/session";
 import { getMessages, toChatMessage } from "@/lib/messages";
 import { requireAdmin, supabaseAdmin } from "@/lib/supabase/server";
 import { uploadPrivateFile } from "@/lib/storage";
+import { pingOrder } from "@/lib/realtime";
 
+// Only load what the permission check needs, and run both lookups at the same time.
 async function access(request: Request, orderId: string) {
-  const order = await getOrderById(orderId);
+  const db = supabaseAdmin();
+  const [{ data: order }, admin] = await Promise.all([
+    db.from("orders").select("id,email,chat_locked").eq("id", orderId).maybeSingle(),
+    requireAdmin(request),
+  ]);
   if (!order) return null;
-  const admin = await requireAdmin(request);
   if (admin) return { order, sender: "admin" as const, admin };
   const session = await readCustomerSession();
   if (canAccessOrder(session, order.id, order.email)) return { order, sender: "customer" as const, admin: null };
@@ -23,9 +27,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ orde
   const db = supabaseAdmin();
   const now = new Date().toISOString();
 
-  // Read receipts are fire-and-forget. This UPDATE ran on every poll — roughly
-  // 24 writes a minute per open tab, almost always matching zero rows — and the
-  // response was waiting on it. Nothing in the payload depends on the result.
+  // Read receipts run in the background so the response never waits for them.
   const markRead = a.sender === "admin"
     ? db.from("messages").update({ read_by_admin_at: now }).eq("order_id", orderId).eq("sender", "customer").is("read_by_admin_at", null)
     : db.from("messages").update({ read_by_customer_at: now }).eq("order_id", orderId).eq("sender", "admin").is("read_by_customer_at", null);
@@ -50,14 +52,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ ord
     if (file instanceof File && file.size) attachment = await uploadPrivateFile("chat-attachments", orderId, file);
 
     const db = supabaseAdmin();
-    // `.select().single()` hands back the inserted row, so we skip the old
-    // getMessages(orderId).at(-1) — which re-read and re-signed the entire
-    // thread just to return one message.
     const { data, error } = await db.from("messages").insert({
       order_id: orderId,
       sender: a.sender,
-      // an image-only message now stays empty instead of showing a literal
-      // "Attachment" bubble above the picture
       body: body || "",
       attachment_path: attachment.path || null,
       attachment_name: attachment.name || null,
@@ -65,7 +62,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ ord
     }).select("id,sender,body,created_at,attachment_path,attachment_name,attachment_mime").single();
     if (error) throw error;
 
-    return NextResponse.json({ message: await toChatMessage(data) });
+    const [message] = await Promise.all([toChatMessage(data), pingOrder(orderId)]);
+    return NextResponse.json({ message });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Message failed" }, { status: 400 });
   }
