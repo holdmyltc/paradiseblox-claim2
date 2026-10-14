@@ -64,9 +64,22 @@ export function AdminClient() {
     const t = setInterval(load, 3500);
     return () => clearInterval(t);
   }, [token, filter]);
+  
+  // refresh the order list the moment anything changes
+  useEffect(() => {
+    if (!token) return;
+    const sb = supabaseBrowser();
+    const channel = sb
+      .channel("admin-feed")
+      .on("broadcast", { event: "ping" }, () => { load(); })
+      .subscribe();
+    return () => { sb.removeChannel(channel); };
+  }, [token, filter]);
 
   async function open(order: PublicOrder) {
     setSelected(order);
+    setMessages([]);
+    setProofs([]);
     setMobileTab("detail");
     setError("");
     const [m, p] = await Promise.all([
