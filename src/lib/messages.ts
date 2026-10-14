@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { signedUrl } from "@/lib/storage";
 import type { ChatMessage, DeliveryProof } from "@/lib/types";
+import { pingOrder } from "@/lib/realtime";
 
 /**
  * Signed URLs were being regenerated on every request. Two costs:
@@ -73,4 +74,5 @@ export async function getProofs(orderId: string): Promise<DeliveryProof[]> {
 export async function addSystemMessage(orderId: string, body: string) {
   const db = supabaseAdmin();
   await db.from("messages").insert({ order_id: orderId, sender: "system", body });
+  await pingOrder(orderId);
 }
