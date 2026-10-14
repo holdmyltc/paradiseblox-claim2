@@ -1,3107 +1,469 @@
+/* ParadiseBlox Claim 2: clean light theme.
+   One blue accent, white surfaces, soft grey page, iMessage style chat. */
+
 :root {
-  --font-display: var(--font-body);
-  --orange: #ff6b00;
-  --orange-dark: #d84f00;
-  --blue: #2764ee;
-  --blue-dark: #1546ba;
-  --blue-soft: #edf3ff;
-  --ink: #14172a;
-  --muted: #65708a;
-  --line: #e1e6ef;
+  --bg: #f5f6f8;
   --surface: #ffffff;
-  --success: #06b985;
-  --warning: #e5a400;
-  --danger: #df3b47;
-  --shadow-sm: 0 8px 24px rgba(20, 32, 70, 0.07);
-  --shadow: 0 22px 70px rgba(20, 32, 70, 0.1);
-  --radius: 22px;
+  --surface-2: #f3f4f6;
+  --line: #e6e8ec;
+  --ink: #111827;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --blue: #0a84ff;
+  --blue-dark: #0071e3;
+  --blue-soft: #eaf4ff;
+  --bubble-them: #eceef2;
+  --green: #16a34a;
+  --red: #dc2626;
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, .04), 0 4px 14px rgba(17, 24, 39, .05);
+  --shadow-lg: 0 1px 2px rgba(17, 24, 39, .05), 0 24px 60px -24px rgba(17, 24, 39, .22);
+  --radius: 16px;
+  --header-h: 64px;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
-html { min-width: 320px; background: #f7f9fd; }
+html { min-width: 320px; background: var(--bg); -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
   min-height: 100vh;
   color: var(--ink);
+  background: var(--bg);
   font-family: var(--font-body), Outfit, ui-sans-serif, system-ui, sans-serif;
-  background:
-    radial-gradient(circle at 15% -12%, rgba(39,100,238,.09), transparent 34rem),
-    radial-gradient(circle at 92% 22%, rgba(255,107,0,.07), transparent 30rem),
-    #f8faff;
+  -webkit-font-smoothing: antialiased;
 }
-button, input, textarea, select { font: inherit; }
+button, input, textarea, select { font: inherit; color: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; }
 img { max-width: 100%; }
 svg { display: block; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.small { margin-top: 2px; color: var(--muted); font-size: 12px; }
 
-.app-shell { min-height: 100svh; padding-bottom: env(safe-area-inset-bottom); }
-.top-strip {
-  min-height: 38px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  padding: 8px 16px;
-  color:#fff;
-  font-size:12px;
-  font-weight:700;
-  text-align:center;
-  background: linear-gradient(90deg, #1b4fc8, #2f72f2);
-}
-.top-strip a {
-  padding:4px 11px;
-  border-radius:999px;
-  background:rgba(255,255,255,.18);
-  text-decoration:none;
-  white-space:nowrap;
-  transition: background .18s ease, transform .18s ease;
-}
-.top-strip a:hover { background:rgba(255,255,255,.27); transform:translateY(-1px); }
+/* the theme toggle is gone, hide any leftover wrapper */
+.theme-toggle, .claim-theme-position { display: none; }
 
-.site-header {
-  width:min(1120px, calc(100% - 32px));
-  min-height:104px;
-  margin:0 auto;
-  padding:18px 0 14px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:24px;
-}
-.brand { display:flex; align-items:center; text-decoration:none; min-width:0; }
-.brand-logo { display:block; width:min(420px, 42vw); height:auto; object-fit:contain; }
-.header-actions { display:flex; align-items:center; gap:20px; flex:none; }
-.header-text-link { text-decoration:none; font-size:14px; font-weight:650; color:#242a3d; }
-.header-link {
-  border:1px solid #dfe5ef;
-  background:#fff;
-  padding:11px 16px;
-  border-radius:999px;
-  font-weight:750;
-  text-decoration:none;
-  font-size:13px;
-  box-shadow:0 5px 16px rgba(19,35,75,.05);
-  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-}
-.header-link:hover { transform:translateY(-1px); border-color:#bfcdf0; box-shadow:0 9px 22px rgba(19,35,75,.09); }
+/* ---------- shell ---------- */
+.app-shell { min-height: 100vh; min-height: 100dvh; background: var(--bg); }
+.page-wrap { width: 100%; max-width: 920px; margin: 0 auto; padding: 16px; }
+.page-wrap.narrow { max-width: 560px; }
+.order-layout { display: grid; gap: 12px; width: 100%; }
+.fade-up { animation: fadeUp .35s ease both; }
 
-.page-wrap { width:min(1060px, calc(100% - 28px)); margin:0 auto; padding:8px 0 58px; }
-.narrow { width:min(620px, calc(100% - 28px)); }
-.card { background:#fff; border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow-sm); }
-.hero { padding:clamp(28px, 6vw, 54px); position:relative; overflow:hidden; }
-.hero::before,.hero::after { content:""; position:absolute; border-radius:999px; filter:blur(2px); pointer-events:none; }
-.hero::before { width:280px; height:280px; right:-100px; top:-130px; background:radial-gradient(circle, rgba(39,100,238,.17), transparent 68%); }
-.hero::after { width:230px; height:230px; left:-100px; bottom:-150px; background:radial-gradient(circle, rgba(255,107,0,.12), transparent 70%); }
-.eyebrow { display:inline-flex; align-items:center; color:var(--blue); font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
-.hero h1 { position:relative; z-index:1; margin:12px 0 10px; max-width:720px; font:750 clamp(32px, 6vw, 58px)/1.05 var(--font-display), Outfit, sans-serif; letter-spacing:-1.7px; }
-.hero p { position:relative; z-index:1; margin:0; max-width:680px; color:var(--muted); font-size:clamp(15px, 2.5vw, 18px); line-height:1.7; }
-.verify-grid { display:grid; grid-template-columns:1.15fr .85fr; gap:18px; margin-top:22px; }
-.form-card, .info-card { padding:clamp(20px, 4vw, 30px); }
-.section-title { margin:0 0 7px; font:750 25px/1.15 var(--font-display), Outfit, sans-serif; letter-spacing:-.3px; }
-.section-copy { margin:0 0 20px; color:var(--muted); line-height:1.6; font-size:14px; }
-.compact-copy { margin:0; }
-.field { display:grid; gap:7px; margin-bottom:15px; }
-.field label { font-size:13px; font-weight:750; color:#344054; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
+.form-card { padding: 28px; }
+.section-title { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+.section-copy { margin: 0 0 20px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+/* ---------- forms and buttons ---------- */
+.field { display: grid; gap: 6px; margin-bottom: 14px; }
+.field label { color: var(--muted); font-size: 13px; font-weight: 600; }
 .input, .textarea, .select {
-  width:100%; min-height:50px; border:1.5px solid #dbe1eb; border-radius:14px; padding:12px 15px; color:var(--ink); background:#fff; outline:none;
-  transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--surface); outline: none; transition: border-color .15s ease, box-shadow .15s ease;
 }
-.textarea { min-height:90px; resize:vertical; }
-.input:focus, .textarea:focus, .select:focus { border-color:var(--blue); box-shadow:0 0 0 4px rgba(39,100,238,.1); }
+.textarea { padding: 12px 14px; min-height: 90px; resize: vertical; }
+.input:focus, .textarea:focus, .select:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(10, 132, 255, .16); }
+
 .btn {
-  min-height:47px; border:0; border-radius:14px; padding:11px 18px; display:inline-flex; justify-content:center; align-items:center; gap:8px; font-weight:800; cursor:pointer; text-decoration:none;
-  transition:transform .16s ease, opacity .16s ease, box-shadow .16s ease, filter .16s ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px;
+  border: 0; border-radius: 12px; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+  transition: background .15s ease, transform .15s ease, opacity .15s ease, box-shadow .15s ease;
 }
-.btn:hover { transform:translateY(-1px); filter:saturate(1.05); }
-.btn:active { transform:translateY(0); }
-.btn:disabled { cursor:not-allowed; opacity:.52; transform:none; }
-.btn-primary { color:#fff; background:linear-gradient(135deg,var(--orange),#ff8b32); box-shadow:0 10px 23px rgba(255,107,0,.23); }
-.btn-blue { color:#fff; background:linear-gradient(135deg,var(--blue-dark),var(--blue)); box-shadow:0 10px 23px rgba(39,100,238,.22); }
-.btn-soft { color:var(--ink); background:#f3f5f9; border:1px solid #e2e7ef; }
-.btn-danger { color:#fff; background:var(--danger); }
-.btn-block { width:100%; }
-.btn-confirm { color:#fff; background:linear-gradient(135deg,#00b986,#06c998); box-shadow:0 10px 24px rgba(0,185,134,.22); }
-.button-row { display:flex; gap:10px; margin-top:16px; }
-.button-row .btn { flex:1; }
-.error-box, .success-box, .notice-box { padding:12px 14px; border-radius:12px; font-size:13px; line-height:1.55; margin:10px 0 14px; }
-.error-box { color:#991b1b; background:#fef2f2; border:1px solid #fecaca; }
-.success-box { color:#166534; background:#f0fdf4; border:1px solid #bbf7d0; }
-.notice-box { color:#1d4ed8; background:#eff6ff; border:1px solid #bfdbfe; }
-.feature-list { display:grid; gap:15px; margin-top:18px; }
-.feature { display:flex; gap:12px; align-items:flex-start; }
-.feature-icon { width:34px; height:34px; border-radius:11px; flex:0 0 auto; display:grid; place-items:center; color:#fff; background:linear-gradient(135deg,var(--blue),#5d8cff); font-weight:900; box-shadow:0 6px 15px rgba(39,100,238,.18); }
-.feature strong { display:block; margin-bottom:3px; font-size:14px; }
-.feature span { display:block; color:var(--muted); font-size:12.5px; line-height:1.55; }
+.btn:active { transform: scale(.98); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.btn-primary, .btn-blue { color: #fff; background: var(--blue); }
+.btn-primary:hover:not(:disabled), .btn-blue:hover:not(:disabled) { background: var(--blue-dark); }
+.btn-soft { color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
+.btn-soft:hover:not(:disabled) { background: #eceef1; }
+.btn-confirm { color: #fff; background: var(--green); }
+.btn-confirm:hover:not(:disabled) { background: #15803d; }
+.btn-danger { color: #fff; background: var(--red); }
+.btn-block { width: 100%; }
+.button-row { display: flex; gap: 10px; margin-top: 16px; }
+.button-row .btn { flex: 1; }
 
-.order-layout { display:grid; gap:17px; }
-.delivery-shell {
-  overflow:hidden;
-  background:#fff;
-  border:1px solid #dce2ec;
-  border-radius:28px;
-  box-shadow:var(--shadow);
-  animation:pageEnter .5s cubic-bezier(.2,.75,.25,1) both;
-}
-.progress { padding:22px 34px 17px; background:#fff; border-bottom:1px solid var(--line); }
-.progress-row { display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
-.progress-step { position:relative; display:flex; flex-direction:column; align-items:center; gap:7px; color:#9ca6b8; font-size:10px; font-weight:750; text-align:center; text-transform:uppercase; letter-spacing:.04em; }
-.progress-step::after { content:""; position:absolute; z-index:0; top:14px; right:50%; width:100%; height:2px; background:#e1e6ef; }
-.progress-step:first-child::after { display:none; }
-.progress-icon { position:relative; z-index:2; width:29px; height:29px; border-radius:50%; display:grid; place-items:center; color:#9ba5b7; background:#f4f6f9; border:1px solid #e1e6ed; box-shadow:0 0 0 5px #fff; font-size:10px; }
-.progress-icon svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
-.progress-step.done { color:var(--blue); }
-.progress-step.done .progress-icon { color:#fff; background:var(--blue); border-color:var(--blue); }
-.progress-step.done::after { background:var(--blue); }
-.progress-step.current { color:#14172a; }
-.progress-step.current .progress-icon { color:#fff; background:var(--blue); border-color:var(--blue); box-shadow:0 0 0 5px #fff, 0 0 0 9px rgba(39,100,238,.12), 0 0 22px rgba(39,100,238,.28); animation:statusPulse 2.2s ease-in-out infinite; }
+.error-box, .notice-box, .success-box { margin: 10px 0 14px; padding: 11px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+.error-box { color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; }
+.notice-box { color: var(--blue-dark); background: var(--blue-soft); border: 1px solid #cfe5ff; }
+.success-box { color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; }
+.empty-state { padding: 40px 20px; color: var(--muted); font-size: 14px; text-align: center; }
 
-.delivery-banner {
-  margin:14px 14px 0;
-  padding:16px 18px;
-  border-radius:22px;
-  display:flex;
-  align-items:flex-start;
-  gap:14px;
-  border:1px solid #a8ead9;
-  background:linear-gradient(105deg,#e8fbf5,#e3faf3 58%,#effcf8);
-  position:relative;
-  overflow:hidden;
-}
-.delivery-banner::after { content:""; position:absolute; top:-70px; right:-40px; width:190px; height:190px; border-radius:50%; background:rgba(255,255,255,.5); animation:floatGlow 6s ease-in-out infinite; }
-.delivery-banner-delivered { border-color:#b9d1ff; background:linear-gradient(105deg,#edf4ff,#f5f8ff); }
-.delivery-banner-complete { border-color:#b8edd7; background:linear-gradient(105deg,#edfcf7,#f8fffc); }
-.delivery-banner-ready { border-color:#ffd6b8; background:linear-gradient(105deg,#fff4ec,#fffaf6); }
-.delivery-check { position:relative; z-index:1; width:36px; height:36px; flex:none; border-radius:50%; display:grid; place-items:center; color:#00a978; background:rgba(0,185,134,.1); }
-.delivery-check svg { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:2.7; stroke-linecap:round; stroke-linejoin:round; }
-.delivery-banner-copy { position:relative; z-index:1; min-width:0; }
-.delivery-banner-copy strong { display:block; color:#08775b; font-size:15px; margin-bottom:2px; }
-.delivery-banner-copy > span { display:block; color:#51647a; font-size:12px; line-height:1.45; }
-.delivery-badges { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
-.mini-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 9px; border-radius:999px; color:#466078; background:rgba(255,255,255,.72); border:1px solid rgba(118,155,183,.18); font-size:10px; font-weight:750; }
-.store-dot { width:7px; height:7px; border-radius:50%; background:#15c88d; box-shadow:0 0 0 3px rgba(21,200,141,.13); }
-.store-dot-busy { background:#f1b800; box-shadow:0 0 0 3px rgba(241,184,0,.13); }
-.store-dot-offline { background:#ed6570; box-shadow:0 0 0 3px rgba(237,101,112,.13); }
-
-.order-summary { margin-top:14px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#fff; }
-.order-summary-row { list-style:none; min-height:72px; padding:13px 18px; display:grid; grid-template-columns:auto minmax(0,1fr) auto auto; align-items:center; gap:14px; cursor:pointer; user-select:none; }
-.order-summary-row::-webkit-details-marker { display:none; }
-.order-thumbnails { width:66px; height:44px; display:flex; align-items:center; position:relative; }
-.order-thumbnails img,.order-thumbnails .item-placeholder { width:42px; height:42px; border-radius:11px; object-fit:cover; background:#edf1f7; border:2px solid #fff; box-shadow:0 4px 12px rgba(24,38,74,.12); }
-.order-thumbnails img + img,.order-thumbnails .item-placeholder + .item-placeholder,.order-thumbnails img + .item-placeholder,.order-thumbnails .item-placeholder + img { margin-left:-20px; }
-.item-placeholder { display:block; position:relative; overflow:hidden; }
-.item-placeholder::after,.item-image:not(img)::after { content:""; position:absolute; inset:0; background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.75) 45%,transparent 70%); transform:translateX(-100%); animation:shimmer 2.5s infinite; }
-.order-summary-copy { min-width:0; }
-.order-summary-title { font-size:18px; font-weight:800; letter-spacing:-.2px; }
-.order-summary-meta { display:flex; flex-wrap:wrap; gap:12px; color:#69758a; font-size:11px; margin-top:4px; }
-.order-summary-meta span { position:relative; }
-.order-summary-meta span + span::before { content:""; position:absolute; left:-7px; top:50%; width:3px; height:3px; border-radius:50%; background:#a8b0be; transform:translateY(-50%); }
-.status-pill { display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-size:10px; font-weight:800; text-transform:uppercase; white-space:nowrap; }
-.status-paid { color:#1d4ed8; background:#dbeafe; }
-.status-progress { color:#1d4ed8; background:#e6efff; }
-.status-delivered { color:#6b21a8; background:#f3e8ff; }
-.status-completed { color:#08775b; background:#dcfce7; }
-.summary-chevron { width:20px; height:20px; fill:none; stroke:#6e7a90; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; transition:transform .22s ease; }
-.order-summary[open] .summary-chevron { transform:rotate(180deg); }
-.order-details-grid { display:grid; grid-template-columns:240px minmax(0,1fr); gap:18px; padding:0 18px 18px; border-top:1px solid #eff2f6; animation:detailsOpen .25s ease both; }
-.roblox-inline,.items-inline,.proofs-inline { padding-top:15px; min-width:0; }
-.detail-kicker { color:#8490a3; font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; margin-bottom:10px; }
-.roblox-card { display:flex; align-items:center; gap:11px; }
-.roblox-avatar { width:52px; height:52px; border-radius:15px; object-fit:cover; background:#f0f3f8; border:1px solid var(--line); }
-.small { color:var(--muted); font-size:11px; margin-top:2px; }
-.item-groups-inline { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 16px; }
-.item-group-inline { min-width:0; }
-.game-label { font-size:9px; font-weight:800; color:var(--blue); letter-spacing:.07em; text-transform:uppercase; margin-bottom:6px; }
-.item-row { display:flex; align-items:center; gap:9px; padding:6px 0; border-top:1px solid #f0f2f6; }
-.item-row:first-of-type { border-top:0; }
-.item-image { position:relative; width:36px; height:36px; border-radius:10px; object-fit:cover; background:#eef1f6; flex:none; overflow:hidden; }
-.item-name { min-width:0; flex:1; font-size:11.5px; font-weight:700; line-height:1.35; }
-.item-qty { color:var(--muted); font-size:10px; white-space:nowrap; }
-.proofs-inline { grid-column:1/-1; }
-.proof-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:8px; }
-.proof-thumb { aspect-ratio:1.35; width:100%; object-fit:cover; border-radius:11px; border:1px solid var(--line); }
-
-.confirmation-panel { margin:14px; padding:17px 18px; border:1px solid #b9d0ff; border-radius:20px; background:linear-gradient(115deg,#f5f8ff,#fff); }
-.confirmation-panel h2 { margin:0 0 5px; font-size:18px; letter-spacing:-.2px; }
-.confirmation-panel p { margin:0; color:var(--muted); font-size:12px; }
-.confirmation-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
-
-.chat-card { display:flex; flex-direction:column; min-height:620px; overflow:hidden; }
-.customer-chat { border:0; border-radius:0; box-shadow:none; background:#fff; }
-.admin-chat-card { min-height:620px; }
-.chat-header { padding:15px 18px; color:#fff; background:linear-gradient(135deg,#1852ce,#2d70ef); display:flex; justify-content:space-between; align-items:center; gap:12px; }
-.chat-identity { display:flex; gap:11px; align-items:center; }
-.chat-avatar { width:38px; height:38px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.42); font-weight:850; }
-.chat-title { font-weight:800; font-size:14px; }
-.chat-sub { font-size:11px; opacity:.85; margin-top:2px; }
-.online-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; background:#42df9c; box-shadow:0 0 0 3px rgba(66,223,156,.16); }
-.busy-dot { background:#f6c43e; box-shadow:0 0 0 3px rgba(246,196,62,.18); }
-.offline-dot { background:#ff7f88; box-shadow:0 0 0 3px rgba(255,127,136,.18); }
-.chat-log { flex:1; min-height:510px; max-height:690px; overflow:auto; padding:22px 24px; background:#fff; display:flex; flex-direction:column; gap:15px; scroll-behavior:smooth; }
-.chat-guidance { display:flex; flex-direction:column; align-items:center; gap:9px; margin-bottom:4px; }
-.message-row { display:flex; align-items:flex-end; max-width:76%; animation:messageIn .28s ease both; }
-.message-row.customer { align-self:flex-end; }
-.message-row.admin { align-self:flex-start; }
-.message-row.system { align-self:center; max-width:92%; width:auto; }
-.message-stack { min-width:0; }
-.message-meta { margin:0 7px 4px; color:#68748a; font-size:9px; }
-.message-meta span { margin-left:4px; color:#9aa3b2; }
-.customer .message-meta { text-align:right; }
-.message-bubble { padding:11px 14px; border-radius:16px 16px 16px 5px; color:#28334b; background:#eaf0fa; font-size:13px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
-.customer .message-bubble { color:#fff; background:linear-gradient(135deg,#2f6df0,#2459dc); border-radius:16px 16px 5px 16px; box-shadow:0 7px 16px rgba(39,100,238,.18); }
-.system-pill { width:fit-content; max-width:100%; margin:0 auto; padding:9px 15px; border-radius:999px; font-size:10.5px; line-height:1.45; text-align:center; }
-.system-pill-info { color:#2453ad; background:#eaf1ff; }
-.system-pill-success { color:#08775b; background:#e7faf4; border:1px solid #a8ead9; box-shadow:0 5px 14px rgba(0,185,134,.08); }
-.system-pill-warning { color:#8a5a00; background:#fff7db; border:1px solid #f5dfa0; }
-.message-image { display:block; margin-top:9px; width:min(300px,100%); max-height:280px; object-fit:cover; border-radius:12px; }
-.attachment-link { display:block; margin-top:8px; text-decoration:underline; }
-.chat-compose { position:sticky; bottom:0; z-index:4; padding:12px 14px max(12px, env(safe-area-inset-bottom)); border-top:1px solid var(--line); background:rgba(255,255,255,.96); backdrop-filter:blur(10px); }
-.compose-row { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:9px; align-items:end; padding:5px; border:1.5px solid #bfd0f4; border-radius:18px; background:#eef4ff; transition:border-color .18s ease, box-shadow .18s ease; }
-.compose-row:focus-within { border-color:#6e96f2; box-shadow:0 0 0 4px rgba(39,100,238,.09); }
-.file-btn,.send-btn { width:42px; height:42px; border-radius:50%; display:grid; place-items:center; cursor:pointer; }
-.file-btn { border:0; color:#5e6b82; background:#fff; }
-.file-btn svg { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
-.compose-input { min-height:42px; max-height:120px; resize:none; border:0; padding:11px 5px; color:var(--ink); background:transparent; outline:none; }
-.compose-input::placeholder { color:#8d9aaf; }
-.send-btn { border:0; color:#fff; background:linear-gradient(135deg,#3979f5,#2459df); box-shadow:0 6px 15px rgba(39,100,238,.22); }
-.send-btn svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-.send-btn:disabled { opacity:.55; cursor:not-allowed; }
-.attachment-notice { margin:0 0 9px; padding:9px 12px; border-radius:11px; color:#40516a; background:#f2f5fa; font-size:11px; }
-.attachment-notice button { float:right; border:0; color:var(--blue); background:none; cursor:pointer; font-weight:700; }
-.read-only { padding:14px; color:#637086; background:#f2f5f9; text-align:center; font-size:12px; font-weight:700; border-top:1px solid var(--line); }
-.empty-state { padding:55px 20px; text-align:center; color:var(--muted); }
-
-.review-panel { padding:20px 22px; display:flex; align-items:center; justify-content:space-between; gap:20px; background:linear-gradient(110deg,#fff,#f5fffb); border-color:#ccefe1; }
-.review-panel h2 { margin:2px 0 4px; font-size:20px; }
-.review-panel p { margin:0; color:var(--muted); font-size:12px; }
-.trustpilot-label { color:#00a878; font-weight:850; font-size:12px; }
-.trustpilot-btn { color:#fff; background:#00b67a; box-shadow:0 10px 22px rgba(0,182,122,.2); white-space:nowrap; }
-
-.roblox-link-card { width:min(470px,100%); margin:24px auto 0; padding:30px; text-align:center; }
-.link-icon { width:54px; height:54px; margin:0 auto 16px; border-radius:50%; display:grid; place-items:center; color:var(--blue); background:#edf3ff; }
-.link-icon svg { width:25px; height:25px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-.roblox-link-card .section-copy { max-width:360px; margin-left:auto; margin-right:auto; }
-.roblox-link-card .field { text-align:left; }
-.roblox-confirm-card { padding:17px; border-radius:20px; display:flex; align-items:center; justify-content:center; gap:14px; background:#f4f7fc; }
-.roblox-confirm-avatar { width:76px; height:76px; border-radius:18px; object-fit:cover; }
-
-.sidebar { display:grid; gap:14px; }
-.side-card { padding:17px; }
-.side-title { margin:0 0 12px; font:750 17px/1.2 var(--font-display), Outfit, sans-serif; }
-.item-group { margin-top:12px; border-top:1px solid var(--line); padding-top:12px; }
-.review-card { padding:18px; background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border-color:#bbf7d0; }
-.review-stars { color:#00b67a; letter-spacing:2px; font-size:18px; }
-
-.dashboard-shell { width:min(1250px, calc(100% - 24px)); margin:0 auto; padding:14px 0 50px; }
-.admin-grid { display:grid; grid-template-columns:330px minmax(0,1fr); gap:14px; }
-.admin-panel { background:#111827; color:#f8fafc; border-radius:20px; border:1px solid #243044; box-shadow:0 18px 50px rgba(0,0,0,.2); overflow:hidden; }
-.admin-toolbar { padding:15px; border-bottom:1px solid #263348; display:flex; gap:8px; flex-wrap:wrap; }
-.admin-input, .admin-select { min-height:42px; border:1px solid #344258; background:#0b1220; color:#fff; border-radius:11px; padding:9px 11px; outline:none; }
-.order-list { max-height:calc(100svh - 185px); overflow:auto; padding:9px; }
-.order-list-item { width:100%; text-align:left; color:#e5e7eb; background:#172033; border:1px solid #29364c; border-radius:13px; padding:12px; margin-bottom:8px; cursor:pointer; }
-.order-list-item.active { border-color:#4b84ff; background:#192b4c; }
-.order-list-top { display:flex; justify-content:space-between; gap:8px; font-weight:850; }
-.order-list-last { color:#8f9bad; font-size:11px; line-height:1.45; margin-top:7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.admin-detail { min-height:760px; background:#f8fafc; color:var(--ink); border-radius:20px; border:1px solid var(--line); overflow:hidden; box-shadow:var(--shadow); }
-.admin-detail-header { padding:16px 18px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-.admin-body { display:grid; grid-template-columns:minmax(0,1fr) 310px; min-height:690px; }
-.admin-chat { display:flex; flex-direction:column; border-right:1px solid var(--line); }
-.admin-controls { padding:16px; overflow:auto; max-height:690px; }
-.control-stack { display:grid; gap:9px; }
-.tabs { display:none; }
-
-.spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
-.fade-up { animation:pageEnter .4s ease both; }
-.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
-
-@keyframes spin { to { transform:rotate(360deg); } }
-@keyframes pageEnter { from { opacity:0; transform:translateY(13px); } to { opacity:1; transform:none; } }
-@keyframes messageIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
-@keyframes detailsOpen { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
-@keyframes statusPulse { 0%,100% { box-shadow:0 0 0 5px #fff,0 0 0 9px rgba(39,100,238,.1),0 0 18px rgba(39,100,238,.2); } 50% { box-shadow:0 0 0 5px #fff,0 0 0 12px rgba(39,100,238,.03),0 0 25px rgba(39,100,238,.32); } }
-@keyframes floatGlow { 0%,100% { transform:translate3d(0,0,0); } 50% { transform:translate3d(-12px,12px,0); } }
-@keyframes shimmer { 100% { transform:translateX(100%); } }
-
-@media (max-width: 860px) {
-  .verify-grid { grid-template-columns:1fr; }
-  .order-details-grid { grid-template-columns:200px minmax(0,1fr); }
-  .item-groups-inline { grid-template-columns:1fr; }
-  .admin-grid { grid-template-columns:1fr; }
-  .admin-panel { display:none; }
-  .admin-panel.mobile-show { display:block; }
-  .admin-detail { display:none; }
-  .admin-detail.mobile-show { display:block; }
-  .tabs { display:flex; gap:8px; margin-bottom:10px; }
-  .tabs button { flex:1; }
-  .admin-body { grid-template-columns:1fr; }
-  .admin-chat { border-right:0; }
-  .admin-controls { border-top:1px solid var(--line); max-height:none; }
+.spinner, .claim-spinner {
+  width: 18px; height: 18px; border: 2px solid rgba(255, 255, 255, .4); border-top-color: #fff; border-radius: 50%;
+  animation: spin .7s linear infinite;
 }
 
-@media (max-width: 620px) {
-  body { background:#f5f7fb; }
-  .top-strip { min-height:34px; font-size:10px; padding:7px 9px; gap:7px; }
-  .top-strip a { padding:3px 8px; }
-  .site-header { width:calc(100% - 18px); min-height:80px; padding:12px 0 9px; gap:12px; }
-  .brand-logo { width:min(248px, 60vw); }
-  .header-actions { gap:8px; }
-  .header-text-link { display:none; }
-  .header-link { padding:9px 12px; font-size:10.5px; }
-  .page-wrap,.narrow { width:calc(100% - 8px); padding:4px 0 28px; }
-  .hero { margin-inline:4px; padding:24px 19px; border-radius:20px; }
-  .hero h1 { font-size:34px; letter-spacing:-1px; }
-  .verify-grid { margin:14px 4px 0; }
-  .form-card,.info-card { padding:20px 17px; border-radius:19px; }
-  .delivery-shell { border-radius:20px; box-shadow:0 12px 36px rgba(20,32,70,.09); }
-  .progress { padding:15px 8px 12px; }
-  .progress-step { font-size:7.5px; letter-spacing:.02em; gap:5px; }
-  .progress-step::after { top:11px; }
-  .progress-icon { width:23px; height:23px; font-size:8px; box-shadow:0 0 0 3px #fff; }
-  .progress-icon svg { width:13px; height:13px; }
-  .progress-step.current .progress-icon { box-shadow:0 0 0 3px #fff,0 0 0 6px rgba(39,100,238,.11); }
-  .delivery-banner { margin:9px 9px 0; padding:13px; border-radius:17px; gap:10px; }
-  .delivery-check { width:31px; height:31px; }
-  .delivery-banner-copy strong { font-size:13px; }
-  .delivery-banner-copy > span { font-size:10.5px; }
-  .delivery-badges { margin-top:7px; gap:4px; }
-  .mini-badge { padding:4px 7px; font-size:8.5px; }
-  .order-summary { margin-top:9px; }
-  .order-summary-row { min-height:65px; padding:10px; grid-template-columns:auto minmax(0,1fr) auto; gap:8px; }
-  .order-thumbnails { width:50px; height:38px; }
-  .order-thumbnails img,.order-thumbnails .item-placeholder { width:35px; height:35px; border-radius:9px; }
-  .order-thumbnails img + img,.order-thumbnails .item-placeholder + .item-placeholder,.order-thumbnails img + .item-placeholder,.order-thumbnails .item-placeholder + img { margin-left:-18px; }
-  .order-summary-title { font-size:15px; }
-  .order-summary-meta { gap:9px; font-size:9px; }
-  .order-summary-meta span:nth-child(3) { display:none; }
-  .status-pill { padding:5px 7px; font-size:8px; }
-  .summary-chevron { grid-column:3; width:17px; height:17px; }
-  .order-summary-row .status-pill { display:none; }
-  .order-details-grid { grid-template-columns:1fr; gap:0; padding:0 12px 12px; }
-  .roblox-inline,.items-inline,.proofs-inline { padding-top:12px; }
-  .roblox-inline { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  .roblox-inline .detail-kicker { margin:0; max-width:90px; }
-  .roblox-avatar { width:45px; height:45px; border-radius:13px; }
-  .item-groups-inline { gap:7px; }
-  .item-group-inline { padding:8px 9px; border:1px solid #edf0f5; border-radius:13px; background:#fbfcfe; }
-  .item-row { padding:5px 0; }
-  .item-image { width:32px; height:32px; border-radius:8px; }
-  .item-name { font-size:10.5px; }
-  .confirmation-panel { margin:9px; padding:14px; border-radius:17px; }
-  .confirmation-panel h2 { font-size:15px; }
-  .confirmation-actions { grid-template-columns:1fr; }
-  .chat-card { min-height:calc(100svh - 265px); }
-  .chat-log { min-height:430px; max-height:none; padding:16px 11px; gap:13px; }
-  .chat-guidance { gap:7px; }
-  .message-row { max-width:88%; }
-  .message-row.system { max-width:95%; }
-  .message-bubble { padding:10px 12px; font-size:12px; border-radius:15px 15px 15px 5px; }
-  .customer .message-bubble { border-radius:15px 15px 5px 15px; }
-  .message-meta { font-size:8.5px; }
-  .system-pill { padding:8px 11px; font-size:9px; }
-  .chat-compose { padding:9px 8px max(9px, env(safe-area-inset-bottom)); }
-  .compose-row { gap:5px; padding:4px; border-radius:16px; }
-  .file-btn,.send-btn { width:39px; height:39px; }
-  .compose-input { min-height:39px; font-size:13px; padding:10px 3px; }
-  .review-panel { margin-inline:4px; padding:17px; display:grid; gap:14px; border-radius:19px; }
-  .trustpilot-btn { width:100%; }
-  .roblox-link-card { margin:10px 4px 0; padding:25px 18px; border-radius:20px; }
-  .button-row { flex-direction:column; }
-  .dashboard-shell { width:calc(100% - 10px); }
-  .admin-detail-header { padding:13px; }
-  .admin-body { min-height:0; }
-  .admin-controls { padding:13px; }
-}
+/* ---------- status pills ---------- */
+.status-pill { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.status-paid, .status-progress { color: var(--blue-dark); background: var(--blue-soft); }
+.status-delivered { color: #7e22ce; background: #f3e8ff; }
+.status-completed { color: #15803d; background: #dcfce7; }
+.status-cancelled { color: #b91c1c; background: #fee2e2; }
+.order-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
-@media (prefers-reduced-motion: reduce) {
-  *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; }
-}
-
-/* Premium Claim 2 layout. Sized from the supplied Claim 2 screenshots. */
-body {
+/* ---------- home / claim page ---------- */
+.claim-home-page { position: relative; min-height: 100dvh; overflow: hidden; background: var(--bg); }
+.claim-atmosphere { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.claim-atmosphere-mesh {
+  position: absolute; inset: 0;
   background:
-    radial-gradient(circle at 14% -15%, rgba(39,100,238,.065), transparent 31rem),
-    radial-gradient(circle at 92% 17%, rgba(255,107,0,.045), transparent 28rem),
-    #fbfcff;
+    radial-gradient(60rem 30rem at 12% -10%, rgba(10, 132, 255, .08), transparent 60%),
+    radial-gradient(40rem 26rem at 100% 100%, rgba(10, 132, 255, .05), transparent 60%);
 }
-.site-header {
-  width:min(1040px, calc(100% - 32px));
-  min-height:88px;
-  padding:14px 0 12px;
-}
-.brand-logo { width:min(285px, 34vw); }
-.page-wrap { width:min(900px, calc(100% - 32px)); padding:10px 0 64px; }
-.order-layout { width:100%; max-width:900px; margin:0 auto; gap:18px; }
-.delivery-shell {
-  position:relative;
-  border-color:#d9e0eb;
-  border-radius:25px;
-  box-shadow:0 18px 54px rgba(31,47,86,.10);
-}
-.delivery-shell::before {
-  content:"";
-  position:absolute;
-  z-index:5;
-  top:0;
-  left:26px;
-  right:26px;
-  height:1px;
-  background:linear-gradient(90deg,transparent,rgba(39,100,238,.28),transparent);
-  pointer-events:none;
-}
-.progress { padding:19px 42px 15px; }
-.delivery-banner { margin:13px 13px 0; border-radius:20px; padding:15px 17px; }
-.order-summary { margin-top:13px; }
-.order-summary-row { min-height:75px; padding:14px 17px; }
-.order-details-grid { grid-template-columns:205px minmax(0,1fr); gap:20px; padding:0 17px 18px; }
-.item-groups-inline { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 14px; }
-.item-group-inline { min-width:0; }
-.item-row {
-  min-height:54px;
-  padding:8px 10px;
-  border:1px solid #edf0f5;
-  border-radius:13px;
-  background:#f6f8fc;
-  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-}
-.item-row + .item-row { margin-top:7px; }
-@media (hover:hover) {
-  .item-row:hover { transform:translateY(-1px); border-color:#dce5f6; box-shadow:0 7px 18px rgba(35,55,96,.07); }
-}
-.item-image { width:39px; height:39px; border-radius:10px; background:#fff; }
-.item-copy { min-width:0; flex:1; }
-.item-name { font-size:12px; line-height:1.3; }
-.item-options { display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
-.item-variant,.item-property {
-  display:inline-flex;
-  align-items:center;
-  min-height:20px;
-  padding:2px 7px;
-  border-radius:6px;
-  border:1px solid #cbd5e1;
-  color:#344054;
-  background:#fff;
-  font-size:9px;
-  font-weight:650;
-  line-height:1.2;
-}
-.item-property { color:#526077; background:#f9fafb; }
-.item-qty { padding-left:7px; font-size:10px; }
-.customer-chat { border-top:1px solid var(--line); }
-.chat-card { min-height:650px; }
-.chat-log {
-  min-height:570px;
-  max-height:720px;
-  padding:22px 26px 20px;
-  gap:14px;
-  overscroll-behavior:contain;
-}
-.chat-guidance { gap:10px; margin:0 auto 8px; }
-.message-row { max-width:72%; }
-.message-row.system { max-width:90%; }
-.message-bubble { box-shadow:0 4px 12px rgba(28,44,82,.045); }
-.system-pill { padding:9px 16px; }
-.chat-compose {
-  position:sticky;
-  bottom:0;
-  padding:11px 14px max(12px, env(safe-area-inset-bottom));
-  background:#fff;
-}
-.compose-row {
-  min-height:58px;
-  padding:5px 6px;
-  border-color:#9ebbf5;
-  border-radius:18px;
-  background:#edf3ff;
-  box-shadow:inset 0 0 0 1px rgba(39,100,238,.03);
-}
-.file-btn,.send-btn { width:44px; height:44px; }
-.compose-input { min-height:44px; padding:11px 6px; font-size:14px; }
-.send-btn { box-shadow:0 7px 17px rgba(39,100,238,.25); transition:transform .16s ease, box-shadow .16s ease; }
-.send-btn:not(:disabled):hover { transform:translateY(-1px) scale(1.02); box-shadow:0 10px 21px rgba(39,100,238,.3); }
-.review-panel { border-radius:22px; }
-
-@media (max-width: 700px) {
-  .site-header { width:calc(100% - 24px); min-height:74px; padding:10px 0 8px; }
-  .brand-logo { width:min(220px, 58vw); }
-  .page-wrap,.narrow { width:100%; padding:4px 8px 30px; }
-  .order-layout { max-width:none; gap:12px; }
-  .delivery-shell { border-radius:22px; box-shadow:0 13px 38px rgba(28,44,82,.10); }
-  .delivery-shell::before { left:18px; right:18px; }
-  .progress { padding:16px 12px 13px; }
-  .delivery-banner { margin:10px 10px 0; padding:13px 14px; border-radius:17px; }
-  .delivery-badges { display:none; }
-  .order-summary { margin-top:10px; }
-  .order-summary-row { min-height:66px; padding:10px 11px; gap:9px; }
-  .order-details-grid { grid-template-columns:1fr; gap:13px; padding:0 11px 13px; }
-  .roblox-inline,.items-inline,.proofs-inline { padding-top:12px; }
-  .roblox-inline { display:block; }
-  .roblox-inline .detail-kicker { max-width:none; margin:0 0 8px; }
-  .roblox-card { padding:10px; border:1px solid #edf0f5; border-radius:14px; background:#f8faff; }
-  .item-groups-inline { grid-template-columns:1fr; gap:10px; }
-  .item-group-inline { padding:0; border:0; border-radius:0; background:transparent; }
-  .item-row { min-height:55px; padding:8px 10px; border-radius:13px; }
-  .item-image { width:39px; height:39px; }
-  .item-name { font-size:11.5px; }
-  .item-variant,.item-property { min-height:19px; padding:2px 6px; font-size:8.5px; }
-  .chat-card { min-height:calc(100svh - 230px); }
-  .chat-log { min-height:480px; max-height:none; padding:18px 13px 16px; gap:13px; }
-  .chat-guidance { gap:8px; margin-bottom:7px; }
-  .message-row { max-width:86%; }
-  .message-row.system { max-width:96%; }
-  .system-pill { padding:8px 11px; font-size:9.2px; }
-  .chat-compose { padding:10px 10px max(11px, env(safe-area-inset-bottom)); }
-  .compose-row { min-height:54px; padding:4px 5px; border-radius:17px; }
-  .file-btn,.send-btn { width:41px; height:41px; }
-  .compose-input { min-height:41px; padding:10px 5px; font-size:13px; }
-  .review-panel { margin:0; border-radius:20px; }
-}
-
-@media (max-width: 390px) {
-  .page-wrap,.narrow { padding-left:6px; padding-right:6px; }
-  .top-strip { padding-left:7px; padding-right:7px; }
-  .site-header { width:calc(100% - 18px); }
-  .brand-logo { width:min(205px, 57vw); }
-  .header-link { padding:8px 10px; }
-  .progress { padding-left:8px; padding-right:8px; }
-  .delivery-banner { margin-left:8px; margin-right:8px; }
-  .order-summary-row { padding-left:9px; padding-right:9px; }
-  .order-details-grid { padding-left:9px; padding-right:9px; }
-  .chat-log { padding-left:11px; padding-right:11px; }
-  .chat-compose { padding-left:8px; padding-right:8px; }
-}
-
-/* Claim 2 v4 order header and mobile refinement */
-.order-title-line {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:18px;
-  min-width:0;
-}
-.order-heading-block { min-width:0; flex:1; }
-.summary-roblox {
-  min-width:190px;
-  display:flex;
-  align-items:center;
-  gap:9px;
-  padding:7px 10px;
-  border:1px solid #e5e9f1;
-  border-radius:14px;
-  background:#f7f9fd;
-  box-shadow:0 5px 14px rgba(28,44,82,.045);
-}
-.summary-roblox-avatar {
-  width:38px;
-  height:38px;
-  flex:none;
-  border-radius:11px;
-  object-fit:cover;
-  background:#edf2f9;
-  border:1px solid #dfe6f1;
-}
-.summary-avatar-fallback {
-  display:grid;
-  place-items:center;
-  color:var(--blue);
-  font-weight:800;
-}
-.summary-roblox-copy { min-width:0; display:grid; line-height:1.16; }
-.summary-roblox-copy strong { font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.summary-roblox-copy span { color:#718096; font-size:9px; white-space:nowrap; }
-.order-details-items-only { grid-template-columns:1fr; }
-.order-details-items-only .items-inline { width:100%; }
-.order-details-items-only .proofs-inline { grid-column:auto; }
-.customer-chat { position:relative; }
-.chat-compose {
-  padding:12px 14px max(14px, env(safe-area-inset-bottom));
-  border-top:1px solid #edf0f5;
-  background:linear-gradient(180deg,rgba(255,255,255,.92),#fff 24%);
-}
-.compose-row { width:100%; margin:0; }
-
-@media (max-width: 700px) {
-  .site-header { min-height:68px; }
-  .page-wrap,.narrow { padding-left:6px; padding-right:6px; }
-  .delivery-shell { border-radius:20px; }
-  .progress { padding:14px 8px 12px; }
-  .delivery-banner { margin:8px 8px 0; padding:12px; }
-  .delivery-banner-copy strong { font-size:13.5px; }
-  .delivery-banner-copy > span { font-size:10.5px; }
-  .order-summary { margin-top:8px; }
-  .order-summary-row {
-    min-height:76px;
-    grid-template-columns:48px minmax(0,1fr) auto;
-    padding:9px 9px;
-    gap:8px;
-  }
-  .order-thumbnails { width:48px; height:38px; }
-  .order-thumbnails img,.order-thumbnails .item-placeholder { width:36px; height:36px; border-radius:9px; }
-  .order-thumbnails img + img,.order-thumbnails .item-placeholder + .item-placeholder,.order-thumbnails img + .item-placeholder,.order-thumbnails .item-placeholder + img { margin-left:-20px; }
-  .order-title-line { gap:8px; }
-  .order-summary-title { font-size:14px; }
-  .order-summary-meta { display:flex; gap:8px; margin-top:3px; font-size:8.5px; white-space:nowrap; }
-  .order-summary-meta span { display:inline !important; }
-  .order-summary-meta span + span::before { left:-5px; width:2px; height:2px; }
-  .summary-roblox {
-    min-width:122px;
-    max-width:48%;
-    gap:6px;
-    padding:5px 6px;
-    border-radius:11px;
-  }
-  .summary-roblox-avatar { width:31px; height:31px; border-radius:9px; }
-  .summary-roblox-copy strong { font-size:10px; }
-  .summary-roblox-copy span { font-size:7.4px; }
-  .order-summary-row .status-pill { display:none; }
-  .summary-chevron { width:17px; height:17px; }
-  .order-details-grid { padding:0 9px 11px; }
-  .items-inline { padding-top:10px; }
-  .detail-kicker { margin-bottom:7px; font-size:8.5px; }
-  .item-groups-inline { gap:8px; }
-  .item-row { min-height:52px; padding:7px 8px; }
-  .game-label { margin-bottom:4px; font-size:8px; }
-  .chat-card { min-height:calc(100svh - 214px); }
-  .chat-log { min-height:470px; padding:15px 10px 13px; }
-  .chat-compose { padding:8px 8px max(10px, env(safe-area-inset-bottom)); }
-  .compose-row { min-height:52px; border-radius:17px; }
-}
-
-@media (max-width: 430px) {
-  .top-strip { min-height:32px; }
-  .site-header { width:calc(100% - 14px); padding:8px 0 7px; }
-  .brand-logo { width:min(188px, 54vw); }
-  .header-link { padding:8px 9px; }
-  .order-summary-row { grid-template-columns:44px minmax(0,1fr) auto; }
-  .order-thumbnails { width:44px; }
-  .order-title-line { align-items:flex-start; }
-  .order-heading-block { padding-top:2px; }
-  .summary-roblox { min-width:116px; max-width:50%; }
-  .order-summary-meta { gap:7px; font-size:7.9px; }
-  .chat-log { min-height:455px; }
-}
-
-/* Claim 2 v5. ParadiseBlox implementation inspired by the supplied premium claim layout. */
-:root,
-html[data-theme="light"] {
-  --nova-rgb: 37, 99, 235;
-  --nova: #2563eb;
-  --nova-deep: #1747c7;
-  --nova-orange: #ff6d00;
-  --c-bg: #f7f8fc;
-  --c-bg-soft: #ffffff;
-  --c-surface: #f5f7fb;
-  --c-surface-2: #ffffff;
-  --c-fg: #121522;
-  --c-fg-2: #667085;
-  --c-fg-3: #98a2b3;
-  --c-ring: rgba(20, 32, 70, .12);
-  --c-line: #e4e8f0;
-  --atmo-dot: rgba(39, 68, 128, .13);
-  --atmo-vignette: rgba(235, 239, 249, .78);
-  --atmo-mesh:
-    radial-gradient(circle at 18% 18%, rgba(37, 99, 235, .10), transparent 30%),
-    radial-gradient(circle at 84% 74%, rgba(255, 109, 0, .08), transparent 30%),
-    radial-gradient(circle at 55% 5%, rgba(82, 126, 255, .07), transparent 35%);
-  --nova-card-shadow: 0 1px 1px rgba(20,30,60,.04), 0 14px 34px -12px rgba(20,30,60,.18), 0 48px 90px -34px rgba(20,30,60,.35);
-  color-scheme: light;
-}
-
-html[data-theme="dark"] {
-  --nova-rgb: 86, 117, 255;
-  --nova: #5a72ff;
-  --nova-deep: #7657f5;
-  --nova-orange: #ff7a1a;
-  --c-bg: #090a0f;
-  --c-bg-soft: #11131b;
-  --c-surface: #171a25;
-  --c-surface-2: #1c2030;
-  --c-fg: #f6f7fb;
-  --c-fg-2: #aeb6c8;
-  --c-fg-3: #737d93;
-  --c-ring: rgba(255,255,255,.10);
-  --c-line: rgba(255,255,255,.09);
-  --atmo-dot: rgba(164, 178, 224, .10);
-  --atmo-vignette: rgba(0,0,0,.78);
-  --atmo-mesh:
-    radial-gradient(circle at 18% 18%, rgba(72, 103, 255, .14), transparent 30%),
-    radial-gradient(circle at 84% 74%, rgba(255, 109, 0, .09), transparent 30%),
-    radial-gradient(circle at 55% 5%, rgba(123, 87, 245, .10), transparent 35%);
-  --nova-card-shadow: 0 1px 1px rgba(0,0,0,.3), 0 18px 40px -12px rgba(0,0,0,.65), 0 50px 100px -38px rgba(0,0,0,.9);
-  color-scheme: dark;
-}
-
-html { background: var(--c-bg); }
-body {
-  color: var(--c-fg);
-  background: var(--c-bg);
-  transition: background-color .3s ease, color .3s ease;
-}
-
-.claim-home-page {
-  position: relative;
-  display: flex;
-  min-height: 100dvh;
-  flex-direction: column;
-  overflow: hidden;
-  color: var(--c-fg);
-  background: var(--c-bg);
-  isolation: isolate;
-}
-
-.claim-atmosphere {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: -1;
-}
-.claim-atmosphere-mesh { position:absolute; inset:0; background-image:var(--atmo-mesh); }
-.claim-atmosphere-dots {
-  position:absolute;
-  inset:0;
-  background-image: radial-gradient(var(--atmo-dot) .75px, transparent 1px), radial-gradient(var(--atmo-dot) .75px, transparent 1px);
-  background-size: 140px 140px, 220px 220px;
-  background-position: 0 0, 80px 100px;
-  -webkit-mask-image: radial-gradient(100% 80% at 50% 10%, #000 35%, transparent 80%);
-  mask-image: radial-gradient(100% 80% at 50% 10%, #000 35%, transparent 80%);
-}
-.claim-atmosphere-bloom { position:absolute; border-radius:999px; filter:blur(130px); opacity:.55; }
-.claim-atmosphere-bloom-a { left:50%; top:-24%; width:42rem; height:31rem; transform:translateX(-50%); background:rgba(var(--nova-rgb),.12); animation:claimDriftA 14s ease-in-out infinite; }
-.claim-atmosphere-bloom-b { right:-10%; bottom:-18%; width:34rem; height:30rem; background:rgba(255,109,0,.08); animation:claimDriftB 16s ease-in-out infinite; }
-.claim-atmosphere-vignette { position:absolute; inset:0; background:radial-gradient(ellipse at center,transparent 46%,var(--atmo-vignette) 100%); }
-
-.claim-theme-position { position:absolute; right:max(16px,env(safe-area-inset-right)); top:max(16px,env(safe-area-inset-top)); z-index:20; }
-.theme-toggle {
-  position:relative;
-  display:flex;
-  width:58px;
-  height:32px;
-  flex:none;
-  align-items:center;
-  justify-content:space-between;
-  padding:4px 7px;
-  border:1px solid var(--c-ring);
-  border-radius:999px;
-  color:var(--c-fg-3);
-  background:var(--c-surface-2);
-  box-shadow:inset 0 1px 2px rgba(0,0,0,.12),0 8px 20px rgba(20,30,60,.08);
-  cursor:pointer;
-  transition:border-color .25s ease,background .25s ease;
-}
-.theme-toggle:hover { border-color:rgba(var(--nova-rgb),.45); }
-.theme-toggle > svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:opacity .25s ease; }
-.theme-toggle-thumb {
-  position:absolute;
-  left:4px;
-  top:3px;
-  display:grid;
-  width:24px;
-  height:24px;
-  place-items:center;
-  border-radius:50%;
-  color:#fff;
-  background:linear-gradient(135deg,var(--nova),var(--nova-deep));
-  box-shadow:0 3px 9px rgba(var(--nova-rgb),.45);
-  transform:translateX(0);
-  transition:transform .3s cubic-bezier(.2,.8,.2,1);
-}
-.theme-toggle-thumb svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
-html[data-theme="dark"] .theme-toggle-thumb { transform:translateX(26px); }
-html[data-theme="dark"] .theme-sun { opacity:.4; }
-html[data-theme="dark"] .theme-moon { opacity:0; }
-html[data-theme="light"] .theme-sun { opacity:0; }
-html[data-theme="light"] .theme-moon { opacity:.45; }
+.claim-atmosphere-dots, .claim-atmosphere-bloom, .claim-atmosphere-vignette { display: none; }
 
 .claim-home-stage {
-  position:relative;
-  z-index:10;
-  width:100%;
-  max-width:1050px;
-  min-height:100dvh;
-  margin:0 auto;
-  padding:56px 16px 44px;
-  display:flex;
-  flex:1;
-  align-items:center;
-  justify-content:center;
-  gap:56px;
+  position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 56px;
+  width: 100%; max-width: 1040px; min-height: 100dvh; margin: 0 auto; padding: 32px 16px;
 }
-
-.claim-home-art {
-  position:relative;
-  display:none;
-  width:440px;
-  height:510px;
-  flex:none;
-  animation:claimFadeUp .8s cubic-bezier(.22,1,.36,1) both;
-}
-.claim-art-logo { position:absolute; z-index:5; left:50%; top:24px; width:365px; transform:translateX(-50%); filter:drop-shadow(0 24px 28px rgba(20,30,60,.18)); animation:claimBob 8s ease-in-out infinite; }
-.claim-art-glow { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; }
-.claim-art-glow-blue { left:18%; top:23%; width:280px; height:280px; background:rgba(var(--nova-rgb),.22); }
-.claim-art-glow-orange { right:1%; bottom:8%; width:230px; height:230px; background:rgba(255,109,0,.16); }
-.claim-portal { position:absolute; left:50%; top:52%; width:260px; height:260px; transform:translate(-50%,-50%); display:grid; place-items:center; }
-.claim-portal-ring { position:absolute; inset:0; border-radius:50%; border:1px solid rgba(var(--nova-rgb),.3); box-shadow:0 0 60px rgba(var(--nova-rgb),.12); }
-.claim-portal-ring-one { animation:portalSpin 18s linear infinite; border-style:dashed; }
-.claim-portal-ring-two { inset:32px; border-color:rgba(255,109,0,.26); animation:portalSpin 14s linear infinite reverse; }
-.claim-portal-core { width:132px; height:132px; display:grid; place-items:center; border-radius:38px; color:#fff; font-size:42px; font-weight:900; letter-spacing:-3px; background:linear-gradient(145deg,#1b9df1 0%,#245fe8 52%,#ff6d00 100%); box-shadow:0 28px 48px rgba(20,30,60,.25), inset 0 1px 0 rgba(255,255,255,.4); animation:claimBob 7.5s ease-in-out .3s infinite; }
-.claim-floating-tile { position:absolute; z-index:4; width:78px; height:78px; display:grid; place-items:center; border-radius:22px; background:rgba(255,255,255,.92); box-shadow:0 18px 38px -12px rgba(20,30,60,.35); border:1px solid rgba(20,30,60,.05); backdrop-filter:blur(12px); }
-html[data-theme="dark"] .claim-floating-tile { background:rgba(28,32,48,.92); border-color:rgba(255,255,255,.08); }
-.claim-floating-tile span { display:grid; width:56px; height:56px; place-items:center; border-radius:16px; color:#fff; font-weight:900; font-size:14px; background:linear-gradient(145deg,var(--nova),var(--nova-deep)); }
-.claim-floating-tile-a { right:0; top:104px; transform:rotate(8deg); animation:claimFloat 7s ease-in-out .2s infinite; }
-.claim-floating-tile-b { left:0; bottom:86px; transform:rotate(-10deg); animation:claimFloat 7.6s ease-in-out .55s infinite; }
-.claim-floating-tile-b span { background:linear-gradient(145deg,#171b29,#44516b); }
-.claim-floating-tile-c { right:18px; bottom:24px; transform:rotate(5deg); animation:claimFloat 8.2s ease-in-out .9s infinite; }
-.claim-floating-tile-c span { background:linear-gradient(145deg,#16b981,#0d9488); }
-
-.claim-card-frame {
-  width:100%;
-  max-width:448px;
-  padding:1.5px;
-  border-radius:32px;
-  background:linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.025));
-  box-shadow:var(--nova-card-shadow);
-  animation:claimFadeUp .7s cubic-bezier(.22,1,.36,1) .08s both;
-}
-html[data-theme="dark"] .claim-card-frame { background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.035)); }
-.claim-card-premium { overflow:hidden; padding:30px; border-radius:30.5px; background:var(--c-bg-soft); transition:background .3s ease; }
-.claim-card-logo { display:none; width:270px; max-width:82%; height:auto; margin:0 auto 22px; object-fit:contain; filter:drop-shadow(0 10px 13px rgba(20,30,60,.12)); }
-.claim-card-heading { margin-bottom:26px; text-align:center; }
-.claim-card-heading h1 { margin:0; color:var(--c-fg); font-size:39px; font-weight:800; line-height:1.05; letter-spacing:-1.6px; }
-.claim-card-heading p { max-width:320px; margin:10px auto 0; color:var(--c-fg-2); font-size:14px; line-height:1.6; }
-.claim-form { display:grid; gap:16px; }
-.claim-form-group { display:grid; gap:7px; }
-.claim-form-group label { color:var(--c-fg-2); font-size:11px; font-weight:800; letter-spacing:.085em; text-transform:uppercase; }
-.claim-field { position:relative; border-radius:16px; }
-.claim-field-icon { position:absolute; z-index:2; left:16px; top:50%; width:18px; height:18px; color:var(--c-fg-3); transform:translateY(-50%); transition:color .25s ease; pointer-events:none; }
-.claim-field-icon svg { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
-.claim-field input { width:100%; min-height:54px; padding:13px 16px 13px 44px; border:0; border-radius:16px; outline:0; color:var(--c-fg); background:var(--c-surface); box-shadow:inset 0 0 0 1px var(--c-ring); font-size:16px; transition:background .25s ease,box-shadow .25s ease; }
-.claim-field input::placeholder { color:var(--c-fg-3); }
-.claim-field:focus-within .claim-field-icon { color:var(--nova); }
-.claim-field:focus-within input { background:var(--c-surface-2); box-shadow:inset 0 0 0 1px transparent,0 0 22px rgba(var(--nova-rgb),.15); }
-.claim-focus-border { position:absolute; inset:0; border-radius:inherit; padding:1.5px; background:linear-gradient(120deg,rgba(var(--nova-rgb),.65),rgba(255,109,0,.35)); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); mask-composite:exclude; opacity:0; transition:opacity .3s ease; pointer-events:none; }
-.claim-field:focus-within .claim-focus-border { opacity:1; }
-.claim-form-error { padding:11px 13px; border:1px solid rgba(239,68,68,.25); border-radius:12px; color:#dc2626; background:rgba(239,68,68,.08); font-size:12px; line-height:1.45; }
-.claim-submit { position:relative; min-height:56px; margin-top:2px; overflow:hidden; border:0; border-radius:16px; color:#fff; background:linear-gradient(135deg,var(--nova),var(--nova-deep)); box-shadow:0 12px 34px rgba(var(--nova-rgb),.34),inset 0 1px 0 rgba(255,255,255,.18); cursor:pointer; transition:transform .25s ease,box-shadow .25s ease,opacity .25s ease; }
-.claim-submit:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 16px 44px rgba(var(--nova-rgb),.46),inset 0 1px 0 rgba(255,255,255,.2); }
-.claim-submit:active:not(:disabled) { transform:scale(.985); }
-.claim-submit:disabled { cursor:not-allowed; opacity:.5; }
-.claim-submit-sheen { position:absolute; inset:0; background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.32) 48%,transparent 66%); transform:translateX(-110%); transition:transform .75s ease; }
-.claim-submit:hover .claim-submit-sheen { transform:translateX(110%); }
-.claim-submit-content { position:relative; display:flex; align-items:center; justify-content:center; gap:9px; font-size:14px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
-.claim-submit-content svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round; transition:transform .25s ease; }
-.claim-submit:hover .claim-submit-content svg { transform:translateX(4px); }
-.claim-spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.38); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
-.claim-card-links { display:flex; justify-content:center; gap:14px; margin-top:18px; font-size:12px; font-weight:700; }
-.claim-card-links a { color:var(--nova); text-decoration:none; }
-.claim-card-links a:hover { text-decoration:underline; }
-.claim-card-hint { margin:12px 0 0; color:var(--c-fg-3); text-align:center; font-size:11px; }
-
-.nova-header { position:relative; z-index:20; border-bottom:1px solid var(--c-line); background:color-mix(in srgb,var(--c-bg-soft) 82%,transparent); backdrop-filter:blur(18px); }
-.nova-header-inner { width:min(1080px,calc(100% - 30px)); min-height:82px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:20px; }
-.nova-brand { display:flex; align-items:center; text-decoration:none; }
-.nova-brand img { display:block; width:clamp(220px,22vw,310px); height:auto; max-height:56px; object-fit:contain; filter:drop-shadow(0 7px 9px rgba(20,30,60,.10)); }
-.nova-header-actions { display:flex; align-items:center; gap:8px; }
-.nova-header-actions > a { min-height:38px; padding:9px 13px; border-radius:999px; color:var(--c-fg-2); text-decoration:none; font-size:12px; font-weight:750; transition:color .2s ease,background .2s ease; }
-.nova-header-actions > a:hover { color:var(--c-fg); background:var(--c-surface); }
-.nova-header-actions .theme-toggle { margin-left:4px; }
-
-/* Public order and history pages use the same atmospheric surface language. */
-.app-shell { min-height:100dvh; color:var(--c-fg); background:var(--c-bg); }
-.app-shell::before { content:""; position:fixed; z-index:0; inset:0; pointer-events:none; background-image:var(--atmo-mesh); opacity:.72; }
-.app-shell > * { position:relative; z-index:1; }
-.page-wrap { padding-top:28px; }
-.delivery-shell,.card,.admin-detail { background:var(--c-bg-soft); border-color:var(--c-line); }
-.progress,.order-summary,.chat-log,.chat-compose { background:var(--c-bg-soft); border-color:var(--c-line); }
-html[data-theme="dark"] .delivery-shell { box-shadow:0 24px 70px rgba(0,0,0,.42); }
-html[data-theme="dark"] .progress,
-html[data-theme="dark"] .order-summary,
-html[data-theme="dark"] .chat-log,
-html[data-theme="dark"] .chat-compose,
-html[data-theme="dark"] .confirmation-panel { background:var(--c-bg-soft); }
-html[data-theme="dark"] .order-summary-row,
-html[data-theme="dark"] .order-details-grid { border-color:var(--c-line); }
-html[data-theme="dark"] .item-row,
-html[data-theme="dark"] .summary-roblox,
-html[data-theme="dark"] .roblox-card { color:var(--c-fg); background:var(--c-surface); border-color:var(--c-line); }
-html[data-theme="dark"] .item-variant,
-html[data-theme="dark"] .item-property { color:var(--c-fg-2); background:var(--c-surface-2); border-color:var(--c-line); }
-html[data-theme="dark"] .order-summary-title,
-html[data-theme="dark"] .section-title,
-html[data-theme="dark"] .side-title,
-html[data-theme="dark"] .message-bubble { color:var(--c-fg); }
-html[data-theme="dark"] .message-bubble { background:#20283a; }
-html[data-theme="dark"] .customer .message-bubble { color:#fff; background:linear-gradient(135deg,var(--nova),var(--nova-deep)); }
-html[data-theme="dark"] .compose-row { background:var(--c-surface); border-color:rgba(var(--nova-rgb),.55); }
-html[data-theme="dark"] .compose-input { color:var(--c-fg); }
-html[data-theme="dark"] .file-btn { color:var(--c-fg-2); background:var(--c-surface-2); }
-html[data-theme="dark"] .form-card,
-html[data-theme="dark"] .info-card,
-html[data-theme="dark"] .roblox-link-card { color:var(--c-fg); background:var(--c-bg-soft); }
-html[data-theme="dark"] .input,
-html[data-theme="dark"] .textarea,
-html[data-theme="dark"] .select { color:var(--c-fg); background:var(--c-surface); border-color:var(--c-line); }
-
-@keyframes claimFadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
-@keyframes claimFloat { 0%,100% { translate:0 0; } 50% { translate:0 -13px; } }
-@keyframes claimBob { 0%,100% { translate:0 0; } 50% { translate:0 -11px; } }
-@keyframes claimDriftA { 0%,100% { transform:translateX(-50%) translate(0,0) scale(1); } 40% { transform:translateX(-50%) translate(44px,-30px) scale(1.08); } 72% { transform:translateX(-50%) translate(-26px,20px) scale(.95); } }
-@keyframes claimDriftB { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-48px,28px) scale(1.07); } 76% { transform:translate(28px,-20px) scale(.96); } }
-@keyframes portalSpin { to { transform:rotate(360deg); } }
-
-@media (min-width: 960px) {
-  .claim-home-art { display:block; }
-}
-
-@media (max-width: 959px) {
-  .claim-home-stage { max-width:520px; padding-top:72px; }
-  .claim-card-logo { display:block; }
-}
-
-@media (max-width: 620px) {
-  .claim-theme-position { top:max(12px,env(safe-area-inset-top)); right:max(12px,env(safe-area-inset-right)); }
-  .claim-home-stage { min-height:100dvh; padding:68px 14px 24px; align-items:center; }
-  .claim-card-frame { max-width:430px; border-radius:29px; }
-  .claim-card-premium { padding:25px 20px 23px; border-radius:27.5px; }
-  .claim-card-logo { width:min(255px,76vw); margin-bottom:20px; }
-  .claim-card-heading { margin-bottom:23px; }
-  .claim-card-heading h1 { font-size:31px; letter-spacing:-1.1px; }
-  .claim-card-heading p { margin-top:8px; font-size:13px; }
-  .claim-form { gap:14px; }
-  .claim-field input { min-height:53px; font-size:16px; }
-  .claim-submit { min-height:55px; }
-  .claim-card-links { flex-direction:column; align-items:center; gap:8px; }
-  .nova-header-inner { width:calc(100% - 20px); min-height:68px; }
-  .nova-brand img { width:min(210px,54vw); max-height:42px; }
-  .nova-header-actions { gap:3px; }
-  .nova-header-actions > a { padding:8px 9px; font-size:10.5px; }
-  .nova-header-actions > a:first-child { display:none; }
-  .nova-header-actions .theme-toggle { transform:scale(.9); transform-origin:right center; margin-left:0; }
-  .page-wrap { padding-top:12px; }
-}
-
-@media (max-width: 370px) {
-  .claim-home-stage { padding-left:9px; padding-right:9px; }
-  .claim-card-premium { padding-left:17px; padding-right:17px; }
-  .claim-card-heading h1 { font-size:28px; }
-  .claim-card-logo { width:min(225px,74vw); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .claim-home-page *, .claim-home-page *::before, .claim-home-page *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
-}
-
-/* Claim 2 v6 visual asset and composer refinements */
-.claim-art-logo {
-  top: 10px;
-  width: 410px;
-  max-width: 92%;
-  animation: none;
-}
-.claim-product-cloud {
-  position: absolute;
-  inset: 70px 0 0;
-  min-height: 500px;
-}
-.claim-center-icon {
-  position: absolute;
-  z-index: 5;
-  left: 50%;
-  top: 52%;
-  width: 168px;
-  height: 168px;
-  object-fit: contain;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 28px 42px rgba(0,0,0,.34));
-  animation: claimBob 7.5s ease-in-out .3s infinite;
-}
-.claim-product {
-  position: absolute;
-  z-index: 4;
-  width: 72px;
-  height: 72px;
-  object-fit: contain;
-  filter: drop-shadow(0 14px 18px rgba(0,0,0,.34));
-  animation: claimFloat 7s ease-in-out infinite;
-}
-.claim-product[src$=".jpg"] { border-radius: 18px; mix-blend-mode: screen; }
-.product-a { left: 5%; top: 25%; width: 78px; height: 78px; animation-delay:.1s; }
-.product-b { right: 4%; top: 20%; width: 80px; height: 80px; animation-delay:.6s; }
-.product-c { right: 15%; top: 2%; width: 76px; height: 76px; animation-delay:1.1s; }
-.product-d { left: 1%; top: 52%; width: 68px; height: 68px; animation-delay:.4s; }
-.product-e { right: 0; top: 49%; width: 72px; height: 72px; animation-delay:.9s; }
-.product-f { left: 17%; bottom: 1%; width: 76px; height: 76px; animation-delay:1.4s; }
-.product-g { right: 18%; bottom: 0; width: 68px; height: 68px; animation-delay:.3s; }
-.product-h { left: 0; bottom: 20%; width: 78px; height: 78px; animation-delay:1.8s; }
-.product-i { right: 0; bottom: 22%; width: 76px; height: 76px; animation-delay:1.2s; }
-.product-j { left: 27%; top: 5%; width: 66px; height: 66px; animation-delay:2s; }
-.product-k { right: 28%; bottom: 5%; width: 78px; height: 78px; animation-delay:.75s; }
-.product-l { left: 22%; top: 43%; width: 58px; height: 58px; animation-delay:1.55s; }
-.product-m { right: 23%; top: 42%; width: 58px; height: 58px; animation-delay:.25s; }
-
-.claim-card-links { display: none !important; }
-
-.chat-compose {
-  width: 100%;
-  box-sizing: border-box;
-  padding-left: 14px;
-  padding-right: 14px;
-  overflow: hidden;
-}
-.compose-row {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  grid-template-columns: 44px minmax(0, 1fr) 46px;
-  align-items: center;
-  padding: 6px;
-}
-.compose-input {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding-left: 8px;
-  padding-right: 8px;
-}
-.file-btn, .send-btn { flex: none; }
-
-@media (max-width: 959px) {
-  .claim-card-logo { width:min(275px,80vw); }
-}
-@media (max-width: 620px) {
-  .claim-card-logo { width:min(250px,76vw); margin-bottom:20px; }
-  .chat-compose { padding-left: 7px; padding-right: 7px; }
-  .compose-row { grid-template-columns: 42px minmax(0,1fr) 44px; gap: 5px; padding: 5px; }
-  .compose-input { padding-left: 7px; padding-right: 5px; }
-}
-
-
-/* Claim 2 v7 logo fixes */
-.claim-art-logo,
-.claim-card-logo,
-.nova-brand img {
-  object-fit: contain;
-}
-
-.claim-card-logo,
-.nova-brand img {
-  aspect-ratio: 1277 / 241;
-}
-
-@media (max-width: 959px) {
-  .claim-card-logo {
-    display: block;
-    width: min(270px, 78vw);
-    max-width: 100%;
-    height: auto;
-    margin: 0 auto 22px;
-  }
-}
-
-@media (max-width: 620px) {
-  .claim-card-premium {
-    padding-top: 24px;
-  }
-
-  .claim-card-logo {
-    width: min(245px, 72vw);
-    margin-bottom: 18px;
-  }
-}
-
-/* Claim 2 v8 desktop hero composition */
-.claim-page-logo {
-  position: absolute;
-  z-index: 16;
-  top: max(20px, env(safe-area-inset-top));
-  left: 50%;
-  width: clamp(300px, 27vw, 470px);
-  height: auto;
-  object-fit: contain;
-  transform: translateX(-50%);
-  filter: drop-shadow(0 12px 18px rgba(0,0,0,.28));
-}
-
-.claim-home-stage {
-  max-width: 1380px;
-  padding-top: 118px;
-  gap: 34px;
-}
-
-.claim-home-art {
-  width: 720px;
-  height: 610px;
-  overflow: visible;
-}
-
-.claim-art-logo,
-.claim-center-icon {
-  display: none !important;
-}
-
-.claim-product-cloud {
-  inset: 0;
-  min-height: 610px;
-  overflow: visible;
-}
-
-.claim-mascot {
-  position: absolute;
-  z-index: 5;
-  left: 47%;
-  bottom: 0;
-  width: 420px;
-  height: 590px;
-  object-fit: contain;
-  object-position: center bottom;
-  transform: translateX(-50%);
-  filter: drop-shadow(0 35px 42px rgba(0,0,0,.42));
-  animation: claimBob 8.2s ease-in-out .2s infinite;
-}
-
-.claim-product {
-  width: 94px;
-  height: 94px;
-  z-index: 6;
-  filter: drop-shadow(0 16px 24px rgba(0,0,0,.42));
-}
-
-.product-a { left: -5%; top: 17%; width: 104px; height: 104px; }
-.product-b { right: 5%; top: 10%; width: 108px; height: 108px; }
-.product-c { left: 10%; top: -2%; width: 106px; height: 106px; }
-.product-d { left: -10%; top: 47%; width: 92px; height: 92px; }
-.product-e { right: -3%; top: 40%; width: 102px; height: 102px; }
-.product-f { left: 1%; bottom: 2%; width: 112px; height: 112px; }
-.product-g { right: 12%; bottom: -2%; width: 90px; height: 90px; }
-.product-h { left: -7%; bottom: 22%; width: 112px; height: 112px; }
-.product-i { right: -8%; bottom: 18%; width: 112px; height: 112px; }
-.product-j { left: 31%; top: -7%; width: 94px; height: 94px; }
-.product-k { right: 29%; bottom: -7%; width: 112px; height: 112px; }
-
-.claim-art-glow-blue { left: 18%; top: 20%; width: 360px; height: 360px; }
-.claim-art-glow-orange { right: 4%; bottom: 8%; width: 320px; height: 320px; }
-
-@media (min-width: 960px) and (max-width: 1180px) {
-  .claim-home-stage { max-width: 1080px; gap: 18px; }
-  .claim-home-art { width: 590px; height: 560px; }
-  .claim-product-cloud { min-height: 560px; }
-  .claim-mascot { width: 360px; height: 530px; }
-  .claim-product { transform: scale(.88); }
-  .claim-card-frame { max-width: 420px; }
-}
-
-@media (max-width: 959px) {
-  .claim-page-logo { display: none; }
-  .claim-home-stage { padding-top: 72px; }
-}
-/* ============================================================================
-   NOVA / BUYBLOX — LAYOUT MATCH LAYER
-   Every value below is lifted from the two reference pages (Tailwind build).
-   Append this to the END of your stylesheet so it wins the cascade.
-
-   Breakpoints are Tailwind's, not yours:
-       sm = 640px    md = 768px    lg = 1024px
-   Your existing 620 / 700 / 860 / 959 blocks stay where they are; these
-   later rules override them at the same specificity.
-   ============================================================================ */
-
-:root {
-  --nv-shell: 1024px;   /* max-w-5xl  — page + header inner width */
-  --nv-card: 448px;     /* max-w-md   — claim card */
-  --nv-copy: 320px;     /* max-w-xs   — subheading measure */
-}
-
-
-/* ===========================================================================
-   1. CLAIM / LANDING PAGE                                    (reference file 1)
-   =========================================================================== */
-
-.claim-home-page {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* stage: max-w-5xl · px-4 py-8 · sm:py-12 · gap-6 · lg:gap-14 */
-.claim-home-stage {
-  width: 100%;
-  max-width: var(--nv-shell);
-  min-height: 0;
-  margin: 0 auto;
-  padding: 32px 16px;
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-}
-@media (min-width: 640px) { .claim-home-stage { padding: 48px 16px; } }
-@media (min-width: 1024px) { .claim-home-stage { gap: 56px; } }
-
-/* art column is hidden until lg (1024), not 960.
-   width:720px + flex:none was overflowing the 992px stage and squeezing the
-   claim card below 448px between 1024–1280px. The column is now sized BY the
-   mascot, exactly like the reference. */
-.claim-home-art {
-  position: relative;
-  display: none;
-  width: auto;
-  height: auto;
-  flex: 0 0 auto;
-  min-width: 0;
-}
+.claim-home-art { position: relative; display: none; flex: none; }
 @media (min-width: 1024px) { .claim-home-art { display: block; } }
-
-/* ---- MASCOT ----------------------------------------------------------------
-   was: 420 x 590 box, object-fit contain, bottom-anchored, absolute
-   now: 448px tall, natural width, in flow — it defines the column's footprint.
-   The 420x590 box was rendering the art up to ~590px tall (~32% oversized).
-   -------------------------------------------------------------------------- */
+.claim-art-glow { display: none; }
 .claim-mascot {
-  position: relative;
-  z-index: 1;                                     /* was 5 — was covering the tiles */
-  left: auto;
-  right: auto;
-  top: auto;
-  bottom: auto;
-  display: block;
-  width: auto;
-  height: 28rem;                                  /* 448px — h-[28rem] */
-  object-fit: contain;
-  object-position: center;
-  transform: none;
-  filter: drop-shadow(0 30px 45px rgba(20, 30, 60, .22));
-  animation: novaBob 8s ease-in-out infinite;
-  will-change: transform;
-  -webkit-user-drag: none;
-  user-select: none;
+  display: block; width: auto; height: 28rem; object-fit: contain;
+  filter: drop-shadow(0 24px 32px rgba(17, 24, 39, .16));
+  animation: drift 8s ease-in-out infinite; -webkit-user-drag: none; user-select: none;
 }
-.claim-product-cloud { position: static; inset: auto; min-height: 0; }
-
-/* the reference bob has a slight rotation and a deeper travel than yours.
-   New name so it doesn't clobber claimBob elsewhere in your file. */
-@keyframes novaBob {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-14px) rotate(-1.2deg); }
-}
-
-/* ---- Alternative: keep the mascot absolutely positioned ---------------------
-   If you can't move it into flow, delete the .claim-mascot rule above and use
-   this instead. Gives the same 448px render height and keeps the art column
-   from overflowing. The bob has to use `translate` (not `transform`) so it
-   doesn't wipe out the centering.
-
-   .claim-home-art { width: 380px; height: 470px; }
-   .claim-mascot {
-     position: absolute;
-     left: 50%;
-     bottom: 0;
-     width: 100%;
-     height: 448px;
-     object-fit: contain;
-     object-position: center bottom;
-     transform: translateX(-50%);
-     filter: drop-shadow(0 30px 45px rgba(20, 30, 60, .22));
-     animation: novaBobTranslate 8s ease-in-out infinite;
-   }
-   @keyframes novaBobTranslate {
-     0%, 100% { translate: 0 0; rotate: 0deg; }
-     50%      { translate: 0 -14px; rotate: -1.2deg; }
-   }
-   -------------------------------------------------------------------------- */
-
-/* mid-desktop: reference doesn't scale the mascot down, it just lets the gap
-   close. Only shrink below 1180 if the card starts getting squeezed. */
-@media (min-width: 1024px) and (max-width: 1180px) {
-  .claim-home-stage { gap: 32px; }
-  .claim-mascot { height: 24rem; }               /* 384px */
-}
-
-/* two blurred glows behind the mascot */
-.claim-art-glow { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
-.claim-art-glow-blue {
-  left: 38%; top: 32%; right: auto; bottom: auto;
-  width: 288px; height: 288px;
-  transform: translate(-50%, -50%);
-  background: rgba(var(--nova-rgb), .25);
-}
-.claim-art-glow-orange {
-  left: 64%; top: 64%; right: auto; bottom: auto;
-  width: 240px; height: 240px;
-  transform: translate(-50%, -50%);
-  background: rgba(251, 146, 60, .20);
-}
-
-/* the reference shows exactly TWO floating item tiles, not 13 products.
-   z-index 6 keeps them above the mascot — in the reference they win purely on
-   DOM order, but your mascot carries an explicit z-index so we need one here. */
-.claim-floating-tile,
 .claim-product {
-  position: absolute;
-  z-index: 6;
-  width: 76px;                /* 10 + 56 + 10 */
-  height: 76px;
-  padding: 10px;
-  display: grid;
-  place-items: center;
-  border-radius: 16px;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, .04);
-  box-shadow: 0 16px 34px -10px rgba(20, 30, 60, .30);
-  backdrop-filter: none;
-  filter: none;
+  position: absolute; z-index: 2; width: 76px; height: 76px; padding: 10px; object-fit: contain;
+  background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 10px 28px rgba(17, 24, 39, .12);
 }
-.claim-floating-tile span,
-.claim-floating-tile img { width: 56px; height: 56px; border-radius: 0; }
+.product-a { right: -18px; top: 40px; rotate: 8deg; animation: drift 7s ease-in-out .3s infinite; }
+.product-b { left: -22px; bottom: 90px; rotate: -10deg; animation: drift 7.6s ease-in-out .6s infinite; }
 
-.claim-floating-tile-a, .product-a {
-  right: -16px; top: 40px; left: auto; bottom: auto;
-  transform: rotate(9deg);
-  animation: claimFloat 7s ease-in-out .3s infinite;
-}
-.claim-floating-tile-b, .product-b {
-  left: -20px; bottom: 96px; right: auto; top: auto;
-  transform: rotate(-11deg);
-  animation: claimFloat 7.6s ease-in-out .55s infinite;
-}
-.claim-floating-tile-c,
-.product-c, .product-d, .product-e, .product-f, .product-g,
-.product-h, .product-i, .product-j, .product-k, .product-l, .product-m,
-.claim-center-icon, .claim-art-logo, .claim-page-logo { display: none !important; }
-
-/* card frame: max-w-md · rounded-[2rem] · p-[1.5px] */
 .claim-card-frame {
-  width: 100%;
-  max-width: var(--nv-card);
-  padding: 1.5px;
-  border-radius: 32px;
-  box-shadow:
-    0 1px 1px rgba(20, 30, 60, .04),
-    0 12px 28px -10px rgba(20, 30, 60, .16),
-    0 44px 80px -28px rgba(20, 30, 60, .34);
+  width: 100%; max-width: 440px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 24px; box-shadow: var(--shadow-lg); animation: fadeUp .5s ease both;
 }
-.claim-card-premium { padding: 28px; border-radius: 30.5px; }   /* p-7 */
-@media (min-width: 640px) { .claim-card-premium { padding: 32px; } }  /* sm:p-8 */
-
-.claim-card-heading { margin-bottom: 28px; }                     /* mb-7 */
-.claim-card-heading h1 {
-  font-size: 1.9rem;                                             /* 30.4px */
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -.025em;                                       /* tracking-tight */
-}
-@media (min-width: 640px) { .claim-card-heading h1 { font-size: 2.45rem; } }
-.claim-card-heading p {
-  max-width: var(--nv-copy);
-  margin: 10px auto 0;                                           /* mt-2.5 */
-  font-size: 14px;
-  line-height: 1.625;                                            /* leading-relaxed */
-}
-
-.claim-form { gap: 16px; }                                       /* space-y-4 */
-.claim-form-group { gap: 6px; }                                  /* space-y-1.5 */
-.claim-form-group label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .05em;                                         /* tracking-wider */
-}
-.claim-field { border-radius: 16px; }                            /* rounded-2xl */
-.claim-field-icon { left: 16px; width: 18px; height: 18px; }
+.claim-card-premium { padding: 32px; }
+.claim-card-heading { margin-bottom: 26px; text-align: center; }
+.claim-card-heading h1 { margin: 0; font-size: 32px; font-weight: 700; line-height: 1.1; letter-spacing: -.03em; }
+.claim-card-heading p { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+.claim-form { display: grid; gap: 16px; }
+.claim-form-group { display: grid; gap: 6px; }
+.claim-form-group label { color: var(--muted); font-size: 13px; font-weight: 600; }
+.claim-field { position: relative; }
+.claim-field-icon { position: absolute; z-index: 1; left: 15px; top: 50%; width: 18px; height: 18px; color: var(--faint); transform: translateY(-50%); pointer-events: none; transition: color .15s ease; }
+.claim-field-icon svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .claim-field input {
-  min-height: 52px;                                              /* 14 + 24 + 14 */
-  padding: 14px 16px 14px 44px;                                  /* py-3.5 pr-4 pl-11 */
-  border-radius: 16px;
-  font-size: 16px;
-  line-height: 1.5;
+  width: 100%; height: 52px; padding: 0 16px 0 44px; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--surface); outline: none; font-size: 16px; transition: border-color .15s ease, box-shadow .15s ease;
 }
+.claim-field input::placeholder { color: var(--faint); }
+.claim-field input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(10, 132, 255, .16); }
+.claim-field:focus-within .claim-field-icon { color: var(--blue); }
+.claim-focus-border, .claim-submit-sheen { display: none; }
+.claim-form-error { padding: 11px 14px; border: 1px solid #fecaca; border-radius: 12px; color: #b91c1c; background: #fef2f2; font-size: 13px; }
 .claim-submit {
-  min-height: 52px;                                              /* 16 + 20 + 16 */
-  margin-top: 4px;
-  border-radius: 16px;
-}
-.claim-submit-content {
-  gap: 8px;
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 700;
-  letter-spacing: .025em;                                        /* tracking-wide */
-}
-.claim-submit-content svg { width: 16px; height: 16px; }
-.claim-card-hint { margin-top: 16px; font-size: 11px; }
-
-/* the reference claim page has NO logo element at any breakpoint — the h1 is
-   the only masthead. Your v7 rule re-shows .claim-card-logo under 959px. */
-.claim-card-logo { display: none !important; }
-
-/* theme toggle: h-8 w-[58px], thumb h-6 w-6, travel 26px */
-.claim-theme-position { top: 16px; right: 16px; }
-.theme-toggle { width: 58px; height: 32px; padding: 0 4px; }
-.theme-toggle > svg { width: 14px; height: 14px; }
-.theme-toggle-thumb { width: 24px; height: 24px; left: 3px; top: 3px; }
-html[data-theme="dark"] .theme-toggle-thumb { transform: translateX(26px); }
-
-
-/* ===========================================================================
-   2. ORDER PAGE SHELL + HEADER                               (reference file 2)
-   =========================================================================== */
-
-/* header: sticky · px-4 py-3 · sm:px-5 · inner max-w-5xl */
-.nova-header {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  padding: 12px 16px;
-  backdrop-filter: blur(24px);
-}
-@media (min-width: 640px) { .nova-header { padding: 12px 20px; } }
-.nova-header-inner {
-  width: 100%;
-  max-width: var(--nv-shell);
-  min-height: 0;
-  margin: 0 auto;
-  gap: 8px;
-}
-@media (min-width: 640px) { .nova-header-inner { gap: 12px; } }
-.nova-header-actions { gap: 8px; }
-.nova-header-actions > a { min-height: 32px; padding: 0 10px; font-size: 12px; }
-
-/* main: max-w-5xl · px-3 py-3 · sm:px-4 sm:py-4 */
-.page-wrap {
-  width: 100%;
-  max-width: var(--nv-shell);
-  margin: 0 auto;
-  padding: 12px;
-}
-@media (min-width: 640px) { .page-wrap { padding: 16px; } }
-.narrow { width: 100%; max-width: var(--nv-card); margin: 0 auto; padding: 12px; }
-
-.order-layout { width: 100%; max-width: none; margin: 0; gap: 12px; }
-
-.delivery-shell {
-  border-radius: 16px;                                           /* rounded-2xl */
-  box-shadow:
-    0 1px 2px rgba(20, 30, 60, .04),
-    0 18px 44px -26px rgba(20, 30, 60, .40);
-}
-.delivery-shell::before { display: none; }   /* no top hairline in reference */
-
-
-/* ===========================================================================
-   3. PROGRESS STEPS
-   =========================================================================== */
-
-.progress { padding: 12px; }
-@media (min-width: 640px) { .progress { padding: 16px; } }
-
-.progress-step { gap: 6px; font-size: 9px; letter-spacing: .025em; line-height: 1.15; }
-@media (min-width: 640px) { .progress-step { font-size: 10px; } }
-
-.progress-icon {
-  width: 28px;
-  height: 28px;
-  box-shadow: 0 0 0 4px var(--c-bg-soft);   /* keeps the connector line broken */
-}
-.progress-icon svg { width: 14px; height: 14px; }
-.progress-step::after { top: 13px; height: 2px; }
-.progress-step.current .progress-icon {
-  box-shadow: 0 0 0 4px var(--c-bg-soft), 0 0 0 5px rgba(var(--nova-rgb), .35);
-}
-
-
-/* ===========================================================================
-   4. ORDER SUMMARY ROW
-   =========================================================================== */
-
-.order-summary-row {
-  min-height: 0;
-  padding: 14px 16px;                                            /* px-4 py-3.5 */
-  gap: 14px;                                                     /* gap-3.5 */
-}
-.order-thumbnails { width: auto; height: 48px; }
-.order-thumbnails img,
-.order-thumbnails .item-placeholder {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;                                           /* rounded-xl */
-  border: 2px solid var(--c-bg-soft);                            /* ring-2 ring-card */
-  box-shadow: none;
-}
-.order-thumbnails img + img,
-.order-thumbnails .item-placeholder + .item-placeholder,
-.order-thumbnails img + .item-placeholder,
-.order-thumbnails .item-placeholder + img { margin-left: -10px; }  /* -space-x-2.5 */
-
-.order-summary-title { font-size: 18px; line-height: 28px; font-weight: 700; letter-spacing: 0; }
-.order-summary-meta { gap: 6px; margin-top: 2px; font-size: 12px; }
-.order-summary-meta span + span::before { left: -4px; width: 3px; height: 3px; }
-
-.status-pill {
-  padding: 2px 10px;                                             /* px-2.5 py-0.5 */
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: 0;
-}
-.summary-chevron { width: 18px; height: 18px; }
-
-
-/* ===========================================================================
-   5. CHAT LOG + MESSAGES
-   =========================================================================== */
-
-.chat-card { min-height: 0; }
-.chat-log {
-  flex: 1;
-  min-height: 0;
-  max-height: none;
-  padding: 16px;                                                 /* px-4 py-4 */
-  gap: 16px;                                                     /* mt-4 group spacing */
-}
-
-.message-row { max-width: 75%; align-items: flex-start; gap: 8px; }
-.message-row.system { max-width: 85%; }
-
-/* --- MESSAGE GROUPING -------------------------------------------------------
-   Decoded from the reference transcript. For a run of N consecutive messages
-   from the same sender:
-
-     first  -> spacer,  name+time header,  18px corners
-     middle -> spacer,  no header,         18px corners,  2px above
-     last   -> AVATAR,  no header,         4px tail,      2px above,
-               trailing timestamp underneath
-     single -> AVATAR,  name+time header,  4px tail,      no trailing time
-
-   Note the avatar sits on the LAST message of a run, not the first.
-
-   Markup:
-     <div class="message-row admin is-first">          <- or .customer
-       <span class="message-avatar-spacer"></span>
-       <div class="message-stack">
-         <div class="message-meta">Name <span>14:59</span></div>
-         <div class="message-bubble">hi</div>
-       </div>
-     </div>
-     <div class="message-row admin is-last">
-       <img class="message-avatar" src="...">
-       <div class="message-stack">
-         <div class="message-bubble">i mail you</div>
-         <span class="message-time">14:59</span>
-       </div>
-     </div>
-   A standalone message gets both is-first and is-last.
-   -------------------------------------------------------------------------- */
-
-/* runs sit 2px apart; .chat-log gap already gives 16px between runs */
-.message-row:not(.is-first) { margin-top: -14px; }
-
-.message-stack { display: flex; flex-direction: column; min-width: 0; }
-.message-row.admin { margin-right: auto; }
-.message-row.admin .message-stack { align-items: flex-start; }
-.message-row.customer { margin-left: auto; flex-direction: row-reverse; }
-.message-row.customer .message-stack { align-items: flex-end; }
-
-.message-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 0 4px;
-  padding: 0 4px;
-  font-size: 11px;
-  font-weight: 600;
-}
-.message-meta span { margin-left: 0; font-size: 10px; font-weight: 400; }
-.message-row:not(.is-first) .message-meta { display: none; }
-
-.message-bubble {
-  display: inline-block;
-  padding: 8px 14px;                                             /* px-3.5 py-2 */
-  border-radius: 18px;
-  font-size: 14px;
-  line-height: 1.625;
-  box-shadow: none;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-.customer .message-bubble { border-radius: 18px; box-shadow: none; }
-
-/* tail corner only on the last bubble of a run */
-.message-row.admin.is-last .message-bubble { border-bottom-left-radius: 4px; }
-.message-row.customer.is-last .message-bubble { border-bottom-right-radius: 4px; }
-
-/* trailing time: last of a run, but not on a standalone message */
-.message-time { margin-top: 4px; padding: 0 4px; font-size: 10px; color: var(--c-fg-3); }
-.message-row.is-first .message-time { display: none; }
-
-/* avatar slot — 32px, pushed down 20px to clear the name line */
-.message-avatar,
-.message-avatar-spacer {
-  width: 32px;
-  flex: none;
-  margin-top: 20px;
-  align-self: flex-start;
-}
-.message-avatar { height: 32px; border-radius: 50%; object-fit: cover; }
-.message-avatar-spacer { height: 0; }
-
-.system-pill {
-  max-width: 85%;
-  padding: 10px 16px;                                            /* px-4 py-2.5 */
-  border-radius: 16px;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.625;
-}
-.system-pill-success {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 600;
-  text-align: left;
-  box-shadow: 0 2px 10px -4px rgba(16, 185, 129, .45);
-}
-.system-pill-success svg { width: 16px; height: 16px; flex: none; }
-
-.message-image {
-  margin-top: 6px;                                               /* gap-1.5 */
-  width: auto;
-  max-width: 280px;
-  max-height: 200px;
-  border-radius: 16px;
-  object-fit: cover;
-}
-@media (min-width: 768px) { .message-image { max-width: 364px; max-height: 260px; } }
-
-
-/* ===========================================================================
-   6. COMPOSER
-   =========================================================================== */
-
-.chat-compose {
-  padding: 12px 16px;                                            /* px-4 py-3 */
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
-  border-top: 0;
-  background: var(--c-bg-soft);
-  backdrop-filter: none;
-}
-.compose-row {
-  min-height: 0;
-  grid-template-columns: 36px minmax(0, 1fr) 36px;
-  align-items: end;
-  gap: 8px;
-  padding: 6px 8px;                                              /* px-2 py-1.5 */
-  border-width: 3px;
-  border-radius: 24px;
-  box-shadow: none;
-}
-.compose-input {
-  min-height: 40px;
-  max-height: 120px;
-  padding: 6px 0;
-  font-size: 16px;
-}
-.file-btn, .send-btn { width: 36px; height: 36px; }              /* p-2 + 20px icon */
-.send-btn { margin-bottom: 2px; }                                /* mb-0.5 */
-.send-btn svg, .file-btn svg { width: 20px; height: 20px; }
-
-
-/* ===========================================================================
-   7. OPTIONAL — full-viewport order page
-   The reference uses h-[100dvh] so the chat scrolls internally and the
-   composer is pinned. Delete this block if you want the whole page to scroll.
-   =========================================================================== */
-
-.app-shell:has(.delivery-shell) {
-  height: 100dvh;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.app-shell:has(.delivery-shell) .page-wrap {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  flex-direction: column;
-}
-.app-shell:has(.delivery-shell) .order-layout,
-.app-shell:has(.delivery-shell) .delivery-shell {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  flex-direction: column;
-}
-.app-shell:has(.delivery-shell) .progress,
-.app-shell:has(.delivery-shell) .order-summary,
-.app-shell:has(.delivery-shell) .delivery-banner { flex: none; }
-.app-shell:has(.delivery-shell) .chat-card {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  flex-direction: column;
-}
-
-
-/* ===========================================================================
-   8. MOBILE PARITY
-   Your file re-tunes chat padding, bubble sizes and max-widths across five
-   stacked blocks (860 / 700 / 620 / 430 / 390). The reference does almost
-   none of that — here is its COMPLETE list of responsive changes:
-
-     at sm (640px):  header   px-4      -> px-5
-                     main     px-3 py-3 -> px-4 py-4
-                     progress p-3       -> p-4
-                     step col 56px      -> 96px
-                     step label 9px     -> 10px
-                     connector mx-2     -> mx-3
-                     claim card p-7     -> p-8
-                     claim h1 1.9rem    -> 2.45rem
-     at md (768px):  chat image 280x200 -> 364x260
-
-   That is the entire list. Chat bubbles, gutters, radii and max-widths are
-   identical on a phone and a 27" monitor. This block pins them back.
-   =========================================================================== */
-
-@media (max-width: 639px) {
-  .nova-header { padding: 12px 16px; }
-  .page-wrap { padding: 12px; }
-  .order-layout { gap: 12px; }
-  .delivery-shell { border-radius: 16px; }
-  .progress { padding: 12px; }
-
-  .order-summary-row { min-height: 0; padding: 14px 16px; gap: 14px; }
-  .order-thumbnails { width: auto; height: 48px; }
-  .order-thumbnails img,
-  .order-thumbnails .item-placeholder { width: 48px; height: 48px; border-radius: 12px; }
-  .order-summary-title { font-size: 18px; line-height: 28px; }
-  .order-summary-meta { gap: 6px; margin-top: 2px; font-size: 12px; }
-
-  .chat-card { min-height: 0; }
-  .chat-log { padding: 16px; gap: 16px; min-height: 0; max-height: none; }
-  .chat-guidance { gap: 16px; margin: 0 0 16px; }
-
-  .message-row { max-width: 75%; gap: 8px; }
-  .message-row.system { max-width: 85%; }
-  .message-bubble { padding: 8px 14px; font-size: 14px; line-height: 1.625; border-radius: 18px; }
-  .message-meta { margin: 0 0 4px; padding: 0 4px; font-size: 11px; }
-  .message-meta span { font-size: 10px; }
-  .system-pill { max-width: 85%; padding: 10px 16px; border-radius: 16px; font-size: 11px; }
-  .system-pill-success { padding: 10px 16px; font-size: 12px; }
-
-  .chat-compose {
-    padding: 12px 16px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
-  }
-  .compose-row {
-    min-height: 0;
-    grid-template-columns: 36px minmax(0, 1fr) 36px;
-    gap: 8px;
-    padding: 6px 8px;
-    border-width: 3px;
-    border-radius: 24px;
-  }
-  .compose-input { min-height: 40px; padding: 6px 0; font-size: 16px; }
-  .file-btn, .send-btn { width: 36px; height: 36px; }
-}
-
-/* these need 0,2,0 specificity to beat your 700px / 620px blocks, which hide
-   the status pill and the third meta value on small screens. The reference
-   keeps both visible at every width. */
-.order-summary-row .status-pill { display: inline-flex; }
-.order-summary-meta span:nth-child(3) { display: inline; }
-
-
-/* ===========================================================================
-   9. THINGS THE REFERENCE HAS THAT YOUR ORDER PAGE DOESN'T
-   Not layout fixes — these are the parts that make their chat read better.
-   Each needs a small markup change.
-   =========================================================================== */
-
-/* 9a. Header carries no logo. It's: back button | user chip | account chip |
-       theme toggle, all inside max-w-5xl. Labels collapse to icons under sm. */
-@media (max-width: 639px) {
-  .nova-header .header-label-sm { display: none; }   /* "Back", "Connected", "· 69 deals" */
-}
-
-/* 9b. Chips in the header — 32px tall, pill, 1px ring, 10px horizontal */
-.nova-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--c-surface-2);
-  box-shadow: inset 0 0 0 1px var(--c-ring);
-}
-.nova-chip-avatar { width: 24px; height: 24px; flex: none; border-radius: 50%; font-size: 11px; font-weight: 700; }
-.nova-chip-name { max-width: 92px; font-size: 11px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nova-chip-sub { font-size: 10px; color: var(--c-fg-2); }
-.nova-chip-divider { width: 1px; height: 14px; background: var(--c-ring); }
-.nova-chip-dot { width: 8px; height: 8px; border-radius: 50%; }
-
-/* 9c. Attachment stacks — 6px between images, not the bubble gap */
-.message-attachments { display: flex; flex-direction: column; gap: 6px; }
-
-/* 9d. Progress step columns are fixed-width with FLEXED connectors between
-       them, not a 4-up equal grid. This is closer to the reference geometry —
-       swap .progress-row to flex and drop the ::after connectors. */
-.progress-row.progress-flex { display: flex; align-items: flex-start; }
-.progress-row.progress-flex .progress-step { width: 56px; flex: none; }
-.progress-row.progress-flex .progress-step::after { display: none; }
-.progress-row.progress-flex .progress-connector {
-  flex: 1;
-  height: 2px;
-  margin: 13px 8px 0;
-  border-radius: 999px;
-  background: var(--c-ring);
-}
-.progress-row.progress-flex .progress-connector.done { background: var(--nova); }
-@media (min-width: 640px) {
-  .progress-row.progress-flex .progress-step { width: 96px; }
-  .progress-row.progress-flex .progress-connector { margin-left: 12px; margin-right: 12px; }
-}
-
-
-@media (prefers-reduced-motion: reduce) {
-  .claim-mascot, .claim-floating-tile, .claim-product {
-    animation: none !important;
-    transform: none;
-  }
-}
-/* system rows are never part of a run — exclude them from run-stacking */
-.message-row:not(.is-first):not(.system) { margin-top: -14px; }
-.message-row.system { margin-top: 0; }
-
-/* avatar fallback when there's no image */
-.message-avatar-fallback {
-  display: grid;
-  place-items: center;
-  color: #fff;
-  background: linear-gradient(135deg, var(--nova), var(--nova-deep));
-  font-size: 11px;
-  font-weight: 700;
-}
-
-/* attachments sit outside the bubble */
-.message-attachments { margin-top: 6px; }
-.message-row.is-first .message-attachments:first-child { margin-top: 0; }
-
-/* brand avatar keeps its squircle; customer avatars stay round */
-.message-row.admin .message-avatar { border-radius: 9px; }
-/* JS controls smoothness per-call; CSS smooth overrides behavior:"auto" */
-.chat-log { scroll-behavior: auto; }
-
-/* .message-row.system already caps at 85%; don't compound it on the pill */
-.message-row.system .system-pill { max-width: 100%; }
-
-/* siblings of the chat must not be squeezed by its flex:1 */
-.app-shell:has(.delivery-shell) .confirmation-panel,
-.app-shell:has(.delivery-shell) .review-panel { flex: none; }
-
-/* reference doesn't clip at page level — let it scroll if the viewport is tiny */
-.app-shell:has(.delivery-shell) { overflow: visible; }
-/* ============================================================================
-   PARADISEBLOX — MOBILE CHAT FIX + LAYOUT PARITY
-   Append to the END of globals.css, after everything already there.
-
-   This SUPERSEDES Section 7 of the earlier layout-match layer. Section 7
-   forced height:100dvh on every order page; when the page also carried a
-   delivery banner, an expanded order summary and a review panel, the flex
-   budget went negative and .chat-card collapsed to zero height. That is the
-   mobile bug.
-   ============================================================================ */
-
-
-/* ===========================================================================
-   1. VIEWPORT-HEIGHT CHAT — ONLY WHEN THE BUDGET ALLOWS
-   Fixed-viewport layout is right for an ACTIVE order: the chat is the page,
-   the composer pins to the bottom. It is wrong for a COMPLETED order, which
-   is a record you scroll through and which carries a review panel.
-
-   .review-panel only renders when status is delivered or completed, so it is
-   a reliable signal for "this page has extra chrome, let it scroll".
-   =========================================================================== */
-
-/* reset Section 7 unconditionally, then re-apply it only where it works */
-.app-shell:has(.delivery-shell) {
-  height: auto;
-  min-height: 100dvh;
-  display: block;
-  overflow: visible;
-}
-.app-shell:has(.delivery-shell) .page-wrap,
-.app-shell:has(.delivery-shell) .order-layout,
-.app-shell:has(.delivery-shell) .delivery-shell,
-.app-shell:has(.delivery-shell) .chat-card {
-  display: block;
-  flex: none;
-  min-height: 0;
-}
-
-/* ACTIVE order (no review panel): true fixed-viewport chat, like the reference */
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) {
-  height: 100dvh;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .page-wrap,
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .order-layout,
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .delivery-shell,
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .chat-card {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  flex-direction: column;
-}
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .nova-header,
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .progress,
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .order-summary,
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .delivery-banner,
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .confirmation-panel {
-  flex: none;
-}
-/* floor: the chat can never be squeezed out of existence again */
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .chat-card { min-height: 260px; }
-
-/* COMPLETED / DELIVERED order: page scrolls, chat log gets a bounded window
-   so the transcript still scrolls internally instead of running for pages */
-.app-shell:has(.review-panel) .chat-log {
-  height: 58vh;
-  min-height: 300px;
-  max-height: 640px;
-  overflow-y: auto;
-}
-
-/* browsers without :has() get natural flow — never a collapsed chat */
-@supports not selector(:has(*)) {
-  .app-shell { height: auto; min-height: 100dvh; display: block; overflow: visible; }
-  .chat-log { height: 58vh; min-height: 300px; overflow-y: auto; }
-}
-
-
-/* ===========================================================================
-   2. HEADER — stop the wrap, match the reference bar
-   Reference header is 12px/16px padding, single row, never wraps. Yours wraps
-   "Order history" onto two lines at 390px, which also inflates the header and
-   steals height from the chat.
-   =========================================================================== */
-
-.nova-header-inner {
-  flex-wrap: nowrap;
-  min-height: 0;
-  gap: 10px;
-}
-.nova-brand { min-width: 0; flex: 0 1 auto; }
-.nova-brand img { width: clamp(150px, 34vw, 250px); max-height: 42px; }
-.nova-header-actions { flex: none; flex-wrap: nowrap; }
-.nova-header-actions > a { white-space: nowrap; }
-
-@media (max-width: 639px) {
-  .nova-header { padding: 10px 12px; }
-  .nova-header-inner { gap: 8px; }
-  .nova-brand img { width: min(160px, 42vw); max-height: 34px; }
-  .nova-header-actions { gap: 2px; }
-  .nova-header-actions > a { padding: 7px 8px; font-size: 11px; }
-  /* Support already hides via the `compact` prop; hide history label too */
-  .nova-header-actions > a { max-width: 84px; overflow: hidden; text-overflow: ellipsis; }
-}
-
-
-/* ===========================================================================
-   3. ORDER SUMMARY ROW — the mobile wrap disaster
-   The Roblox chip inside .order-title-line squeezes the title to ~40% width,
-   so "Order #2436" breaks across two lines and the meta stacks vertically.
-   The reference does not put an account chip in this row at all.
-   =========================================================================== */
-
-.order-summary-row {
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
-}
-.order-title-line { display: block; }        /* chip no longer competes */
-.order-heading-block { width: 100%; }
-
-.order-summary-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.order-summary-meta {
-  flex-wrap: nowrap;
-  overflow: hidden;
-  white-space: nowrap;
-}
-.order-summary-meta span { flex: none; }
-
-@media (max-width: 639px) {
-  .order-summary-row { grid-template-columns: auto minmax(0, 1fr) auto; padding: 12px; gap: 12px; }
-  .order-summary-title { font-size: 16px; line-height: 24px; }
-  .order-summary-meta { gap: 6px; font-size: 11px; }
-  /* status pill is the one thing that can go — the progress bar above says the same */
-  .order-summary-row > .status-pill { display: none; }
-}
-
-/* the account chip moves into the header (see header.tsx) — hide the inline one */
-.order-summary-row .summary-roblox { display: none; }
-
-
-/* ===========================================================================
-   4. THUMBNAILS — reference shows max 2, yours renders 3 and overflows at 390px
-   =========================================================================== */
-.order-thumbnails img:nth-child(n + 3),
-.order-thumbnails .item-placeholder:nth-child(n + 3) { display: none; }
-
-
-/* ===========================================================================
-   5. DELIVERY BANNER — tighten so it stops eating the chat's budget
-   The reference has no banner at all; this keeps yours but at half the height.
-   =========================================================================== */
-.delivery-banner { margin: 12px 12px 0; padding: 12px 14px; border-radius: 14px; gap: 10px; }
-.delivery-check { width: 30px; height: 30px; }
-.delivery-check svg { width: 16px; height: 16px; }
-.delivery-banner-copy strong { font-size: 14px; }
-.delivery-banner-copy > span { font-size: 11.5px; line-height: 1.4; }
-.delivery-badges { margin-top: 7px; }
-
-@media (max-width: 639px) {
-  .delivery-banner { margin: 10px 10px 0; padding: 10px 12px; }
-  .delivery-banner-copy strong { font-size: 13px; }
-  .delivery-banner-copy > span { font-size: 11px; }
-  .delivery-badges { display: none; }        /* progress bar already says this */
-}
-
-
-/* ===========================================================================
-   6. COMPOSER — never let it be pushed off-screen
-   =========================================================================== */
-.chat-compose { flex: none; position: sticky; bottom: 0; z-index: 4; }
-.compose-row { min-height: 48px; }
-
-/* locked chat: the file button is a 36px spacer, don't let it look clickable */
-.chat-compose span.file-btn { background: transparent; box-shadow: none; pointer-events: none; }
-
-
-/* ===========================================================================
-   7. ADMIN — sign-in screen, matched to the Nova seller portal
-   The seller portal HTML you sent is the SIGN-IN page only, so this is the
-   only admin screen I can match with confidence.
-   =========================================================================== */
-
-.admin-auth-stage {
-  position: relative;
-  display: flex;
-  min-height: 100dvh;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 16px;
-  text-align: center;
-}
-.admin-auth-inner { width: 100%; max-width: 448px; }
-
-.admin-auth-mark {
-  position: relative;
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 24px;
-  display: grid;
-  place-items: center;
-  border-radius: 16px;
-  background: linear-gradient(135deg, var(--nova), var(--nova-deep));
-  box-shadow: 0 12px 34px rgba(var(--nova-rgb), .34), inset 0 1px 0 rgba(255, 255, 255, .2);
-}
-.admin-auth-mark::before {
-  content: "";
-  position: absolute;
-  inset: -12px;
-  border-radius: 26px;
-  background: rgba(var(--nova-rgb), .20);
-  filter: blur(24px);
-  z-index: -1;
-}
-.admin-auth-mark img { width: 40px; height: 40px; border-radius: 10px; }
-
-.admin-auth-stage h1 {
-  margin: 0;
-  font-size: 36px;
-  font-weight: 800;
-  letter-spacing: -.025em;
-  line-height: 1.05;
-}
-.admin-auth-stage h1 span { font-weight: 300; color: var(--nova); }
-.admin-auth-lede {
-  max-width: 360px;
-  margin: 12px auto 0;
-  color: var(--c-fg-2);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.admin-auth-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 24px; }
-.admin-auth-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--c-surface-2);
-  box-shadow: inset 0 0 0 1px var(--c-ring);
-  color: var(--c-fg-2);
-  font-size: 11px;
-  font-weight: 600;
-}
-.admin-auth-pill::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #34d399;
-  box-shadow: 0 0 8px rgba(52, 211, 153, .9);
-}
-
-.admin-auth-card {
-  margin-top: 32px;
-  padding: 1px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .14), transparent);
-  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .45);
-  text-align: left;
-}
-html[data-theme="light"] .admin-auth-card { background: linear-gradient(180deg, rgba(20, 30, 60, .12), transparent); }
-.admin-auth-card > form {
-  padding: 24px;
-  border-radius: 23px;
-  background: var(--c-bg-soft);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
-}
-.admin-auth-card .field { margin-bottom: 14px; }
-.admin-auth-card .btn { width: 100%; min-height: 50px; border-radius: 16px; }
-.admin-auth-note { margin: 16px 0 0; color: var(--c-fg-3); font-size: 11px; line-height: 1.6; text-align: center; }
-
-@media (max-width: 620px) {
-  .admin-auth-stage { padding: 32px 14px; }
-  .admin-auth-stage h1 { font-size: 30px; }
-  .admin-auth-card > form { padding: 20px; }
-}
-
-
-/* ===========================================================================
-   8. ADMIN DASHBOARD — width + mobile height parity with the customer page
-   Not matched to the Nova seller dashboard (I have not seen that page), but
-   aligned to your own order page so the two feel like one product.
-   =========================================================================== */
-
-.dashboard-shell { width: min(1280px, calc(100% - 24px)); padding: 12px 0 40px; }
-@media (min-width: 640px) { .dashboard-shell { width: min(1280px, calc(100% - 32px)); padding: 16px 0 48px; } }
-
-.admin-grid { gap: 12px; }
-.admin-panel, .admin-detail { border-radius: 16px; }
-.admin-detail { min-height: 0; }
-.admin-body { min-height: 0; }
-
-/* the admin chat needs the same internal-scroll treatment as the customer one */
-.admin-chat { display: flex; min-height: 0; flex-direction: column; }
-.admin-chat .chat-card { display: flex; flex: 1; min-height: 0; flex-direction: column; }
-.admin-chat .chat-log { flex: 1; min-height: 0; max-height: none; overflow-y: auto; }
-
-@media (min-width: 861px) {
-  .admin-detail { display: flex; height: calc(100dvh - 104px); flex-direction: column; }
-  .admin-detail-header { flex: none; }
-  .admin-body { display: grid; flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) 310px; }
-  .admin-controls { max-height: none; overflow-y: auto; }
-  .order-list { max-height: calc(100dvh - 168px); }
-}
-
-@media (max-width: 860px) {
-  .admin-chat .chat-log { height: 55vh; min-height: 280px; }
-  .tabs { margin-bottom: 12px; }
-}
-
-/* admin chat header sits above the log and must not scroll with it */
-.chat-header { flex: none; border-radius: 0; }
-
-
-/* ===========================================================================
-   9. HEADER ACCOUNT CHIP  (see header.tsx)
-   Reference geometry: 32px tall pill, 24px avatar, 11px name / 10px sub.
-   =========================================================================== */
-.nova-chip { flex: none; }
-.nova-chip-copy { display: grid; line-height: 1.15; min-width: 0; }
-.nova-chip-fallback {
-  display: grid;
-  place-items: center;
-  color: #fff;
-  background: linear-gradient(135deg, var(--nova), var(--nova-deep));
-}
-.nova-chip-name { color: var(--c-fg); }
-
-@media (max-width: 767px) {
-  /* below md the chip is avatar-only — the name lives in the summary anyway */
-  .nova-chip { padding: 3px; }
-  .nova-chip-copy { display: none; }
-}
-/* ============================================================================
-   CANCELLED / REFUNDED ORDER STATES
-   Append to the END of globals.css.
-   ============================================================================ */
-
-/* --- status pill (order summary row, admin list, history list) ------------ */
-.status-cancelled { color: #b42318; background: #fee4e2; }
-.status-refunded  { color: #854708; background: #fef0c7; }
-html[data-theme="dark"] .status-cancelled { color: #fda29b; background: rgba(180, 35, 24, .18); }
-html[data-theme="dark"] .status-refunded  { color: #fec84b; background: rgba(133, 71, 8, .22); }
-
-/* --- terminal progress bar (replaces the 4 steps) ------------------------- */
-.progress-terminal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 16px 12px;
-}
-.progress-terminal-icon {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  flex: none;
-  border-radius: 50%;
-  color: #b42318;
-  background: #fee4e2;
-}
-.progress-terminal-icon svg {
-  width: 15px;
-  height: 15px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-}
-.progress-terminal-label {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: var(--c-fg-2);
-}
-html[data-theme="dark"] .progress-terminal-icon { color: #fda29b; background: rgba(180, 35, 24, .18); }
-
-/* --- banner tone ---------------------------------------------------------- */
-.delivery-banner-cancelled { border-color: #fda29b; background: linear-gradient(105deg, #fef3f2, #fffbfa); }
-.delivery-banner-cancelled .delivery-check { color: #b42318; background: rgba(180, 35, 24, .10); }
-.delivery-banner-cancelled .delivery-banner-copy strong { color: #b42318; }
-html[data-theme="dark"] .delivery-banner-cancelled { border-color: rgba(180,35,24,.4); background: rgba(180, 35, 24, .10); }
-html[data-theme="dark"] .delivery-banner-cancelled .delivery-banner-copy strong { color: #fda29b; }
-
-/* --- admin: destructive controls sit apart from the happy path ------------ */
-.control-stack .btn-danger { margin-top: 4px; }
-.control-divider {
-  margin: 12px 0 4px;
-  padding-top: 12px;
-  border-top: 1px solid var(--c-line);
-  color: var(--c-fg-3);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-
-/* --- admin chat header avatar is now an <img>, not a text div ------------- */
-img.chat-avatar { object-fit: cover; border-radius: 10px; background: rgba(255,255,255,.12); }
-/* ============================================================================
-   CHAT RESPONSIVENESS
-   Append to the END of globals.css.
-   ============================================================================ */
-
-/* --- pending / failed message states -------------------------------------- */
-.message-row.is-pending .message-bubble,
-.message-row.is-pending .message-image { opacity: .58; }
-.message-row.is-pending .message-bubble { transition: opacity .18s ease; }
-.message-row.is-failed .message-bubble { opacity: .5; box-shadow: inset 0 0 0 1px rgba(223, 59, 71, .5); }
-
-.message-retry {
-  margin-top: 4px;
-  padding: 3px 8px;
-  border: 0;
-  border-radius: 8px;
-  color: #df3b47;
-  background: rgba(223, 59, 71, .10);
-  font-size: 10.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.message-retry:hover { background: rgba(223, 59, 71, .18); }
-
-/* --- scroll smoothness ----------------------------------------------------- */
-.chat-log {
-  overscroll-behavior: contain;      /* don't chain scroll to the page */
-  -webkit-overflow-scrolling: touch; /* momentum on iOS */
-  contain: layout paint;             /* isolate the log from page reflow */
-}
-
-/* Stop the entry animation re-running when React re-renders the list. Only
-   genuinely new rows animate; existing rows stay put. */
-.message-row { animation: none; }
-.message-row.is-pending { animation: messageIn .22s ease both; }
-
-/* Reserve avatar space so images landing don't shift the column */
-.message-avatar { background: var(--c-surface-2); }
-
-/* The composer repaints on every keystroke; keep it off the main layout */
-.chat-compose { contain: layout; }
-
-/* Images: give the browser a box before the file arrives, so the log doesn't
-   jump as attachments load in */
-.message-image { background: var(--c-surface); min-height: 60px; }
-
-
-/* ============================================================================
-   MULTI-FILE ATTACHMENT TRAY  (chat composer + admin delivery proof)
-   ============================================================================ */
-.attachment-tray {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin: 8px 0 4px;
-}
-.attachment-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 190px;
-  padding: 4px 6px 4px 4px;
-  border-radius: 10px;
-  background: var(--c-surface-2);
-  box-shadow: inset 0 0 0 1px var(--c-ring);
-  font-size: 11px;
-}
-.attachment-chip img {
-  width: 26px;
-  height: 26px;
-  flex: none;
-  border-radius: 6px;
-  object-fit: cover;
-  background: var(--c-surface);
-}
-.attachment-chip-name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--c-fg-2);
-}
-.attachment-chip button {
-  flex: none;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  color: var(--c-fg-2);
-  background: transparent;
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-}
-.attachment-chip button:hover { color: var(--c-fg); background: var(--c-ring); }
-
-.attachment-clear {
-  border: 0;
-  background: none;
-  color: var(--nova);
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 4px 2px;
-}
-.attachment-clear:hover { text-decoration: underline; }
-
-/* the tray lives inside the admin control stack too — keep it from stretching */
-.control-stack .attachment-tray { margin-top: 6px; }
-.control-stack .attachment-chip { max-width: 100%; }
-/* ============================================================================
-   CHAT RESPONSIVENESS
-   Append to the END of globals.css.
-   ============================================================================ */
-
-/* --- pending / failed message states -------------------------------------- */
-.message-row.is-pending .message-bubble,
-.message-row.is-pending .message-image { opacity: .58; }
-.message-row.is-pending .message-bubble { transition: opacity .18s ease; }
-.message-row.is-failed .message-bubble { opacity: .5; box-shadow: inset 0 0 0 1px rgba(223, 59, 71, .5); }
-
-.message-retry {
-  margin-top: 4px;
-  padding: 3px 8px;
-  border: 0;
-  border-radius: 8px;
-  color: #df3b47;
-  background: rgba(223, 59, 71, .10);
-  font-size: 10.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.message-retry:hover { background: rgba(223, 59, 71, .18); }
-
-/* --- scroll smoothness ----------------------------------------------------- */
-.chat-log {
-  overscroll-behavior: contain;      /* don't chain scroll to the page */
-  -webkit-overflow-scrolling: touch; /* momentum on iOS */
-  contain: layout paint;             /* isolate the log from page reflow */
-}
-
-/* Stop the entry animation re-running when React re-renders the list. Only
-   genuinely new rows animate; existing rows stay put. */
-.message-row { animation: none; }
-.message-row.is-pending { animation: messageIn .22s ease both; }
-
-/* Reserve avatar space so images landing don't shift the column */
-.message-avatar { background: var(--c-surface-2); }
-
-/* The composer repaints on every keystroke; keep it off the main layout */
-.chat-compose { contain: layout; }
-
-/* Images: give the browser a box before the file arrives, so the log doesn't
-   jump as attachments load in */
-.message-image { background: var(--c-surface); min-height: 60px; }
-
-
-/* ============================================================================
-   MULTI-FILE ATTACHMENT TRAY  (chat composer + admin delivery proof)
-   ============================================================================ */
-.attachment-tray {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin: 8px 0 4px;
-}
-.attachment-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 190px;
-  padding: 4px 6px 4px 4px;
-  border-radius: 10px;
-  background: var(--c-surface-2);
-  box-shadow: inset 0 0 0 1px var(--c-ring);
-  font-size: 11px;
-}
-.attachment-chip img {
-  width: 26px;
-  height: 26px;
-  flex: none;
-  border-radius: 6px;
-  object-fit: cover;
-  background: var(--c-surface);
-}
-.attachment-chip-name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--c-fg-2);
-}
-.attachment-chip button {
-  flex: none;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  color: var(--c-fg-2);
-  background: transparent;
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-}
-.attachment-chip button:hover { color: var(--c-fg); background: var(--c-ring); }
-
-.attachment-clear {
-  border: 0;
-  background: none;
-  color: var(--nova);
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 4px 2px;
-}
-.attachment-clear:hover { text-decoration: underline; }
-
-/* the tray lives inside the admin control stack too — keep it from stretching */
-.control-stack .attachment-tray { margin-top: 6px; }
-.control-stack .attachment-chip { max-width: 100%; }
-
-
-/* ============================================================================
-   ADMIN CONTROL PANEL POLISH
-   Append to the END of globals.css.
-   ============================================================================ */
-
-/* --- native file input looked unstyled next to everything else ------------- */
-.control-stack input[type="file"],
-.admin-controls input[type="file"] {
-  padding: 7px 8px;
-  font-size: 12px;
-  cursor: pointer;
-  line-height: 1.4;
-}
-.control-stack input[type="file"]::file-selector-button,
-.admin-controls input[type="file"]::file-selector-button {
-  margin-right: 10px;
-  padding: 7px 12px;
-  border: 0;
-  border-radius: 10px;
-  color: var(--c-fg);
-  background: var(--c-surface-2);
-  box-shadow: inset 0 0 0 1px var(--c-ring);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .18s ease;
-}
-.control-stack input[type="file"]::file-selector-button:hover,
-.admin-controls input[type="file"]::file-selector-button:hover {
-  background: var(--c-surface);
-}
-
-/* --- a locked composer shouldn't look ready for input --------------------- */
-.chat-compose:has(textarea:disabled) .compose-row {
-  border-color: var(--c-ring);
-  background: var(--c-surface);
-  opacity: .72;
-}
-.chat-compose:has(textarea:disabled) .send-btn { opacity: .35; }
-
-/* --- danger button needs to read as the last resort ----------------------- */
-.control-stack .btn-danger {
-  background: transparent;
-  color: #df3b47;
-  box-shadow: inset 0 0 0 1.5px rgba(223, 59, 71, .45);
-}
-.control-stack .btn-danger:hover:not(:disabled) {
-  color: #fff;
-  background: #df3b47;
-  box-shadow: none;
-}
-.control-stack .btn-danger:disabled { opacity: .4; }
-
-/* --- admin detail header on a phone --------------------------------------- */
-@media (max-width: 639px) {
-  .admin-detail-header { padding: 12px; gap: 8px; }
-  .admin-detail-header .small { font-size: 10.5px; word-break: break-all; }
-  .tabs .btn { min-height: 40px; font-size: 13px; }
-  .dashboard-shell { width: calc(100% - 16px); padding-top: 8px; }
-}
-
-
-/* ============================================================================
-   MOBILE POLISH — header, progress, empty item art
-   Append to the END of globals.css (after admin-polish.css).
-   ============================================================================ */
-
-/* ---------------------------------------------------------------------------
-   1. HEADER — "Order hist..." was being ellipsised by my own max-width rule.
-   Drop the truncation; swap to a short label and hide Support on small screens
-   instead. Needs the updated header.tsx for .nav-full / .nav-short.
-   --------------------------------------------------------------------------- */
-.nova-header-actions > a { max-width: none; overflow: visible; text-overflow: clip; }
+  height: 52px; border: 0; border-radius: 14px; color: #fff; background: var(--blue); font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: background .15s ease, transform .15s ease, opacity .15s ease;
+}
+.claim-submit:hover:not(:disabled) { background: var(--blue-dark); }
+.claim-submit:active:not(:disabled) { transform: scale(.985); }
+.claim-submit:disabled { opacity: .5; cursor: not-allowed; }
+.claim-submit-content { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.claim-submit-content svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.claim-card-hint { margin: 16px 0 0; color: var(--faint); font-size: 12px; text-align: center; }
+
+/* ---------- header ---------- */
+.nova-header { position: sticky; top: 0; z-index: 30; height: var(--header-h); padding: 0 16px; background: rgba(255, 255, 255, .86); border-bottom: 1px solid var(--line); backdrop-filter: blur(14px); }
+.nova-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 10px; height: 100%; max-width: 1040px; margin: 0 auto; }
+.nova-brand { display: flex; align-items: center; min-width: 0; text-decoration: none; }
+.nova-brand img { display: block; width: auto; height: 30px; }
+.nova-header-actions { display: flex; align-items: center; flex: none; gap: 6px; }
+.nova-header-actions > a { padding: 8px 12px; border-radius: 999px; color: var(--muted); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease, color .15s ease; }
+.nova-header-actions > a:hover { color: var(--ink); background: var(--surface-2); }
 .nav-short { display: none; }
+.nova-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border-radius: 999px; background: var(--surface-2); }
+.nova-chip-avatar { width: 26px; height: 26px; flex: none; border-radius: 50%; object-fit: cover; background: #dfe3ea; }
+.nova-chip-fallback { display: grid; place-items: center; color: #fff; background: var(--blue); font-size: 11px; font-weight: 700; }
+.nova-chip-copy { display: grid; min-width: 0; line-height: 1.15; }
+.nova-chip-name { max-width: 110px; overflow: hidden; font-size: 12px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.nova-chip-sub { color: var(--muted); font-size: 10px; }
 
-@media (max-width: 639px) {
-  .nova-support-link { display: none; }      /* Support lives in the footer/email anyway */
+/* ---------- customer order page: chat first ---------- */
+.delivery-shell {
+  display: flex; flex-direction: column; overflow: hidden;
+  height: calc(100vh - var(--header-h) - 32px); height: calc(100dvh - var(--header-h) - 32px); min-height: 440px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow-sm);
+}
+.delivery-shell > * { flex: none; }
+.delivery-shell > .chat-card { flex: 1 1 auto; min-height: 0; }
+
+.progress { padding: 10px 16px 8px; border-bottom: 1px solid var(--line); }
+.progress-row { display: grid; grid-template-columns: repeat(4, 1fr); }
+.progress-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--faint); font-size: 10.5px; font-weight: 600; letter-spacing: .02em; text-align: center; }
+.progress-step::before { content: ""; position: absolute; top: 10px; right: 50%; width: 100%; height: 2px; background: var(--line); }
+.progress-step:first-child::before { display: none; }
+.progress-step.done::before, .progress-step.current::before { background: var(--blue); }
+.progress-icon { position: relative; z-index: 1; display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid var(--line); border-radius: 50%; background: var(--surface); font-size: 10px; font-weight: 700; }
+.progress-icon svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.progress-step.done { color: var(--ink); }
+.progress-step.done .progress-icon { color: #fff; background: var(--blue); border-color: var(--blue); }
+.progress-step.current { color: var(--ink); }
+.progress-step.current .progress-icon { color: var(--blue); border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
+.progress-terminal { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; }
+.progress-terminal-icon { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #b91c1c; background: #fee2e2; }
+.progress-terminal-icon svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
+.progress-terminal-label { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+
+.delivery-banner { display: flex; align-items: center; gap: 10px; margin: 10px 12px 0; padding: 9px 12px; border-radius: 12px; background: var(--blue-soft); }
+.delivery-banner-complete { background: #ecfdf3; }
+.delivery-banner-cancelled { background: #fef2f2; }
+.delivery-check { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; color: var(--blue); background: #fff; }
+.delivery-banner-complete .delivery-check { color: var(--green); }
+.delivery-banner-cancelled .delivery-check { color: var(--red); }
+.delivery-check svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.delivery-banner-copy { min-width: 0; }
+.delivery-banner-copy strong { display: block; font-size: 13.5px; font-weight: 700; }
+.delivery-banner-copy > span { display: block; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.delivery-badges, .mini-badge, .store-dot { display: none; }
+
+.order-summary { margin-top: 10px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.order-summary-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; list-style: none; cursor: pointer; user-select: none; }
+.order-summary-row::-webkit-details-marker { display: none; }
+.order-thumbnails { display: flex; flex: none; }
+.order-thumbnails img, .item-placeholder { width: 36px; height: 36px; border: 2px solid #fff; border-radius: 10px; object-fit: cover; background: #eef0f3; }
+.order-thumbnails > * + * { margin-left: -10px; }
+.order-summary-copy { flex: 1; min-width: 0; }
+.order-heading-block { min-width: 0; }
+.order-summary-title { overflow: hidden; font-size: 15px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.order-summary-meta { display: flex; gap: 8px; margin-top: 1px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.order-summary-meta span + span::before { content: "\00B7"; margin-right: 8px; }
+.summary-chevron { width: 18px; height: 18px; flex: none; fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s ease; }
+.order-summary[open] .summary-chevron { transform: rotate(180deg); }
+.order-details-grid { max-height: 36vh; padding: 4px 16px 14px; overflow-y: auto; overscroll-behavior: contain; }
+.detail-kicker { margin: 8px 0; color: var(--faint); font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.item-groups-inline { display: grid; gap: 4px 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.game-label { margin: 8px 0 2px; color: var(--blue); font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.item-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.item-image { position: relative; width: 36px; height: 36px; flex: none; overflow: hidden; border-radius: 9px; object-fit: cover; background: var(--surface-2); }
+.item-copy { flex: 1; min-width: 0; }
+.item-name { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.item-options { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.item-variant, .item-property { padding: 2px 7px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); background: var(--surface); font-size: 10px; font-weight: 600; }
+.item-qty { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.proof-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.proof-thumb { width: 100%; aspect-ratio: 1.3; border: 1px solid var(--line); border-radius: 10px; object-fit: cover; }
+
+.confirmation-panel { margin: 10px 12px 0; padding: 14px; border: 1px solid #cfe5ff; border-radius: 14px; background: var(--blue-soft); }
+.confirmation-panel h2 { margin: 0 0 2px; font-size: 15px; font-weight: 700; }
+.confirmation-panel p { margin: 0; color: var(--muted); font-size: 12.5px; }
+.confirmation-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+
+.review-panel { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; }
+.review-panel h2 { margin: 2px 0 4px; font-size: 17px; font-weight: 700; }
+.review-panel p { margin: 0; color: var(--muted); font-size: 13px; }
+.trustpilot-label { color: #00a878; font-size: 12px; font-weight: 700; }
+.trustpilot-btn { flex: none; color: #fff; background: #00b67a; }
+
+.roblox-link-card { width: 100%; max-width: 440px; margin: 40px auto 0; padding: 32px; text-align: center; }
+.roblox-link-card .field { text-align: left; }
+.roblox-link-card .section-copy { max-width: 340px; margin-left: auto; margin-right: auto; }
+.link-icon { display: grid; place-items: center; width: 52px; height: 52px; margin: 0 auto 16px; border-radius: 50%; color: var(--blue); background: var(--blue-soft); }
+.link-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.roblox-confirm-card { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 14px; border-radius: 16px; background: var(--surface-2); text-align: left; }
+.roblox-confirm-avatar { width: 64px; height: 64px; border-radius: 14px; object-fit: cover; }
+
+/* ---------- chat (iMessage style) ---------- */
+.chat-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; background: var(--surface); }
+.customer-chat { border: 0; border-radius: 0; box-shadow: none; }
+.chat-header { display: flex; flex: none; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.chat-identity { display: flex; align-items: center; gap: 10px; }
+.chat-avatar { width: 34px; height: 34px; border-radius: 10px; object-fit: cover; }
+.chat-title { font-size: 14px; font-weight: 700; }
+.chat-sub { display: flex; align-items: center; gap: 6px; margin-top: 1px; color: var(--muted); font-size: 11.5px; }
+.online-dot, .busy-dot, .offline-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+.busy-dot { background: #f59e0b; }
+.offline-dot { background: #ef4444; }
+
+.chat-log { display: flex; flex: 1 1 auto; flex-direction: column; gap: 2px; min-height: 0; padding: 14px 16px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.chat-guidance { display: grid; gap: 4px; margin: 0 auto 10px; text-align: center; }
+.chat-guidance .system-pill { padding: 0; background: none; color: var(--faint); font-size: 11.5px; }
+
+.message-row { display: flex; width: 100%; }
+.message-row.is-first { margin-top: 10px; }
+.message-row.mine { justify-content: flex-end; }
+.message-row.theirs { justify-content: flex-start; }
+.message-avatar, .message-avatar-spacer, .message-time { display: none; }
+.message-stack { display: flex; flex-direction: column; max-width: 78%; min-width: 0; }
+.message-row.mine .message-stack { align-items: flex-end; }
+.message-row.theirs .message-stack { align-items: flex-start; }
+.message-meta { display: flex; align-items: baseline; gap: 6px; margin: 0 6px 3px; color: var(--muted); font-size: 11px; font-weight: 600; }
+.message-meta span { color: var(--faint); font-size: 10.5px; font-weight: 500; }
+
+.message-bubble { padding: 8px 14px; border-radius: 19px; font-size: 15px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.message-row.theirs .message-bubble { color: var(--ink); background: var(--bubble-them); }
+.message-row.mine .message-bubble { color: #fff; background: var(--blue); }
+.message-row.theirs.is-last .message-bubble { border-bottom-left-radius: 6px; }
+.message-row.mine.is-last .message-bubble { border-bottom-right-radius: 6px; }
+.message-attachments { margin-top: 3px; }
+.message-image { display: block; width: auto; max-width: min(280px, 100%); max-height: 240px; border-radius: 18px; object-fit: cover; background: var(--surface-2); }
+.attachment-link { display: inline-block; margin-top: 4px; color: var(--blue); font-size: 13px; font-weight: 600; }
+.message-row.is-pending { animation: bubbleIn .18s ease both; }
+.message-row.is-pending .message-bubble, .message-row.is-pending .message-image { opacity: .6; }
+.message-row.is-failed .message-bubble { opacity: .55; box-shadow: inset 0 0 0 1px rgba(220, 38, 38, .5); }
+.message-retry { margin-top: 4px; padding: 3px 8px; border: 0; border-radius: 8px; color: var(--red); background: rgba(220, 38, 38, .08); font-size: 11px; font-weight: 600; cursor: pointer; }
+
+.message-row.system { justify-content: center; margin-top: 10px; }
+.system-pill { max-width: 88%; color: var(--muted); font-size: 12px; line-height: 1.5; text-align: center; }
+.system-pill > span { vertical-align: middle; }
+.system-pill svg { display: inline-block; width: 13px; height: 13px; margin-right: 5px; vertical-align: middle; fill: none; stroke: var(--green); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.system-pill-warning { color: #b45309; }
+
+.chat-compose { flex: none; padding: 10px 14px; padding-bottom: max(10px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--surface); }
+.compose-row { display: flex; align-items: flex-end; gap: 8px; }
+.file-btn, .send-btn { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border: 0; border-radius: 50%; cursor: pointer; transition: background .15s ease, transform .15s ease, opacity .15s ease; }
+.file-btn { color: var(--muted); background: var(--surface-2); }
+.file-btn:hover { background: #e9ebef; }
+.file-btn svg, .send-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.send-btn { color: #fff; background: var(--blue); }
+.send-btn:hover:not(:disabled) { background: var(--blue-dark); }
+.send-btn:active:not(:disabled) { transform: scale(.94); }
+.send-btn:disabled { opacity: .35; cursor: not-allowed; }
+.compose-input {
+  flex: 1; min-width: 0; min-height: 36px; max-height: 120px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 20px;
+  background: var(--surface); outline: none; resize: none; font-size: 16px; line-height: 20px; field-sizing: content;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.compose-input::placeholder { color: var(--faint); }
+.compose-input:focus { border-color: #a8d2ff; box-shadow: 0 0 0 3px rgba(10, 132, 255, .08); }
+.compose-input:disabled { background: var(--surface-2); }
+
+.attachment-tray { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 8px; }
+.attachment-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 190px; padding: 4px 6px 4px 4px; border-radius: 10px; background: var(--surface-2); font-size: 11px; }
+.attachment-chip img { width: 26px; height: 26px; flex: none; border-radius: 6px; object-fit: cover; }
+.attachment-chip-name { min-width: 0; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+.attachment-chip button { flex: none; width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%; color: var(--muted); background: transparent; font-size: 14px; line-height: 1; cursor: pointer; }
+.attachment-chip button:hover { color: var(--ink); background: #e3e6ea; }
+.attachment-clear { padding: 4px 2px; border: 0; color: var(--blue); background: none; font-size: 11px; font-weight: 600; cursor: pointer; }
+
+/* ---------- admin ---------- */
+.admin-auth-stage { display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 40px 16px; text-align: center; }
+.admin-auth-inner { width: 100%; max-width: 420px; }
+.admin-auth-mark { display: grid; place-items: center; width: 60px; height: 60px; margin: 0 auto 20px; border-radius: 16px; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+.admin-auth-mark img { width: 40px; height: 40px; border-radius: 10px; }
+.admin-auth-stage h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
+.admin-auth-stage h1 span { color: var(--blue); font-weight: 400; }
+.admin-auth-lede { max-width: 340px; margin: 10px auto 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.admin-auth-card { margin-top: 28px; padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow-lg); text-align: left; }
+.admin-auth-card .btn { width: 100%; min-height: 48px; }
+.admin-auth-note { margin: 14px 0 0; color: var(--faint); font-size: 11.5px; text-align: center; }
+
+.dashboard-shell { width: min(1320px, calc(100% - 24px)); margin: 0 auto; padding: 14px 0; }
+.tabs { display: none; }
+.admin-grid { display: grid; gap: 12px; grid-template-columns: 300px minmax(0, 1fr); }
+.admin-panel, .admin-detail { min-width: 0; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-sm); }
+.admin-panel { display: flex; flex-direction: column; height: calc(100dvh - 28px); }
+.admin-detail { display: flex; flex-direction: column; height: calc(100dvh - 28px); }
+.admin-toolbar { display: flex; flex: none; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); }
+.admin-select, .admin-input { flex: 1; min-width: 0; min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); outline: none; font-size: 13px; }
+.admin-select:focus, .admin-input:focus { border-color: var(--blue); }
+.order-list { flex: 1; min-height: 0; padding: 8px; overflow-y: auto; }
+.order-list-item { display: block; width: 100%; margin-bottom: 6px; padding: 11px 12px; border: 1px solid transparent; border-radius: 12px; background: transparent; text-align: left; cursor: pointer; transition: background .15s ease; }
+.order-list-item:hover { background: var(--surface-2); }
+.order-list-item.active { background: var(--blue-soft); border-color: #cfe5ff; }
+.order-list-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13.5px; font-weight: 700; }
+.order-list-status, .order-list-unread { flex: none; padding: 2px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 700; }
+.order-list-unread { color: #fff; background: var(--blue); }
+.order-list-last { display: flex; align-items: baseline; gap: 8px; min-width: 0; margin-top: 4px; font-size: 11.5px; }
+.order-list-user { flex: none; color: var(--muted); font-weight: 600; }
+.order-list-games { min-width: 0; overflow: hidden; color: var(--faint); text-overflow: ellipsis; white-space: nowrap; }
+
+.admin-detail-header { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.admin-detail-id { min-width: 0; }
+.admin-detail-id strong { font-size: 15px; }
+.admin-body { display: grid; flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) 320px; }
+.admin-chat { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: 1px solid var(--line); }
+.admin-chat .chat-card { flex: 1; min-height: 0; border: 0; border-radius: 0; box-shadow: none; }
+.admin-controls { display: grid; align-content: start; gap: 10px; padding: 12px; overflow-y: auto; background: #fafbfc; }
+.ctl-card, .side-card { display: grid; gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: none; }
+.ctl-title, .side-title { margin: 0 0 2px; color: var(--faint); font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.ctl-card .btn { width: 100%; min-height: 40px; font-size: 13px; }
+.ctl-card .input { min-height: 40px; font-size: 13px; }
+.ctl-card input[type="file"] { padding: 6px 8px; font-size: 12px; cursor: pointer; }
+.ctl-card input[type="file"]::file-selector-button { margin-right: 10px; padding: 6px 12px; border: 0; border-radius: 8px; background: var(--surface-2); font-size: 12px; font-weight: 600; cursor: pointer; }
+.ctl-card .btn-danger { color: var(--red); background: transparent; box-shadow: inset 0 0 0 1.5px rgba(220, 38, 38, .4); }
+.ctl-card .btn-danger:hover:not(:disabled) { color: #fff; background: var(--red); box-shadow: none; }
+.ctl-field { display: grid; gap: 5px; }
+.ctl-field > label { display: flex; align-items: baseline; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.ctl-field > label span { color: var(--faint); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.ctl-hint { margin: 0; color: var(--faint); font-size: 11.5px; line-height: 1.5; }
+.sidebar { display: grid; gap: 10px; }
+.side-card { margin: 0; }
+.roblox-card { display: flex; align-items: center; gap: 12px; }
+.roblox-avatar { width: 48px; height: 48px; flex: none; border-radius: 12px; object-fit: cover; background: var(--surface-2); }
+.item-group { margin-top: 4px; }
+
+/* ---------- motion ---------- */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes bubbleIn { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes drift { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+
+/* ---------- tablet and phone ---------- */
+@media (max-width: 860px) {
+  .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+  .tabs .btn { flex: 1; min-height: 40px; }
+  .admin-grid { grid-template-columns: 1fr; }
+  .admin-panel, .admin-detail { display: none; height: auto; }
+  .admin-panel.mobile-show { display: flex; }
+  .admin-detail.mobile-show { display: block; }
+  .order-list { max-height: none; }
+  .admin-body { display: block; }
+  .admin-chat { border-right: 0; }
+  .admin-chat .chat-card { height: 62vh; }
+  .admin-controls { border-top: 1px solid var(--line); }
+}
+
+@media (max-width: 640px) {
+  :root { --header-h: 58px; }
+  .page-wrap { padding: 8px; }
+  .form-card { padding: 22px; }
+  .nova-header { padding: 0 12px; }
+  .nova-brand img { height: 26px; }
+  .nova-support-link { display: none; }
   .nav-full { display: none; }
   .nav-short { display: inline; }
-  .nova-header-actions > a { padding: 7px 9px; font-size: 12px; }
+  .nova-chip { padding: 3px; }
+  .nova-chip-copy { display: none; }
+  .delivery-shell { height: calc(100vh - var(--header-h) - 16px); height: calc(100dvh - var(--header-h) - 16px); border-radius: 16px; }
+  .progress { padding: 8px 8px 6px; }
+  .delivery-banner { margin: 8px 8px 0; padding: 8px 10px; }
+  .order-summary-row { padding: 9px 12px; gap: 10px; }
+  .order-details-grid { max-height: 30vh; padding: 2px 12px 12px; }
+  .item-groups-inline { grid-template-columns: 1fr; }
+  .proof-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .confirmation-panel { margin: 8px 8px 0; padding: 12px; }
+  .chat-log { padding: 12px; }
+  .message-stack { max-width: 84%; }
+  .chat-compose { padding: 8px 10px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  .review-panel { flex-direction: column; align-items: stretch; }
+  .roblox-link-card { margin-top: 16px; padding: 24px 18px; }
+  .claim-home-stage { padding: 24px 14px; }
+  .claim-card-premium { padding: 26px 20px; }
+  .claim-card-heading h1 { font-size: 28px; }
+  .dashboard-shell { width: calc(100% - 16px); padding: 8px 0; }
 }
 
-/* very narrow: wordmark shrinks rather than pushing the toggle off */
-@media (max-width: 400px) {
-  .nova-brand img { width: min(132px, 36vw); max-height: 30px; }
-  .nova-header-actions { gap: 4px; }
-}
-
-/* ---------------------------------------------------------------------------
-   2. PROGRESS — the current-step pulse ring was wide enough on a phone to sit
-   on top of the step label underneath it.
-   --------------------------------------------------------------------------- */
-@media (max-width: 639px) {
-  .progress-step.current .progress-icon {
-    box-shadow: 0 0 0 3px var(--c-bg-soft), 0 0 0 4px rgba(var(--nova-rgb), .35);
-  }
-  .progress-icon { box-shadow: 0 0 0 3px var(--c-bg-soft); }
-  .progress-step { gap: 8px; }               /* clear the ring */
-  .progress-step > span:last-child { position: relative; z-index: 1; }
-}
-
-/* ---------------------------------------------------------------------------
-   3. MISSING ITEM ART — .item-image and .item-placeholder carried hardcoded
-   light backgrounds (#fff, #edf1f7, #eef1f6) with no dark-mode variant, so any
-   item without an image rendered as a glaring white square.
-   --------------------------------------------------------------------------- */
-html[data-theme="dark"] .item-image,
-html[data-theme="dark"] div.item-image,
-html[data-theme="dark"] .order-thumbnails .item-placeholder {
-  background: var(--c-surface-2);
-  border-color: var(--c-line);
-}
-html[data-theme="dark"] .order-thumbnails img { border-color: var(--c-bg-soft); }
-
-/* the shimmer sweep was white-on-white in dark mode */
-html[data-theme="dark"] .item-placeholder::after,
-html[data-theme="dark"] .item-image:not(img)::after {
-  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, .07) 45%, transparent 70%);
-}
-
-/* an item with no art gets a neutral glyph instead of an empty slab */
-div.item-image:not(:has(img))::before,
-.order-thumbnails .item-placeholder::before {
-  content: "";
-  position: absolute;
-  inset: 28%;
-  border-radius: 3px;
-  background: currentColor;
-  opacity: .14;
-}
-
-/* ---------------------------------------------------------------------------
-   4. LOCKED COMPOSER — shouldn't look ready for input
-   (duplicated from admin-polish.css so this file stands alone)
-   --------------------------------------------------------------------------- */
-.chat-compose:has(textarea:disabled) .compose-row {
-  border-color: var(--c-ring);
-  background: var(--c-surface);
-  opacity: .72;
-}
-.chat-compose:has(textarea:disabled) .send-btn { opacity: .35; }
-
-
-/* ============================================================================
-   CONTRAST FIX + LIGHT DEFAULT SUPPORT
-   Append to the END of globals.css (after mobile-polish.css).
-   ============================================================================ */
-
-/* ---------------------------------------------------------------------------
-   1. THE ROOT CAUSE OF "TEXT DISAPPEARS IN DARK MODE"
-
-   The original stylesheet defines --ink, --muted, --line, --surface once in
-   :root and never redefines them for dark mode. So `color: var(--ink)`
-   (#14172a, near-black) renders on a near-black background — invisible.
-   27 declarations across the file depend on these.
-
-   Remapping them onto the theme-aware tokens fixes every one at once.
-   --------------------------------------------------------------------------- */
-html[data-theme="dark"] {
-  --ink: #f6f7fb;          /* was #14172a */
-  --muted: #aeb6c8;        /* was #65708a */
-  --line: rgba(255,255,255,.09);
-  --surface: #11131b;      /* was #ffffff */
-  --blue: #5a72ff;
-  --blue-dark: #7657f5;
-  --blue-soft: rgba(90,114,255,.14);
-}
-
-/* ---------------------------------------------------------------------------
-   2. SYSTEM PILLS AND BANNERS — hardcoded light palettes
-   Readable, but a white slab in a dark chat looks broken. These give them
-   dark-mode equivalents that keep the same colour meaning.
-   --------------------------------------------------------------------------- */
-html[data-theme="dark"] .system-pill-info {
-  color: #b8ccff;
-  background: rgba(37, 99, 235, .16);
-}
-html[data-theme="dark"] .system-pill-success {
-  color: #7cebc4;
-  background: rgba(6, 185, 133, .14);
-  border-color: rgba(6, 185, 133, .3);
-  box-shadow: none;
-}
-html[data-theme="dark"] .system-pill-success svg { color: #34d399; }
-html[data-theme="dark"] .system-pill-warning {
-  color: #fbd57e;
-  background: rgba(229, 164, 0, .15);
-  border-color: rgba(229, 164, 0, .3);
-}
-
-html[data-theme="dark"] .delivery-banner {
-  border-color: rgba(6, 185, 133, .28);
-  background: rgba(6, 185, 133, .10);
-}
-html[data-theme="dark"] .delivery-banner-copy strong { color: #7cebc4; }
-html[data-theme="dark"] .delivery-banner-copy > span { color: var(--c-fg-2); }
-html[data-theme="dark"] .delivery-check { color: #34d399; background: rgba(6, 185, 133, .16); }
-html[data-theme="dark"] .delivery-banner::after { background: rgba(255,255,255,.03); }
-html[data-theme="dark"] .mini-badge {
-  color: var(--c-fg-2);
-  background: rgba(255,255,255,.05);
-  border-color: var(--c-line);
-}
-html[data-theme="dark"] .delivery-banner-delivered { border-color: rgba(37,99,235,.3); background: rgba(37,99,235,.10); }
-html[data-theme="dark"] .delivery-banner-delivered .delivery-banner-copy strong { color: #b8ccff; }
-html[data-theme="dark"] .delivery-banner-ready { border-color: rgba(255,109,0,.3); background: rgba(255,109,0,.09); }
-html[data-theme="dark"] .delivery-banner-ready .delivery-banner-copy strong { color: #ffb37a; }
-
-/* status pills */
-html[data-theme="dark"] .status-paid,
-html[data-theme="dark"] .status-progress { color: #b8ccff; background: rgba(37,99,235,.18); }
-html[data-theme="dark"] .status-delivered { color: #dcc0ff; background: rgba(147,51,234,.18); }
-html[data-theme="dark"] .status-completed { color: #7cebc4; background: rgba(6,185,133,.16); }
-
-/* boxes */
-html[data-theme="dark"] .notice-box { color: #b8ccff; background: rgba(37,99,235,.12); border-color: rgba(37,99,235,.28); }
-html[data-theme="dark"] .success-box { color: #7cebc4; background: rgba(6,185,133,.12); border-color: rgba(6,185,133,.28); }
-html[data-theme="dark"] .error-box   { color: #ffa8a8; background: rgba(223,59,71,.12); border-color: rgba(223,59,71,.30); }
-html[data-theme="dark"] .attachment-notice { color: var(--c-fg-2); background: var(--c-surface); }
-html[data-theme="dark"] .read-only { color: var(--c-fg-2); background: var(--c-surface); }
-html[data-theme="dark"] .empty-state { color: var(--c-fg-2); }
-html[data-theme="dark"] .btn-soft { color: var(--c-fg); background: var(--c-surface-2); border-color: var(--c-line); }
-
-/* review panel was a light gradient in both themes */
-html[data-theme="dark"] .review-panel { background: var(--c-bg-soft); border-color: rgba(6,185,133,.25); }
-html[data-theme="dark"] .review-panel h2 { color: var(--c-fg); }
-html[data-theme="dark"] .review-panel p { color: var(--c-fg-2); }
-
-/* low-contrast greys that were tuned for a white page */
-html[data-theme="dark"] .detail-kicker,
-html[data-theme="dark"] .order-summary-meta,
-html[data-theme="dark"] .item-qty,
-html[data-theme="dark"] .small { color: var(--c-fg-2); }
-
-/* ---------------------------------------------------------------------------
-   3. EXPANDED SUMMARY WAS PUSHING THE COMPOSER OFF-SCREEN
-   On an active order the shell is a fixed 100dvh with overflow:hidden. Opening
-   the item list added height that got clipped rather than scrolled, taking the
-   composer with it. Give the detail panel its own scroll instead.
-   --------------------------------------------------------------------------- */
-.app-shell:has(.delivery-shell):not(:has(.review-panel)) .order-summary[open] .order-details-grid {
-  max-height: 30vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-@media (max-width: 639px) {
-  .app-shell:has(.delivery-shell):not(:has(.review-panel)) .order-summary[open] .order-details-grid {
-    max-height: 26vh;
-  }
-}
-
-
-/* ============================================================================
-   ADMIN DASHBOARD REDESIGN
-   Append to the END of globals.css (after contrast-fix.css).
-   Supersedes the admin blocks in admin-polish.css where they overlap.
-   ============================================================================ */
-
-/* ---------------------------------------------------------------------------
-   1. THE ORDER LIST WAS HARDCODED DARK
-   .admin-panel used #111827 / #f8fafc regardless of theme, so in light mode a
-   black sidebar sat next to a white detail pane. Now it follows the tokens.
-   --------------------------------------------------------------------------- */
-.admin-panel {
-  color: var(--c-fg);
-  background: var(--c-bg-soft);
-  border: 1px solid var(--c-line);
-  border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(20,30,60,.04), 0 18px 44px -26px rgba(20,30,60,.28);
-}
-.admin-toolbar {
-  padding: 12px;
-  gap: 8px;
-  border-bottom: 1px solid var(--c-line);
-}
-.admin-input, .admin-select {
-  min-height: 38px;
-  flex: 1 1 140px;
-  color: var(--c-fg);
-  background: var(--c-surface);
-  border: 1px solid var(--c-line);
-  border-radius: 10px;
-  padding: 8px 10px;
-  font-size: 12.5px;
-}
-
-.order-list { padding: 8px; }
-.order-list-item {
-  color: var(--c-fg);
-  background: var(--c-surface);
-  border: 1px solid var(--c-line);
-  border-radius: 12px;
-  padding: 11px 12px;
-  margin-bottom: 6px;
-  transition: border-color .16s ease, background .16s ease;
-}
-.order-list-item:hover { border-color: rgba(var(--nova-rgb), .4); }
-.order-list-item.active {
-  border-color: var(--nova);
-  background: rgba(var(--nova-rgb), .08);
-  box-shadow: inset 3px 0 0 var(--nova);
-}
-.order-list-top { font-size: 13px; font-weight: 800; align-items: center; }
-.order-list-top span:last-child {
-  flex: none;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: var(--c-surface-2);
-  box-shadow: inset 0 0 0 1px var(--c-ring);
-  color: var(--c-fg-2);
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: capitalize;
-}
-.order-list-last { color: var(--c-fg-2); font-size: 11px; margin-top: 6px; }
-
-/* ---------------------------------------------------------------------------
-   2. DETAIL HEADER
-   --------------------------------------------------------------------------- */
-.admin-detail {
-  background: var(--c-bg-soft);
-  border: 1px solid var(--c-line);
-  border-radius: 16px;
-}
-.admin-detail-header {
-  padding: 14px 16px;
-  background: transparent;
-  border-bottom: 1px solid var(--c-line);
-}
-.admin-detail-header strong { font-size: 15px; }
-.admin-detail-header .small { color: var(--c-fg-2); font-size: 11px; }
-
-/* ---------------------------------------------------------------------------
-   3. CONTROL STACK — was a wall of identical full-width buttons.
-   Group them, shrink the secondary ones, let the primary action stand out.
-   --------------------------------------------------------------------------- */
-.admin-controls { padding: 14px; }
-.admin-controls .side-card { padding: 14px; border-radius: 14px; }
-.admin-controls .side-title { margin-bottom: 10px; font-size: 15px; }
-
-.control-stack { gap: 8px; }
-.control-stack .btn { min-height: 42px; border-radius: 11px; font-size: 13px; }
-.control-stack .field { margin: 2px 0; gap: 5px; }
-.control-stack .field label { font-size: 11px; font-weight: 700; color: var(--c-fg-2); }
-.control-stack .input { min-height: 40px; padding: 9px 11px; font-size: 13px; border-radius: 10px; }
-
-.control-divider {
-  margin: 10px 0 2px;
-  padding-top: 10px;
-  border-top: 1px solid var(--c-line);
-  color: var(--c-fg-3);
-  font-size: 9.5px;
-  font-weight: 800;
-  letter-spacing: .09em;
-  text-transform: uppercase;
-}
-.control-stack > .control-divider:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
-
-/* destructive actions read as outlines, not solid slabs */
-.control-stack .btn-danger {
-  background: transparent;
-  color: #df3b47;
-  box-shadow: inset 0 0 0 1.5px rgba(223,59,71,.45);
-}
-.control-stack .btn-danger:hover:not(:disabled) { color: #fff; background: #df3b47; box-shadow: none; }
-.control-stack .btn-danger:disabled { opacity: .35; }
-
-/* file picker */
-.control-stack input[type="file"] { padding: 7px 8px; font-size: 12px; cursor: pointer; }
-.control-stack input[type="file"]::file-selector-button {
-  margin-right: 10px;
-  padding: 7px 12px;
-  border: 0;
-  border-radius: 9px;
-  color: var(--c-fg);
-  background: var(--c-surface-2);
-  box-shadow: inset 0 0 0 1px var(--c-ring);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* ---------------------------------------------------------------------------
-   4. LAYOUT — desktop columns, phone stacking
-   --------------------------------------------------------------------------- */
-.dashboard-shell { width: min(1320px, calc(100% - 24px)); padding: 14px 0 40px; }
-.admin-grid { grid-template-columns: 300px minmax(0, 1fr); gap: 12px; }
-
-@media (min-width: 1100px) {
-  .admin-grid { grid-template-columns: 320px minmax(0, 1fr); }
-  .admin-body { grid-template-columns: minmax(0, 1fr) 320px; }
-}
-
-@media (min-width: 861px) {
-  .admin-panel, .admin-detail { height: calc(100dvh - 96px); }
-  .admin-panel { display: flex; flex-direction: column; }
-  .admin-toolbar { flex: none; }
-  .order-list { flex: 1; min-height: 0; max-height: none; overflow-y: auto; }
-  .admin-detail { display: flex; flex-direction: column; }
-  .admin-detail-header { flex: none; }
-  .admin-body { display: grid; flex: 1; min-height: 0; }
-  .admin-controls { max-height: none; overflow-y: auto; }
-}
-
-@media (max-width: 860px) {
-  .dashboard-shell { width: calc(100% - 16px); padding: 10px 0 32px; }
-  .tabs { gap: 6px; margin-bottom: 10px; }
-  .tabs .btn { min-height: 40px; border-radius: 11px; font-size: 13px; }
-  .admin-panel, .admin-detail { height: auto; }
-  .order-list { max-height: none; }
-  .admin-chat .chat-log { height: 52vh; min-height: 260px; }
-  .admin-controls { padding: 12px; }
-}
-
-@media (max-width: 480px) {
-  .admin-toolbar { flex-direction: column; }
-  .admin-input, .admin-select { flex: none; width: 100%; }
-  .admin-detail-header { padding: 12px; }
-  .admin-detail-header .small { word-break: break-all; }
-  .admin-chat .chat-log { height: 48vh; }
-}
-
-/* the admin chat header shouldn't scroll with the log */
-.chat-header { flex: none; border-radius: 0; }
-.admin-chat { display: flex; min-height: 0; flex-direction: column; }
-.admin-chat .chat-card { display: flex; flex: 1; min-height: 0; flex-direction: column; }
-.admin-chat .chat-log { flex: 1; min-height: 0; overflow-y: auto; }
-
-
-/* ============================================================================
-   STATUS-AWARE CONTROL CARDS  (replaces the old flat .control-stack)
-   ============================================================================ */
-.admin-controls { display: grid; gap: 10px; padding: 12px; align-content: start; }
-
-.ctl-card {
-  display: grid;
-  gap: 8px;
-  padding: 14px;
-  border: 1px solid var(--c-line);
-  border-radius: 14px;
-  background: var(--c-bg-soft);
-}
-.ctl-title {
-  margin: 0 0 2px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .09em;
-  text-transform: uppercase;
-  color: var(--c-fg-3);
-}
-.ctl-card .btn { min-height: 42px; border-radius: 11px; font-size: 13px; width: 100%; }
-.ctl-card .input { min-height: 40px; padding: 9px 11px; font-size: 13px; border-radius: 10px; }
-
-.ctl-field { display: grid; gap: 5px; }
-.ctl-field > label {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--c-fg-2);
-}
-.ctl-field > label span {
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--c-fg-3);
-}
-
-.ctl-hint { margin: 0; color: var(--c-fg-3); font-size: 11px; line-height: 1.5; }
-
-/* destructive action reads as an outline until you commit to it */
-.ctl-card .btn-danger {
-  background: transparent;
-  color: #df3b47;
-  box-shadow: inset 0 0 0 1.5px rgba(223, 59, 71, .45);
-}
-.ctl-card .btn-danger:hover:not(:disabled) { color: #fff; background: #df3b47; box-shadow: none; }
-.ctl-card .btn-danger:disabled { opacity: .4; }
-
-.ctl-card input[type="file"] { padding: 7px 8px; font-size: 12px; cursor: pointer; }
-.ctl-card input[type="file"]::file-selector-button {
-  margin-right: 10px;
-  padding: 7px 12px;
-  border: 0;
-  border-radius: 9px;
-  color: var(--c-fg);
-  background: var(--c-surface-2);
-  box-shadow: inset 0 0 0 1px var(--c-ring);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* the sidebar cards should match the control cards, not float separately */
-.admin-controls .sidebar { display: grid; gap: 10px; }
-.admin-controls .side-card {
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid var(--c-line);
-  background: var(--c-bg-soft);
-  box-shadow: none;
-}
-.admin-controls .side-title {
-  margin: 0 0 10px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .09em;
-  text-transform: uppercase;
-  color: var(--c-fg-3);
-}
-
-/* ---- order list rows -------------------------------------------------------- */
-.order-list-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.order-list-status,
-.order-list-unread {
-  flex: none;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: 9.5px;
-  font-weight: 800;
-  letter-spacing: .03em;
-  text-transform: uppercase;
-}
-.order-list-unread { color: #fff; background: var(--nova); }
-
-.order-list-last { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
-.order-list-user { flex: none; font-weight: 700; color: var(--c-fg-2); }
-.order-list-games {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--c-fg-3);
-}
-
-/* ---- detail header ---------------------------------------------------------- */
-.admin-detail-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.admin-detail-id { min-width: 0; }
-.admin-detail-id .small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-@media (max-width: 480px) {
-  .admin-detail-id .small { white-space: normal; word-break: break-all; }
-  .admin-controls { padding: 10px; gap: 8px; }
-  .ctl-card { padding: 12px; }
-}
-/* ADMIN GRID — MOBILE WIDTH FIX */
-.admin-grid { grid-template-columns: 1fr; }
-
-@media (min-width: 861px) {
-  .admin-grid { grid-template-columns: 300px minmax(0, 1fr); }
-}
 @media (min-width: 1100px) {
   .admin-grid { grid-template-columns: 320px minmax(0, 1fr); }
 }
 
-@media (max-width: 860px) {
-  .admin-body { grid-template-columns: 1fr; }
-  .admin-chat { border-right: 0; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
 
-.dashboard-shell { max-width: 100%; overflow-x: clip; }
-.admin-panel, .admin-detail, .admin-body, .admin-controls { min-width: 0; }
+/* ---- admin: search, alerts, inline cancel ---- */
+.admin-searchbar { display: flex; flex: none; gap: 8px; padding: 12px 12px 0; }
+.admin-searchbar .admin-input { padding-left: 12px; background: var(--surface-2); border-color: transparent; }
+.admin-searchbar .admin-input:focus { background: var(--surface); border-color: var(--blue); }
+.alert-btn { flex: none; min-height: 38px; padding: 0 12px; border: 0; border-radius: 10px; color: var(--muted); background: var(--surface-2); font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.alert-btn:hover { background: #eceef1; }
+.alert-btn.on { color: var(--blue); background: var(--blue-soft); }
+.order-list-time { margin-top: 3px; color: var(--faint); font-size: 11px; }
+.order-list-item.has-unread .order-list-top > span:first-child { color: var(--ink); }
+.cancel-confirm { display: grid; gap: 8px; padding: 12px; border-radius: 12px; background: #fef2f2; animation: fadeUp .18s ease both; }
+.cancel-confirm p { margin: 0; color: #991b1b; font-size: 12px; line-height: 1.5; }
+.cancel-confirm .btn-danger { color: #fff; background: var(--red); box-shadow: none; }
