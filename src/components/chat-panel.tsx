@@ -283,18 +283,19 @@ export function ChatPanel({
         const isFirst = prev?.sender !== m.sender;
         const isLast = next?.sender !== m.sender;
 
-        const isMine = m.sender === "customer";
-        const name = isMine ? (customerName || "Customer") : "ParadiseBlox";
+       const isCustomer = m.sender === "customer";
+const isMine = m.sender === mode;
+const name = isCustomer ? (customerName || "Customer") : "ParadiseBlox";
         const time = timeLabel(m.createdAt);
         const isImage = Boolean(m.attachmentUrl && m.attachmentMime?.startsWith("image/"));
         const isFile = Boolean(m.attachmentUrl && !isImage);
 
         return <div
-          className={["message-row", m.sender, isFirst && "is-first", isLast && "is-last", m.pending && "is-pending", m.failed && "is-failed"].filter(Boolean).join(" ")}
+          className={["message-row", m.sender, isMine ? "mine" : "theirs", isFirst && "is-first", isLast && "is-last", m.pending && "is-pending", m.failed && "is-failed"].filter(Boolean).join(" ")}
           key={m.id}
         >
           {isLast
-            ? <Avatar src={isMine ? customerAvatarUrl : adminAvatarUrl} label={name} />
+            ? <Avatar src={isCustomer ? customerAvatarUrl : adminAvatarUrl} label={name} />
             : <span className="message-avatar-spacer" aria-hidden="true" />}
 
           <div className="message-stack">
