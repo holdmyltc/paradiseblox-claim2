@@ -37,6 +37,7 @@ export type PublicOrder = {
   storeStatus: StoreStatus;
   trustpilotUrl: string;
   unreadCount?: number;
+  lastCustomerMessageAt?: string | null;
   claimRequestedAt?: string | null;
   email?: string;
 };
