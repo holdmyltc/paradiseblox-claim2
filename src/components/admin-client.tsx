@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import type { ChatMessage, DeliveryProof, PublicOrder, StoreStatus } from "@/lib/types";
 import { ChatPanel } from "@/components/chat-panel";
@@ -47,15 +47,28 @@ export function AdminClient() {
     else setToken(data.session.access_token);
   }
 
+   const loadingRef = useRef(false);
+
   async function load() {
-    if (!token) return;
-    const r = await fetch(`/api/admin/orders?filter=${filter}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
-    if (!r.ok) return;
-    const d = await r.json();
-    setOrders(d.orders);
-    setStoreStatus(d.storeStatus);
-    // functional updater: the interval closure would otherwise hold a stale `selected`
-    setSelected((prev) => (prev ? d.orders.find((o: PublicOrder) => o.id === prev.id) ?? prev : prev));
+    if (!token || loadingRef.current) return;
+    loadingRef.current = true;
+    try {
+      const r = await fetch(`/api/admin/orders?filter=${filter}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      setOrders(d.orders);
+      setStoreStatus(d.storeStatus);
+      // functional updater: the interval closure would otherwise hold a stale `selected`
+      setSelected((prev) => (prev ? d.orders.find((o: PublicOrder) => o.id === prev.id) ?? prev : prev));
+    } catch {
+      // timed out or network hiccup: the next poll will try again
+    } finally {
+      loadingRef.current = false;
+    }
   }
 
   useEffect(() => {
