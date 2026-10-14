@@ -1,10 +1,9 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import type { ChatMessage, DeliveryProof, PublicOrder, StoreStatus } from "@/lib/types";
 import { ChatPanel } from "@/components/chat-panel";
 import { OrderSidebar } from "@/components/order-sidebar";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const STATUS_LABEL: Record<string, string> = {
   paid: "Paid",
@@ -13,6 +12,37 @@ const STATUS_LABEL: Record<string, string> = {
   completed: "Completed",
   cancelled: "Cancelled",
 };
+
+/** Short, soft two-note ping made in the browser, so there is no sound file to host. */
+function playPing() {
+  try {
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    const c = new Ctx();
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(880, c.currentTime);
+    o.frequency.setValueAtTime(1175, c.currentTime + 0.12);
+    g.gain.setValueAtTime(0.0001, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.18, c.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.38);
+    o.connect(g);
+    g.connect(c.destination);
+    o.start();
+    o.stop(c.currentTime + 0.4);
+    setTimeout(() => c.close().catch(() => {}), 700);
+  } catch {}
+}
+
+function shortTime(iso?: string | null) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const diff = Date.now() - d.getTime();
+  if (diff < 60_000) return "just now";
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
 
 export function AdminClient() {
   const [email, setEmail] = useState("");
@@ -31,6 +61,46 @@ export function AdminClient() {
   const [uploading, setUploading] = useState(false);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [query, setQuery] = useState("");
+  const [search, setSearch] = useState("");
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [alertsOn, setAlertsOn] = useState(false);
+  const loadingRef = useRef(false);
+  const openSeq = useRef(0);
+  const seenRef = useRef<Record<string, string>>({});
+  const firstLoad = useRef(true);
+  const alertsRef = useRef(false);
+  useEffect(() => { alertsRef.current = alertsOn; }, [alertsOn]);
+
+  // wait a beat after typing before asking the server
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(query.trim()), 250);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  useEffect(() => {
+    try { setAlertsOn(localStorage.getItem("pb_admin_alerts") === "1" && typeof Notification !== "undefined" && Notification.permission === "granted"); } catch {}
+  }, []);
+
+  async function toggleAlerts() {
+    if (alertsOn) {
+      setAlertsOn(false);
+      try { localStorage.setItem("pb_admin_alerts", "0"); } catch {}
+      return;
+    }
+    playPing(); // also unlocks audio for this tab
+    let granted = false;
+    try {
+      if (typeof Notification !== "undefined") {
+        granted = Notification.permission === "granted" || (await Notification.requestPermission()) === "granted";
+      }
+    } catch {}
+    // sound still works without the popup, so turn alerts on either way
+    setAlertsOn(true);
+    try { localStorage.setItem("pb_admin_alerts", "1"); } catch {}
+    if (!granted) setError("Sound alerts are on. Allow notifications in your browser to also get a popup.");
+  }
 
   useEffect(() => {
     const sb = supabaseBrowser();
@@ -47,13 +117,11 @@ export function AdminClient() {
     else setToken(data.session.access_token);
   }
 
-   const loadingRef = useRef(false);
-
-  async function load() {
+  const load = useCallback(async () => {
     if (!token || loadingRef.current) return;
     loadingRef.current = true;
     try {
-      const r = await fetch(`/api/admin/orders?filter=${filter}`, {
+      const r = await fetch(`/api/admin/orders?filter=${filter}&q=${encodeURIComponent(search)}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
         signal: AbortSignal.timeout(15000),
@@ -64,57 +132,83 @@ export function AdminClient() {
       setStoreStatus(d.storeStatus);
       // functional updater: the interval closure would otherwise hold a stale `selected`
       setSelected((prev) => (prev ? d.orders.find((o: PublicOrder) => o.id === prev.id) ?? prev : prev));
+
+      // new customer message alerts
+      let fresh: PublicOrder | null = null;
+      for (const o of d.orders as PublicOrder[]) {
+        const stamp = o.lastCustomerMessageAt || "";
+        if (stamp && seenRef.current[o.id] !== stamp) {
+          if (!firstLoad.current && (o.unreadCount || 0) > 0) fresh = o;
+          seenRef.current[o.id] = stamp;
+        }
+      }
+      firstLoad.current = false;
+      if (fresh && alertsRef.current && document.hidden) {
+        playPing();
+        try {
+          if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+            new Notification(`New message on ${fresh.orderNumber}`, { body: fresh.roblox?.username ? `@${fresh.roblox.username}` : "A customer wrote to you", icon: "/pb-avatar.png", tag: fresh.id });
+          }
+        } catch {}
+      }
     } catch {
-      // timed out or network hiccup: the next poll will try again
+      /* timeout or network blip: the next tick tries again */
     } finally {
       loadingRef.current = false;
     }
-  }
+  }, [token, filter, search]);
 
   useEffect(() => {
     load();
     if (!token) return;
-    const t = setInterval(load, 3500);
-    return () => clearInterval(t);
-  }, [token, filter]);
-  
-  // refresh the order list the moment anything changes
+    const t = setInterval(load, 4000);
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+    return () => { clearInterval(t); window.removeEventListener("focus", onFocus); };
+  }, [token, load]);
+
+  // unread count in the tab title so you can see it from another tab
+  const totalUnread = useMemo(() => orders.reduce((n, o) => n + (o.unreadCount || 0), 0), [orders]);
   useEffect(() => {
-    if (!token) return;
-    const sb = supabaseBrowser();
-    const channel = sb
-      .channel("admin-feed")
-      .on("broadcast", { event: "ping" }, () => { load(); })
-      .subscribe();
-    return () => { sb.removeChannel(channel); };
-  }, [token, filter]);
+    document.title = totalUnread ? `(${totalUnread}) ParadiseBlox Admin` : "ParadiseBlox Admin";
+  }, [totalUnread]);
 
   async function open(order: PublicOrder) {
+    const seq = ++openSeq.current;
     setSelected(order);
-    setMessages([]);
-    setProofs([]);
     setMobileTab("detail");
     setError("");
+    setCancelOpen(false);
+    setCancelReason("");
+    setReason("");
+    setMessages([]);
+    setProofs([]);
     const [m, p] = await Promise.all([
       fetch(`/api/orders/${order.id}/messages`, { headers: { Authorization: `Bearer ${token}` } }),
       fetch(`/api/admin/orders/${order.id}/proof`, { headers: { Authorization: `Bearer ${token}` } }),
     ]);
+    // ignore the answer if you already clicked a different order
+    if (seq !== openSeq.current) return;
     if (m.ok) setMessages((await m.json()).messages);
     if (p.ok) setProofs((await p.json()).proofs);
+    // opening a chat reads it, so drop its badge straight away
+    setOrders((prev) => prev.map((o) => (o.id === order.id ? { ...o, unreadCount: 0 } : o)));
   }
 
-  async function changeStatus(status: string) {
+  async function changeStatus(status: string, why: string = reason) {
     if (!selected) return;
     setBusy(true);
     const r = await fetch(`/api/admin/orders/${selected.id}/status`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ status, reason }),
+      body: JSON.stringify({ status, reason: why }),
     });
     const d = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) { setError(d.error || "Status update failed"); return; }
     setReason("");
+    setCancelOpen(false);
+    setCancelReason("");
     setError("");
     if (status === "cancelled") { setSelected(null); setMobileTab("orders"); load(); return; }
     setSelected(d.order);
@@ -124,13 +218,15 @@ export function AdminClient() {
 
   async function setChatLocked(chatLocked: boolean) {
     if (!selected) return;
+    const before = selected;
+    setSelected({ ...selected, chatLocked }); // instant, rolled back if the server says no
     const r = await fetch(`/api/admin/orders/${selected.id}/status`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ chatLocked }),
     });
     const d = await r.json().catch(() => ({}));
-    if (!r.ok) setError(d.error || "Could not change chat lock");
+    if (!r.ok) { setSelected(before); setError(d.error || "Could not change chat lock"); }
     else { setSelected(d.order); load(); }
   }
 
@@ -173,30 +269,30 @@ export function AdminClient() {
 
   function cancelOrder() {
     if (!selected) return;
-    if (!reason.trim()) { setError("Enter a reason before cancelling."); return; }
-    const ok = confirm(
-      `Cancel ${selected.orderNumber}?\n\n` +
-      `• It disappears from your order list\n` +
-      `• The customer's claim page stops working\n` +
-      `• Their Roblox account is unlinked\n` +
-      `• No email is sent\n\n` +
-      `They can start a fresh claim with their order number and email.`
-    );
-    if (ok) changeStatus("cancelled");
+    if (!cancelReason.trim()) { setError("Enter a reason before cancelling."); return; }
+    changeStatus("cancelled", cancelReason.trim());
   }
 
-  // cancelled orders are hidden unless you deliberately look for them
-  const filtered = useMemo(
-    () => (filter === "cancelled" ? orders : orders.filter((o) => o.status !== "cancelled")),
-    [orders, filter]
-  );
+  // cancelled orders stay hidden unless you filter for them or search
+  const filtered = useMemo(() => {
+    const list = filter === "cancelled" || search ? orders : orders.filter((o) => o.status !== "cancelled");
+    // unread first, then whoever wrote most recently, then newest order
+    return [...list].sort((x, y) => {
+      const ux = (x.unreadCount || 0) > 0 ? 1 : 0;
+      const uy = (y.unreadCount || 0) > 0 ? 1 : 0;
+      if (ux !== uy) return uy - ux;
+      const tx = x.lastCustomerMessageAt ? new Date(x.lastCustomerMessageAt).getTime() : 0;
+      const ty = y.lastCustomerMessageAt ? new Date(y.lastCustomerMessageAt).getTime() : 0;
+      if (tx !== ty) return ty - tx;
+      return new Date(y.createdAt).getTime() - new Date(x.createdAt).getTime();
+    });
+  }, [orders, filter, search]);
 
   if (!token) return (
     <div className="app-shell">
       <div className="admin-auth-stage">
         <div className="admin-auth-inner">
                     <div className="admin-auth-mark"><img src="/pb-avatar.png" alt="" /></div>
-          <div className="claim-theme-position"><ThemeToggle /></div>
           <h1>ParadiseBlox <span>Admin</span></h1>
           <p className="admin-auth-lede">Manage deliveries, chat with customers, and track every order in one place.</p>
           <div className="admin-auth-card">
@@ -219,7 +315,6 @@ export function AdminClient() {
   return (
         <div className="app-shell">
       <div className="dashboard-shell">
-        <div className="claim-theme-position"><ThemeToggle /></div>
         <div className="tabs">
           <button className={`btn ${mobileTab === "orders" ? "btn-blue" : "btn-soft"}`} onClick={() => setMobileTab("orders")}>Orders</button>
           <button className={`btn ${mobileTab === "detail" ? "btn-blue" : "btn-soft"}`} onClick={() => setMobileTab("detail")} disabled={!s}>Order chat</button>
@@ -227,6 +322,19 @@ export function AdminClient() {
 
         <div className="admin-grid">
           <aside className={`admin-panel ${mobileTab === "orders" ? "mobile-show" : ""}`}>
+            <div className="admin-searchbar">
+              <input
+                className="admin-input"
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search order, email or username"
+                aria-label="Search orders"
+              />
+              <button type="button" className={`alert-btn ${alertsOn ? "on" : ""}`} onClick={toggleAlerts} title="Ping me when a customer writes and this tab is in the background">
+                {alertsOn ? "Alerts on" : "Alerts off"}
+              </button>
+            </div>
             <div className="admin-toolbar">
               <select className="admin-select" value={filter} onChange={(e) => setFilter(e.target.value)}>
                 <option value="active">Active</option>
@@ -246,7 +354,7 @@ export function AdminClient() {
 
             <div className="order-list">
               {filtered.map((o) => (
-                <button className={`order-list-item ${s?.id === o.id ? "active" : ""}`} key={o.id} onClick={() => open(o)}>
+                <button className={`order-list-item ${s?.id === o.id ? "active" : ""} ${o.unreadCount ? "has-unread" : ""}`} key={o.id} onClick={() => open(o)}>
                   <div className="order-list-top">
                     <span>{o.orderNumber}</span>
                     {o.unreadCount
@@ -257,10 +365,10 @@ export function AdminClient() {
                     <span className="order-list-user">@{o.roblox?.username || "not linked"}</span>
                     <span className="order-list-games">{o.items.map((i) => i.game).filter((v, i, a) => a.indexOf(v) === i).join(", ")}</span>
                   </div>
-                  {o.claimRequestedAt && <div className="small">{new Date(o.claimRequestedAt).toLocaleString("en-US")}</div>}
+                  {(o.lastCustomerMessageAt || o.claimRequestedAt) && <div className="order-list-time">{o.lastCustomerMessageAt ? `Last message ${shortTime(o.lastCustomerMessageAt)}` : `Claimed ${shortTime(o.claimRequestedAt)}`}</div>}
                 </button>
               ))}
-              {!filtered.length && <div className="empty-state">No orders in this view.</div>}
+              {!filtered.length && <div className="empty-state">{search ? `Nothing found for \u201c${search}\u201d.` : "No orders in this view."}</div>}
             </div>
           </aside>
 
@@ -341,7 +449,7 @@ export function AdminClient() {
                     </>}
 
                     {s.status === "completed" && <>
-                      <p className="ctl-hint">This order is closed and the chat is read-only.</p>
+                      <p className="ctl-hint">This order is complete. The customer can keep chatting for 3 days after completion.</p>
                       <button className="btn btn-blue" onClick={resendReceipt}>Resend receipt email</button>
                       <button className="btn btn-soft" onClick={() => changeStatus("in_progress")} disabled={busy}>Reopen order</button>
                     </>}
@@ -356,10 +464,16 @@ export function AdminClient() {
                     <section className="ctl-card">
                       <h3 className="ctl-title">Order</h3>
                       <button className="btn btn-soft" onClick={() => setChatLocked(!s.chatLocked)}>{s.chatLocked ? "Unlock chat" : "Lock chat"}</button>
-                      {s.status !== "delivered" && s.status !== "completed" && (
-                        <input className="input" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Cancellation reason" />
+                      {!cancelOpen ? (
+                        <button className="btn btn-danger" onClick={() => { setCancelOpen(true); setError(""); }} disabled={busy}>Cancel order</button>
+                      ) : (
+                        <div className="cancel-confirm">
+                          <p>This removes the order from your list, stops the customer's claim page and unlinks their Roblox account. No email is sent.</p>
+                          <input className="input" autoFocus value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} placeholder="Reason (required)" />
+                          <button className="btn btn-danger" onClick={cancelOrder} disabled={busy || !cancelReason.trim()}>Confirm cancel</button>
+                          <button className="btn btn-soft" onClick={() => { setCancelOpen(false); setCancelReason(""); }}>Keep order</button>
+                        </div>
                       )}
-                      <button className="btn btn-danger" onClick={cancelOrder} disabled={busy}>Cancel order</button>
                       <p className="ctl-hint">Cancelling removes the order from this list, kills the customer's claim page and unlinks their Roblox account. No email is sent.</p>
                     </section>
                   )}
