@@ -4,6 +4,7 @@ import type { ChatMessage, DeliveryProof, PublicOrder, RobloxProfile } from "@/l
 import { ChatPanel } from "@/components/chat-panel";
 import { OrderOverview } from "@/components/order-overview";
 import { StatusSteps } from "@/components/status-steps";
+import { supabaseBrowser } from "@/lib/supabase/client";
 
 export function OrderPageClient({ initialOrder, initialMessages, initialProofs }: { initialOrder:PublicOrder; initialMessages:ChatMessage[]; initialProofs:DeliveryProof[] }) {
   const [order,setOrder]=useState(initialOrder);
@@ -19,7 +20,7 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
     let live=true;
     const poll = async () => {
   try {
-    const r = await fetch(`/api/orders/${order.id}`, { cache: "no-store" });
+    const r = await fetch(`/api/orders/${order.id}`, { cache: "no-store", signal: AbortSignal.timeout(8000) });
     if (!r.ok || !live) return;
     const d = await r.json();
     // only re-render when something actually changed
@@ -29,7 +30,8 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
 };
     poll();
     const t=setInterval(poll,3000);
-    return()=>{live=false;clearInterval(t)};
+    const channel=supabaseBrowser().channel(`order-${order.id}-state`).on("broadcast",{event:"ping"},()=>poll()).subscribe();
+    return()=>{live=false;clearInterval(t);supabaseBrowser().removeChannel(channel)};
   },[order.id]);
 
   async function lookup(){
