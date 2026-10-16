@@ -55,3 +55,26 @@ export function canAccessOrder(session: CustomerSession | null, orderId: string,
   if (session.email.toLowerCase() !== orderEmail.toLowerCase()) return false;
   return session.history || session.orderIds.includes(orderId);
 }
+
+/** How long a customer stays logged in to "My orders" after proving they own the email. */
+export const ACCOUNT_DAYS = 90;
+const SINGLE_ORDER_DAYS = 14;
+
+/**
+ * Lets this browser open one order, without logging anyone out.
+ * account = true when they proved they own the email (6-digit code or a link we emailed them),
+ * which also unlocks every order for that email.
+ * Typing an order number and email only opens that one order.
+ */
+export async function grantOrderAccess(email: string, orderId: string | null, { account }: { account: boolean }) {
+  const existing = await readCustomerSession();
+  const same = existing && existing.email.toLowerCase() === email.toLowerCase();
+  const history = Boolean(account || (same && existing.history));
+  const ids = [...new Set([...(same ? existing.orderIds : []), ...(orderId ? [orderId] : [])])].slice(-30);
+  await writeCustomerSession({ email: email.toLowerCase(), orderIds: ids, history }, history ? ACCOUNT_DAYS : SINGLE_ORDER_DAYS);
+}
+
+export async function clearCustomerSession() {
+  const jar = await cookies();
+  jar.set(SESSION_COOKIE, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", expires: new Date(0) });
+}

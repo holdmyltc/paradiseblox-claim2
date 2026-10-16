@@ -1,16 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const outfit = Outfit({
-  subsets: ["latin"],
+const lato = localFont({
+  src: [
+    { path: "../fonts/lato-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/lato-latin-700-normal.woff2", weight: "700", style: "normal" },
+    { path: "../fonts/lato-latin-900-normal.woff2", weight: "900", style: "normal" },
+  ],
   variable: "--font-body",
-  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Claim Your ParadiseBlox Order",
-  description: "Verify your order, connect your Roblox account and chat with ParadiseBlox during delivery.",
+  title: "Your Paradise Blox Order",
+  description: "Open your order, link your Roblox account and chat with Paradise Blox while we deliver your items.",
   icons: {
     icon: "/pb-icon-192.png",
     apple: "/pb-apple-touch-icon.png",
@@ -21,31 +25,13 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
-  themeColor: "#f7f8fc",
+  themeColor: "#0c0d12",
 };
-
-/**
- * Light is the default. We deliberately ignore prefers-color-scheme: a visitor
- * whose phone is in dark mode still lands on the light theme, and only gets
- * dark if they choose it with the toggle.
- */
-const themeScript = `
-(function(){
-  try {
-    var saved = localStorage.getItem('claim2_theme');
-    document.documentElement.setAttribute('data-theme', saved === 'dark' ? 'dark' : 'light');
-  } catch (error) {
-    document.documentElement.setAttribute('data-theme', 'light');
-  }
-})();`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={outfit.variable} suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+    <html lang="en" className={lato.variable}>
       <body>{children}</body>
     </html>
   );
