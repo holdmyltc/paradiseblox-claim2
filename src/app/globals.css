@@ -476,3 +476,9 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .acct-card-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
 
 @media (min-width: 750px) { .acct-table { display: block; } .acct-cards { display: none; } }
+
+/* ---------- iPhone notch and Home Screen app ---------- */
+/* When opened from the Home Screen, the page draws under the status bar. Keep buttons below it. */
+.topbar { padding-top: env(safe-area-inset-top); }
+.admin-top { padding-top: max(10px, env(safe-area-inset-top)); padding-left: max(var(--gutter), env(safe-area-inset-left)); padding-right: max(var(--gutter), env(safe-area-inset-right)); }
+.admin-chat.show, .admin-list.show, .admin-info.show { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
