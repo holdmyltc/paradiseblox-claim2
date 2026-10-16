@@ -1,11 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const outfit = Outfit({
-  subsets: ["latin"],
+const lato = localFont({
+  src: [
+    { path: "../fonts/lato-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/lato-latin-700-normal.woff2", weight: "700", style: "normal" },
+    { path: "../fonts/lato-latin-900-normal.woff2", weight: "900", style: "normal" },
+  ],
   variable: "--font-body",
-  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -44,7 +48,7 @@ const themeScript = `
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={outfit.variable} suppressHydrationWarning>
+    <html lang="en" className={lato.variable} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body>{children}</body>
     </html>
