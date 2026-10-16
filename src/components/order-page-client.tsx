@@ -162,8 +162,12 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
     <aside className="order-side"><OrderDetails order={order} proofs={proofs} /></aside>
   </div>;
 
-  return <div className="order-grid">
-    <div className="order-main">
+  const help = <p className="help-line">Need help? Email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> with your order number.</p>;
+
+  /* Phone: status, details, chat, safety tips, top to bottom.
+     Computer: status across the top, big chat on the left, details on the right. */
+  return <div className="order-layout">
+    <div className="ol-top">
       <section className={`panel status ${order.onHold ? "is-hold" : ""}`}>
         {!order.onHold && <StatusSteps order={order} />}
         <div className="status-body">
@@ -200,9 +204,11 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
 
       {order.onHold && <Notice tone="danger" title="How to help us approve your order">{HOLD_TEXT}<br /><strong>{HOLD_SAFETY}</strong></Notice>}
       {offline && !order.onHold && <Notice tone="warn">{OFFLINE_NOTICE}</Notice>}
+    </div>
 
-      <div className="order-side-mobile"><OrderDetails order={order} proofs={proofs} collapsible /></div>
+    <div className="ol-mobile"><OrderDetails order={order} proofs={proofs} collapsible /></div>
 
+    <div className="ol-chat">
       <ChatPanel
         orderId={order.id}
         initialMessages={initialMessages}
@@ -213,10 +219,14 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
         adminAvatarUrl="/pb-avatar.png"
         onChanged={() => void refresh()}
       />
-
-      <StaySecure />
-      <p className="help-line">Need help? Email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> with your order number.</p>
     </div>
-    <aside className="order-side"><OrderDetails order={order} proofs={proofs} /></aside>
+
+    <aside className="ol-side">
+      <OrderDetails order={order} proofs={proofs} />
+      <StaySecure />
+      {help}
+    </aside>
+
+    <div className="ol-mobile ol-after"><StaySecure />{help}</div>
   </div>;
 }
