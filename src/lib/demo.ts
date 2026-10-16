@@ -53,3 +53,15 @@ export function demoOrder(state?: string): PublicOrder {
       return DEMO_ORDER;
   }
 }
+
+/** Demo only: /history?demo=1 */
+export function demoAccountOrders(): PublicOrder[] {
+  const ago = (h: number) => new Date(Date.now() - h * 3600_000).toISOString();
+  return [
+    { ...demoOrder(), id: "a1", orderNumber: "#4821", createdAt: ago(1), unreadCount: 2 },
+    { ...demoOrder("delivered"), id: "a2", orderNumber: "#4790", createdAt: ago(20), totalAmount: "8.50", items: [DEMO_ORDER.items[1]] },
+    { ...demoOrder("completed"), id: "a3", orderNumber: "#4602", createdAt: ago(80), totalAmount: "42.00" },
+    { ...demoOrder("hold"), id: "a4", orderNumber: "#4511", createdAt: ago(200), totalAmount: "129.00", items: [DEMO_ORDER.items[0]] },
+    { ...demoOrder("completed"), id: "a5", orderNumber: "#4400", status: "cancelled", createdAt: ago(500), totalAmount: "4.99", items: [DEMO_ORDER.items[2]] },
+  ];
+}

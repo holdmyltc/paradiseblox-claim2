@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { findShopifyOrder } from "@/lib/shopify";
 import { getOrderByNumber, publicOrder, reclaimIfCancelled, upsertShopifyOrder } from "@/lib/orders";
-import { writeCustomerSession } from "@/lib/session";
+import { grantOrderAccess } from "@/lib/session";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { logEvent } from "@/lib/audit";
 
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     if (order.status === "cancelled")
       return NextResponse.json({ error: "This order was cancelled. Check your email, or contact support if you think this is a mistake." }, { status: 403 });
 
-    await writeCustomerSession({ email: order.email, orderIds: [order.id], history: false }, 14);
+    await grantOrderAccess(order.email, order.id, { account: false });
     await logEvent(order.id, "customer", "order_verified", request);
     return NextResponse.json({ order: publicOrder(order) });
   } catch (e) {

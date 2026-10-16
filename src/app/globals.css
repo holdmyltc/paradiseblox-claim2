@@ -436,3 +436,43 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .ev-customer { background: var(--accent); }
 .ev-admin { background: var(--green-strong); }
 .ev-system { background: var(--amber); }
+
+/* ---------- My orders (account) ---------- */
+.acct { display: grid; gap: 16px; }
+.acct-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.acct-title { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
+@media (min-width: 750px) { .acct-title { font-size: 32px; } }
+.acct-sub { color: var(--muted); font-size: 14px; margin-top: 2px; overflow-wrap: anywhere; }
+.acct-sub strong { color: var(--text); }
+.acct-tools { display: flex; gap: 10px; flex-wrap: wrap; }
+.acct-select { position: relative; display: inline-block; }
+.acct-select::after { content: ""; position: absolute; right: 14px; top: 50%; width: 7px; height: 7px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.acct-select select { appearance: none; -webkit-appearance: none; min-height: 42px; min-width: 160px; padding: 0 38px 0 14px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); font-weight: 700; font-size: 14px; cursor: pointer; }
+.acct-select select:focus { outline: none; border-color: var(--accent-line); }
+.acct-thumb { width: 48px; height: 48px; border-radius: 10px; object-fit: contain; padding: 3px; background: radial-gradient(circle at 50% 40%, rgba(var(--accent-rgb), 0.22), transparent 70%), var(--inset); flex: none; }
+.acct-game { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acct-new { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 900; color: #93c5fd; }
+.acct-new::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.acct-total { font-weight: 900; font-size: 15px; white-space: nowrap; }
+.acct-right { text-align: right; justify-self: end; }
+
+.acct-table { display: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+.acct-tr { display: grid; grid-template-columns: minmax(0, 1fr) 110px 130px 150px 100px; gap: 16px; align-items: center; padding: 14px 18px; border-top: 1px solid var(--line); transition: background-color 0.15s; }
+.acct-tr:not(.acct-th):hover { background: var(--surface-2); }
+.acct-th { border-top: 0; padding-top: 12px; padding-bottom: 12px; background: #1b1d26; font-size: 13px; font-weight: 900; color: var(--muted); }
+.acct-order { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.acct-order-text { display: grid; gap: 2px; min-width: 0; }
+.acct-order-text strong { font-size: 15px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acct-num { font-weight: 700; color: var(--muted); }
+.acct-date { display: grid; font-size: 14px; }
+.acct-date small { color: var(--muted-2); font-size: 12px; }
+
+.acct-cards { display: grid; gap: 8px; }
+.acct-card { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); transition: border-color 0.15s; }
+.acct-card:active { border-color: var(--line-2); }
+.acct-card-main { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.acct-card-main strong { font-size: 15px; line-height: 1.3; }
+.acct-card-meta { font-size: 12.5px; color: var(--muted); }
+.acct-card-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+
+@media (min-width: 750px) { .acct-table { display: block; } .acct-cards { display: none; } }
