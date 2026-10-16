@@ -137,8 +137,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 /* ---------- Header ---------- */
 .topbar { position: sticky; top: 0; z-index: 50; background: rgba(20, 21, 27, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
 .topbar-inner { max-width: calc(var(--content) + var(--gutter) * 2); margin: 0 auto; padding: 0 var(--gutter); height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.brand img { height: 20px; width: auto; }
-@media (min-width: 750px) { .brand img { height: 24px; } }
+.brand img { height: 22px; width: auto; }
+@media (min-width: 750px) { .brand img { height: 27px; } }
 .topbar-nav { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .topbar-link { padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .topbar-link:hover { color: var(--text); background: var(--surface-2); }
@@ -365,7 +365,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .admin { height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
 .admin-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px var(--gutter); border-bottom: 1px solid var(--line); background: #14151b; flex-wrap: wrap; }
 .admin-brand { display: flex; align-items: center; gap: 10px; }
-.admin-brand img { height: 18px; width: auto; }
+.admin-brand img { height: 20px; width: auto; }
 .admin-brand span { font-size: 12px; font-weight: 900; padding: 3px 8px; border-radius: 6px; background: var(--accent-soft); color: #93c5fd; }
 .admin-top-actions { display: flex; align-items: center; gap: 6px; }
 @media (max-width: 749px) { .admin-top { flex-wrap: wrap; row-gap: 8px; } .admin-top-actions { width: 100%; overflow-x: auto; scrollbar-width: none; } .admin-top-actions::-webkit-scrollbar { display: none; } .admin-top-actions > * { flex: none; } }
