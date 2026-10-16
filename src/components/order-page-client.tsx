@@ -6,7 +6,7 @@ import { OrderDetails } from "@/components/order-details";
 import { StatusSteps } from "@/components/status-steps";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { CONSENT_TEXT, HOLD_SAFETY, HOLD_TEXT, HOLD_TITLE, OFFLINE_NOTICE, RECEIVED_PROMPT } from "@/lib/copy";
-import { SUPPORT_EMAIL } from "@/lib/config";
+import { COMEBACK_CODE, STORE_URL, SUPPORT_EMAIL } from "@/lib/config";
 import { Avatar as RobloxAvatar } from "@/components/avatar";
 
 function statusCopy(order: PublicOrder) {
@@ -25,6 +25,26 @@ function Notice({ tone, title, children }: { tone: "warn" | "info" | "danger"; t
   return <div className={`notice notice-${tone}`} role={tone === "danger" ? "alert" : undefined}>
     <svg viewBox="0 0 24 24" aria-hidden="true">{tone === "info" ? <><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.5" /></> : <><path d="M12 3 2 20h20L12 3Z" /><path d="M12 10v4M12 17v.5" /></>}</svg>
     <div>{title && <strong>{title}</strong>}<div>{children}</div></div>
+  </div>;
+}
+
+function Comeback() {
+  const [copied, setCopied] = useState(false);
+  async function copy() {
+    try { await navigator.clipboard.writeText(COMEBACK_CODE); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+  }
+  return <div className="comeback">
+    <div>
+      <strong>5% off your next order</strong>
+      <span>Thanks for shopping with us. Use this code once on your next order.</span>
+    </div>
+    <div className="comeback-actions">
+      <button type="button" className="comeback-code" onClick={copy} aria-label={`Copy code ${COMEBACK_CODE}`}>
+        <span>{COMEBACK_CODE}</span>
+        <em>{copied ? "Copied" : "Copy"}</em>
+      </button>
+      <a className="btn btn-primary" href={`${STORE_URL}/discount/${encodeURIComponent(COMEBACK_CODE)}`} target="_blank" rel="noreferrer">Shop with 5% off</a>
+    </div>
   </div>;
 }
 
@@ -200,6 +220,8 @@ export function OrderPageClient({ initialOrder, initialMessages, initialProofs }
             Review us on Trustpilot
           </a>
         </div>}
+
+        {order.status === "completed" && COMEBACK_CODE.toLowerCase() !== "off" && <Comeback />}
       </section>
 
       {order.onHold && <Notice tone="danger" title="How to help us approve your order">{HOLD_TEXT}<br /><strong>{HOLD_SAFETY}</strong></Notice>}

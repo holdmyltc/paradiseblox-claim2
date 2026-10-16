@@ -528,3 +528,15 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
   :root { --content: clamp(1120px, 78vw, 1320px); --content-home: clamp(920px, 64vw, 1180px); }
   .topbar-inner { max-width: none; padding-left: 32px; padding-right: 32px; }
 }
+
+/* Second-order code on completed orders */
+.comeback { display: grid; gap: 14px; padding: 16px; border-radius: var(--r); background: rgba(251, 146, 60, 0.08); border: 1px solid rgba(251, 146, 60, 0.3); }
+.comeback > div:first-child { display: grid; gap: 3px; font-size: 14px; color: var(--muted); }
+.comeback strong { color: var(--text); font-size: 16px; }
+.comeback-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.comeback-actions .btn { flex: 1 1 160px; }
+.comeback-code { flex: 1 1 160px; min-height: 44px; display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 14px; border-radius: 10px; border: 1.5px dashed rgba(251, 146, 60, 0.6); background: var(--inset); }
+.comeback-code span { font-weight: 900; letter-spacing: 0.08em; font-size: 15px; color: #fdba74; }
+.comeback-code em { font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.comeback-code:hover em { color: var(--text); }
+@media (min-width: 990px) { .comeback { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } .comeback-actions { width: 380px; } }

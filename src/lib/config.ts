@@ -19,3 +19,7 @@ export const GAME_COLLECTIONS: Record<string, string> = {
 };
 
 export const SUPPORT_EMAIL = process.env.REPLY_TO_EMAIL || "support@paradiseblox.com";
+
+/** Second-order code shown on completed orders. Set NEXT_PUBLIC_COMEBACK_CODE to change it, or to "off" to hide the card. */
+export const COMEBACK_CODE = process.env.NEXT_PUBLIC_COMEBACK_CODE || "COMEBACK5";
+export const STORE_URL = "https://paradiseblox.com";
