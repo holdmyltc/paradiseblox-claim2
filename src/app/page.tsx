@@ -14,7 +14,6 @@ export default function HomePage() {
       <Header />
       <main className="home">
         <section className="home-hero">
-          <p className="eyebrow">Paradise Blox orders</p>
           <h1 className="home-title">Get your items delivered</h1>
           <p className="home-text">Open your order, link your Roblox account and chat with us while we deliver.</p>
         </section>
