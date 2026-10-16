@@ -146,21 +146,38 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 @media (min-width: 600px) { .me { display: inline-flex; } }
 
 /* ---------- Claim home ---------- */
-.home { width: 100%; max-width: calc(1400px + var(--gutter) * 2); margin: 0 auto; padding: 28px var(--gutter) 48px; display: grid; gap: 24px; align-items: center; flex: 1; position: relative; }
+.home { width: 100%; max-width: calc(1400px + var(--gutter) * 2); margin: 0 auto; padding: 22px var(--gutter) 40px; display: grid; gap: 16px; align-content: start; flex: 1; position: relative; }
 .home::before { content: ""; position: absolute; top: 0; left: 50%; width: 100vw; transform: translateX(-50%); height: 460px; background: radial-gradient(760px 300px at 30% 0%, rgba(var(--accent-rgb), 0.18), transparent 70%); pointer-events: none; z-index: -1; }
-@media (min-width: 900px) { .home { grid-template-columns: minmax(0, 1fr) minmax(400px, 480px); gap: 64px; padding-top: 72px; } }
-.home-copy { display: grid; gap: 12px; }
-.home-title { font-size: 32px; line-height: 1.08; font-weight: 900; letter-spacing: -0.025em; }
-@media (min-width: 750px) { .home-title { font-size: 44px; } }
-.home-text { color: var(--muted); font-size: 16px; max-width: 46ch; }
-.home-steps { display: grid; gap: 10px; margin-top: 8px; }
-.home-steps li { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 14.5px; }
-.home-steps span { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: #93c5fd; font-weight: 900; font-size: 13px; flex: none; }
+.home-hero { display: grid; gap: 8px; }
+.home-title { font-size: 28px; line-height: 1.08; font-weight: 900; letter-spacing: -0.025em; }
+.home-text { color: var(--muted); font-size: 15px; max-width: 46ch; }
 .home-card { display: grid; gap: 6px; box-shadow: var(--shadow-lg); }
 .home-card-title { font-size: 20px; font-weight: 900; }
 .home-card-text { color: var(--muted); font-size: 14px; margin-bottom: 10px; }
-@media (max-width: 899px) { .home { align-content: start; } .home-card { order: -1; } .home-steps { display: none; } .home-copy .home-text { font-size: 15px; } .home-title { font-size: 26px; } }
-
+.home-card-foot { margin-top: 10px; padding-top: 14px; border-top: 1px solid var(--line); text-align: center; font-size: 14px; color: var(--muted); }
+.home-card-foot a { color: var(--accent); font-weight: 700; }
+.home-how { display: grid; gap: 12px; padding: 18px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); }
+.home-how-title { font-size: 16px; font-weight: 900; }
+.home-steps { display: grid; gap: 14px; }
+.home-steps li { display: flex; gap: 12px; align-items: flex-start; }
+.home-steps strong { display: block; font-size: 14.5px; }
+.home-steps p { color: var(--muted); font-size: 13.5px; line-height: 1.5; margin-top: 1px; }
+.home-step-num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: #93c5fd; font-weight: 900; font-size: 13px; flex: none; }
+.home-trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.home-trust li { display: grid; justify-items: center; gap: 6px; text-align: center; padding: 14px 6px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); }
+.home-trust svg { width: 22px; height: 22px; color: var(--accent); }
+.home-trust span { display: grid; gap: 1px; font-size: 12px; color: var(--muted); line-height: 1.35; }
+.home-trust strong { color: var(--text); font-size: 13.5px; }
+@media (min-width: 900px) {
+  .home { grid-template-columns: minmax(0, 1fr) minmax(400px, 480px); grid-template-areas: "hero card" "how card" "trust card"; column-gap: 72px; row-gap: 22px; padding-top: 72px; padding-bottom: 72px; align-content: center; }
+  .home-hero { grid-area: hero; gap: 12px; }
+  .home-card { grid-area: card; align-self: center; }
+  .home-how { grid-area: how; background: none; border: 0; padding: 0; }
+  .home-trust { grid-area: trust; max-width: 620px; }
+  .home-title { font-size: 46px; }
+  .home-text { font-size: 17px; }
+  .home-trust li { justify-items: start; text-align: left; grid-template-columns: auto 1fr; align-items: center; gap: 10px; padding: 14px; }
+}
 /* ---------- Order page ---------- */
 .order-grid { display: grid; gap: 16px; align-items: start; }
 @media (min-width: 990px) { .order-grid { grid-template-columns: minmax(0, 1fr) 360px; gap: 22px; } }
