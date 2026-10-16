@@ -26,10 +26,31 @@ export async function upsertShopifyOrder(node: any) {
   }, { onConflict: "shopify_order_gid" }).select("*").single();
   if (error) throw error;
 
-  await db.from("order_items").delete().eq("order_id", order.id);
-  if (mapped.items.length) {
-    const { error: itemError } = await db.from("order_items").insert(mapped.items.map((item) => ({
-      order_id: order.id,
+  await syncOrderItems(order.id, mapped.items);
+  return getOrderById(order.id);
+}
+
+type MappedItem = ReturnType<typeof mapShopifyOrder>["items"][number];
+
+/**
+ * Updates the order's items without wiping their delivery ticks. The old
+ * version deleted and re-inserted every item on each Shopify sync, which would
+ * reset "delivered" back to "pending" every time a customer opened their order
+ * history.
+ */
+async function syncOrderItems(orderId: string, items: MappedItem[]) {
+  const db = supabaseAdmin();
+  const { data: existing, error } = await db.from("order_items").select("id,shopify_line_item_gid").eq("order_id", orderId);
+  if (error) throw error;
+  const byLine = new Map<string, string>();
+  const unmatched: string[] = [];
+  for (const row of existing || []) {
+    if (row.shopify_line_item_gid && !byLine.has(row.shopify_line_item_gid)) byLine.set(row.shopify_line_item_gid, row.id);
+    else unmatched.push(row.id);
+  }
+  const keep = new Set<string>();
+  for (const item of items) {
+    const fields = {
       shopify_line_item_gid: item.shopifyLineItemId,
       name: item.name,
       variant_title: item.variantTitle,
@@ -38,10 +59,23 @@ export async function upsertShopifyOrder(node: any) {
       sku: item.sku,
       image_url: item.imageUrl,
       game: item.game,
-    })));
-    if (itemError) throw itemError;
+    };
+    const id = item.shopifyLineItemId ? byLine.get(item.shopifyLineItemId) : undefined;
+    if (id) {
+      keep.add(id);
+      const { error: e } = await db.from("order_items").update(fields).eq("id", id);
+      if (e) throw e;
+    } else {
+      const { data: inserted, error: e } = await db.from("order_items").insert({ order_id: orderId, ...fields }).select("id").single();
+      if (e) throw e;
+      keep.add(inserted.id);
+    }
   }
-  return getOrderById(order.id);
+  const remove = [...(existing || []).map((r) => r.id)].filter((id) => !keep.has(id));
+  if (remove.length) {
+    const { error: e } = await db.from("order_items").delete().in("id", remove);
+    if (e) throw e;
+  }
 }
 
 export async function getOrderByNumber(orderNumber: string) {
@@ -81,8 +115,11 @@ export async function listOrdersByEmail(email: string) {
  */
 export async function reclaimIfCancelled(orderId: string) {
   const db = supabaseAdmin();
-  const { data } = await db.from("orders").select("status").eq("id", orderId).maybeSingle();
+  const { data } = await db.from("orders").select("status,risk_decision").eq("id", orderId).maybeSingle();
   if (data?.status !== "cancelled") return false;
+  // An order cancelled after a risk review stays cancelled. Otherwise the
+  // customer could simply claim it again.
+  if (data?.risk_decision === "cancelled") return false;
 
   await db.from("orders").update({
     status: "paid",
@@ -95,14 +132,23 @@ export async function reclaimIfCancelled(orderId: string) {
     completed_by: null,
     admin_completion_reason: null,
     chat_locked: false,
+    received_at: null,
+    auto_received: false,
+    consent_at: null,
     updated_at: new Date().toISOString(),
   }).eq("id", orderId);
+  await db.from("order_items").update({ delivery_status: "pending", delivery_updated_at: null }).eq("order_id", orderId);
 
   return true;
 }
 
-export function publicOrder(order: any): PublicOrder {
-  return {
+export function isOffline(storeStatus: string | null | undefined) {
+  return storeStatus !== "online";
+}
+
+export function publicOrder(order: any, options: { admin?: boolean } = {}): PublicOrder {
+  const storeStatus = order.store_status === "online" ? "online" : "offline";
+  const base: PublicOrder = {
     id: order.id,
     orderNumber: order.order_number,
     emailMasked: maskEmail(order.email),
@@ -126,15 +172,32 @@ export function publicOrder(order: any): PublicOrder {
       game: item.game,
       imageUrl: item.image_url,
       sku: item.sku,
+      deliveryStatus: item.delivery_status === "delivered" || item.delivery_status === "missing" ? item.delivery_status : "pending",
     })),
     chatLocked: Boolean(order.chat_locked),
     deliveredAt: order.delivered_at,
+    receivedAt: order.received_at || null,
     completedAt: order.completed_at,
     completedBy: order.completed_by,
-    storeStatus: order.store_status,
+    storeStatus,
     trustpilotUrl: TRUSTPILOT_URL,
+    onHold: Boolean(order.risk_hold) && order.status !== "cancelled",
     claimRequestedAt: order.claim_link_sent_at || null,
   };
+  if (options.admin) {
+    base.email = order.email;
+    base.risk = {
+      level: order.risk_level || null,
+      reasons: Array.isArray(order.risk_reasons) ? order.risk_reasons : [],
+      hold: Boolean(order.risk_hold),
+      decision: order.risk_decision || null,
+      pending: Boolean(order.risk_pending),
+      checkoutIp: order.checkout_ip || null,
+      billingCountry: order.billing_country || null,
+      customerOrderCount: order.customer_order_count ?? null,
+    };
+  }
+  return base;
 }
 
 function maskEmail(email: string) {

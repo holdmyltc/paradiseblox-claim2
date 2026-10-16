@@ -4,6 +4,7 @@ import { requireAdmin, supabaseAdmin } from "@/lib/supabase/server";
 import { getOrderById, publicOrder } from "@/lib/orders";
 import { addSystemMessage } from "@/lib/messages";
 import { sendCompletionReceipt } from "@/lib/receipt";
+import { logEvent } from "@/lib/audit";
 
 /**
  * Two shapes of request:
@@ -39,16 +40,20 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
     /* ---------- chat lock toggle: no status change ---------- */
     if ("chatLocked" in input) {
       await db.from("orders").update({ chat_locked: input.chatLocked, updated_at: now }).eq("id", orderId);
+      await logEvent(orderId, "admin", input.chatLocked ? "chat_locked" : "chat_unlocked", request);
       await addSystemMessage(
         orderId,
         input.chatLocked
           ? "ParadiseBlox closed this chat. The delivery record stays available."
           : "ParadiseBlox reopened this chat. You can send a message again."
       );
-      return NextResponse.json({ order: publicOrder(await getOrderById(orderId)) });
+      return NextResponse.json({ order: publicOrder(await getOrderById(orderId), { admin: true }) });
     }
 
     /* ---------- guards ---------- */
+    if (order.risk_hold && (input.status === "delivered" || input.status === "completed"))
+      return NextResponse.json({ error: "This order is on hold. Approve it first, or cancel it." }, { status: 409 });
+
     // proof is optional: plenty of deliveries don't need a screenshot
     if (input.status === "completed" && (!input.reason?.trim() || order.status !== "delivered"))
       return NextResponse.json({ error: "A completion reason is required after delivery" }, { status: 409 });
@@ -63,11 +68,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
        chat_locked is NOT set here unless the transition genuinely implies it,
        so a manual lock survives ordinary status changes. */
     const updates: Record<string, unknown> = { status: input.status, updated_at: now };
-    let system = "ParadiseBlox is preparing your order.";
+    let system = "ParadiseBlox is delivering your order now.";
 
     if (input.status === "delivered") {
       updates.delivered_at = now;
-      system = "ParadiseBlox has marked the order as delivered.";
+      system = "ParadiseBlox marked your order as delivered. Check your items in-game, then tap Received.";
+      // Anything not ticked yet counts as delivered. Items marked missing stay missing.
+      await db.from("order_items").update({ delivery_status: "delivered", delivery_updated_at: now }).eq("order_id", orderId).eq("delivery_status", "pending");
     }
 
     if (input.status === "completed") {
@@ -97,6 +104,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
 
     if (input.status === "in_progress") {
       updates.delivered_at = null;
+      updates.received_at = null;
+      updates.auto_received = false;
       updates.chat_locked = false;                      // reopening always unlocks
       if (order.status === "completed" || order.status === "cancelled") {
         updates.completed_at = null;
@@ -108,12 +117,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
 
     await db.from("orders").update(updates).eq("id", orderId);
     await addSystemMessage(orderId, system);
+    const reopened = input.status === "in_progress" && (order.status === "completed" || order.status === "cancelled" || order.status === "delivered");
+    await logEvent(orderId, "admin", reopened ? "admin_reopened" : input.status === "in_progress" ? "admin_started" : `admin_${input.status}`, request, input.reason ? { reason: input.reason.trim() } : {});
 
     const updated = await getOrderById(orderId);
     if (input.status === "completed")
       await sendCompletionReceipt(updated).catch((error) => console.error("Receipt email failed", error));
 
-    return NextResponse.json({ order: publicOrder(updated) });
+    return NextResponse.json({ order: publicOrder(updated, { admin: true }) });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Status update failed" }, { status: 400 });
   }

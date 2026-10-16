@@ -2,11 +2,75 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { PublicOrder } from "@/lib/types";
+import { formatMoney } from "@/components/order-details";
+
+const LABEL: Record<string, string> = { paid: "Waiting for you", in_progress: "Delivering", delivered: "Delivered", completed: "Completed", cancelled: "Cancelled" };
 
 export function HistoryClient() {
-  const[email,setEmail]=useState("");const[code,setCode]=useState("");const[step,setStep]=useState<"email"|"code"|"orders">("email");const[subscribe,setSubscribe]=useState(false);const[orders,setOrders]=useState<PublicOrder[]>([]);const[error,setError]=useState("");const[loading,setLoading]=useState(false);
-  async function request(){setLoading(true);setError("");const r=await fetch("/api/history/request-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});const d=await r.json();if(r.ok)setStep("code");else setError(d.error||"Code could not be sent");setLoading(false)}
-  async function verify(){setLoading(true);setError("");const r=await fetch("/api/history/verify-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,code,subscribe})});const d=await r.json();if(r.ok){setOrders(d.orders);setStep("orders")}else setError(d.error||"Invalid code");setLoading(false)}
-  if(step==="orders")return <div className="card form-card"><h1 className="section-title">Your orders</h1><p className="section-copy">Active orders appear first. Completed orders stay available as read-only delivery records.</p><div style={{display:"grid",gap:10}}>{orders.map((o)=><Link href={`/order/${o.orderNumber.replace("#","")}`} className="card" style={{padding:16,textDecoration:"none",boxShadow:"none"}} key={o.id}><div className="order-meta"><div><strong>{o.orderNumber}</strong><div className="small">{o.items.length} item{o.items.length===1?"":"s"}  |  {new Date(o.createdAt).toLocaleDateString("en-US")}</div></div><span className={`status-pill ${o.status==="in_progress"?"status-progress":`status-${o.status}`}`}>{o.status.replace("_"," ")}</span></div></Link>)}</div></div>;
-  return <div className="card form-card"><h1 className="section-title">View all your orders</h1><p className="section-copy">For privacy, a six-digit code is required before we show every order connected to an email.</p>{step==="email"?<><div className="field"><label>Checkout email</label><input className="input" type="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="you@example.com"/></div><button className="btn btn-primary btn-block" onClick={request} disabled={!email||loading}>{loading?<span className="spinner"/>:"Send verification code"}</button></>:<><div className="notice-box">We sent a six-digit code to {email}.</div><div className="field"><label>Verification code</label><input className="input" inputMode="numeric" maxLength={6} value={code} onChange={(e)=>setCode(e.target.value.replace(/\D/g,""))} placeholder="000000"/></div><label style={{display:"flex",gap:10,alignItems:"flex-start",fontSize:12.5,lineHeight:1.5,margin:"4px 0 16px"}}><input type="checkbox" checked={subscribe} onChange={(e)=>setSubscribe(e.target.checked)} style={{marginTop:3}}/><span>Email me ParadiseBlox deals, product updates and special offers. This is optional and does not affect order access.</span></label><button className="btn btn-primary btn-block" onClick={verify} disabled={code.length!==6||loading}>{loading?<span className="spinner"/>:"Verify and continue"}</button></>}{error&&<div className="error-box">{error}</div>}</div>;
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState<"email" | "code" | "orders">("email");
+  const [subscribe, setSubscribe] = useState(false);
+  const [orders, setOrders] = useState<PublicOrder[]>([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function request(e?: React.FormEvent) {
+    e?.preventDefault();
+    setLoading(true); setError("");
+    try {
+      const r = await fetch("/api/history/request-code", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim() }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "The code couldn't be sent");
+      setStep("code");
+    } catch (err) { setError(err instanceof Error ? err.message : "The code couldn't be sent"); }
+    finally { setLoading(false); }
+  }
+
+  async function verify(e?: React.FormEvent) {
+    e?.preventDefault();
+    setLoading(true); setError("");
+    try {
+      const r = await fetch("/api/history/verify-code", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim(), code, subscribe }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "That code didn't work");
+      setOrders(d.orders); setStep("orders");
+    } catch (err) { setError(err instanceof Error ? err.message : "That code didn't work"); }
+    finally { setLoading(false); }
+  }
+
+  if (step === "orders") {
+    const active = orders.filter((o) => ["paid", "in_progress", "delivered"].includes(o.status));
+    const rest = orders.filter((o) => !["paid", "in_progress", "delivered"].includes(o.status));
+    const row = (o: PublicOrder) => <Link href={`/order/${o.orderNumber.replace("#", "")}`} className="hist-row" key={o.id}>
+      <span className="hist-thumbs">{o.items.slice(0, 2).map((i) => i.imageUrl ? <img key={i.id} src={i.imageUrl} alt="" /> : <span key={i.id} />)}</span>
+      <span className="hist-main"><strong>{o.orderNumber}</strong><span>{o.items.length} item{o.items.length === 1 ? "" : "s"} · {formatMoney(o.totalAmount, o.currency)} · {new Date(o.createdAt).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}</span></span>
+      <span className={`badge badge-${o.status}`}>{LABEL[o.status] || o.status}</span>
+    </Link>;
+    return <section className="panel">
+      <h1 className="status-title">Your orders</h1>
+      {!orders.length && <p className="status-text">We couldn't find any orders for {email}.</p>}
+      {active.length > 0 && <><h2 className="hist-h">Active</h2><div className="hist-list">{active.map(row)}</div></>}
+      {rest.length > 0 && <><h2 className="hist-h">Past orders</h2><div className="hist-list">{rest.map(row)}</div></>}
+    </section>;
+  }
+
+  return <section className="panel">
+    <h1 className="status-title">See all your orders</h1>
+    <p className="status-text">We'll email you a 6-digit code so only you can see the orders linked to your email.</p>
+    {step === "email" ? <form className="verify" onSubmit={request}>
+      <label className="field"><span className="field-label">Checkout email</span>
+        <input className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" /></label>
+      {error && <div className="form-error" role="alert">{error}</div>}
+      <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={!email.trim() || loading}>{loading ? <span className="spinner" /> : "Send my code"}</button>
+    </form> : <form className="verify" onSubmit={verify}>
+      <div className="notice notice-info"><div>We sent a code to <strong>{email}</strong>. Check your spam folder if you can't see it.</div></div>
+      <label className="field"><span className="field-label">6-digit code</span>
+        <input className="input input-code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} placeholder="000000" /></label>
+      <label className="check"><input type="checkbox" checked={subscribe} onChange={(e) => setSubscribe(e.target.checked)} /><span>Email me Paradise Blox deals and new items. This is optional.</span></label>
+      {error && <div className="form-error" role="alert">{error}</div>}
+      <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={code.length !== 6 || loading}>{loading ? <span className="spinner" /> : "Show my orders"}</button>
+      <button className="btn btn-link" type="button" onClick={() => { setStep("email"); setCode(""); setError(""); }}>Use a different email</button>
+    </form>}
+  </section>;
 }

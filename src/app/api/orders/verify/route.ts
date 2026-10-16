@@ -4,6 +4,7 @@ import { findShopifyOrder } from "@/lib/shopify";
 import { getOrderByNumber, publicOrder, reclaimIfCancelled, upsertShopifyOrder } from "@/lib/orders";
 import { writeCustomerSession } from "@/lib/session";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { logEvent } from "@/lib/audit";
 
 const schema = z.object({ orderId: z.string().min(1).max(50), email: z.string().email() });
 
@@ -36,7 +37,11 @@ export async function POST(request: Request) {
       order = (await getOrderByNumber(input.orderId)) ?? order;
     }
 
+    if (order.status === "cancelled")
+      return NextResponse.json({ error: "This order was cancelled. Check your email, or contact support if you think this is a mistake." }, { status: 403 });
+
     await writeCustomerSession({ email: order.email, orderIds: [order.id], history: false }, 14);
+    await logEvent(order.id, "customer", "order_verified", request);
     return NextResponse.json({ order: publicOrder(order) });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Verification failed" }, { status: 400 });

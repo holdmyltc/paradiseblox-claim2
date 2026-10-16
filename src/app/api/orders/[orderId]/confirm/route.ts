@@ -1,8 +1,31 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import { getOrderById, publicOrder } from "@/lib/orders";
 import { canAccessOrder, readCustomerSession } from "@/lib/session";
 import { addSystemMessage } from "@/lib/messages";
-import { supabaseAdmin } from "@/lib/supabase/server";
-import { sendCompletionReceipt } from "@/lib/receipt";
-export async function POST(request:Request,{params}:{params:Promise<{orderId:string}>}){try{const{orderId}=await params;const{action}=z.object({action:z.enum(["confirm","not_yet"])}).parse(await request.json());const order=await getOrderById(orderId);const session=await readCustomerSession();if(!order||!canAccessOrder(session,order.id,order.email))return NextResponse.json({error:"Unauthorized"},{status:403});if(order.status!=="delivered")return NextResponse.json({error:"This order is not awaiting confirmation"},{status:409});if(action==="not_yet"){await addSystemMessage(order.id,"The customer selected Not yet. ParadiseBlox will continue assisting in chat.");return NextResponse.json({order:publicOrder(order)});}const now=new Date().toISOString();await supabaseAdmin().from("orders").update({status:"completed",completed_at:now,completed_by:"customer",updated_at:now}).eq("id",order.id);await addSystemMessage(order.id,"The customer confirmed that the complete order was received. This chat is now read-only.");const updated=await getOrderById(order.id);await sendCompletionReceipt(updated).catch((error)=>console.error("Receipt email failed",error));return NextResponse.json({order:publicOrder(updated)});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Confirmation failed"},{status:400})}}
+import { completeAsReceived } from "@/lib/lifecycle";
+import { logEvent } from "@/lib/audit";
+import { pushToAdmins } from "@/lib/push";
+
+export async function POST(request: Request, { params }: { params: Promise<{ orderId: string }> }) {
+  try {
+    const { orderId } = await params;
+    const { action } = z.object({ action: z.enum(["confirm", "not_yet"]) }).parse(await request.json());
+    const order = await getOrderById(orderId);
+    const session = await readCustomerSession();
+    if (!order || !canAccessOrder(session, order.id, order.email)) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    if (order.status !== "delivered") return NextResponse.json({ error: "This order isn't waiting for you to confirm" }, { status: 409 });
+
+    if (action === "not_yet") {
+      await logEvent(order.id, "customer", "not_yet", request);
+      await addSystemMessage(order.id, "The customer tapped Not yet. ParadiseBlox will keep helping in this chat.");
+      after(() => pushToAdmins({ title: `${order.order_number}: Not yet`, body: "The customer says something hasn't arrived.", url: `/admin?order=${order.id}`, tag: `notyet-${order.id}`, kind: "message" }));
+      return NextResponse.json({ order: publicOrder(order) });
+    }
+
+    await completeAsReceived(order.id, "customer", request);
+    return NextResponse.json({ order: publicOrder(await getOrderById(order.id)) });
+  } catch (e) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : "Confirmation failed" }, { status: 400 });
+  }
+}

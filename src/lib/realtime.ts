@@ -22,3 +22,20 @@ export async function pingOrder(orderId: string) {
     console.error("realtime ping error", e);
   }
 }
+
+/** Tells every open order page that the store went online or offline. */
+export async function pingAll() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return;
+  try {
+    await fetch(`${url}/realtime/v1/api/broadcast`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
+      body: JSON.stringify({ messages: [{ topic: "store-status", event: "ping", payload: {} }, { topic: "admin-feed", event: "ping", payload: {} }] }),
+      signal: AbortSignal.timeout(1500),
+    });
+  } catch (e) {
+    console.error("realtime store ping error", e);
+  }
+}

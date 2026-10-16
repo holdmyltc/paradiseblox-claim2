@@ -2,6 +2,8 @@
 
 A new and separate delivery portal for `claim2.paradiseblox.com`. It does not modify or reuse the old claim website.
 
+> **Order page v2:** see [UPGRADE-V2.md](UPGRADE-V2.md) for the new setup steps and how to go live.
+
 ## Main features
 
 - Current order access using order ID and matching checkout email, without an email code

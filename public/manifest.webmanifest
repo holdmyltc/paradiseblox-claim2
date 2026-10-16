@@ -1,13 +1,28 @@
 {
-  "name": "ParadiseBlox Claim",
-  "short_name": "PB Claim",
+  "name": "Paradise Blox Orders",
+  "short_name": "PB Orders",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#090a0f",
-  "theme_color": "#090a0f",
+  "background_color": "#0c0d12",
+  "theme_color": "#0c0d12",
   "icons": [
-    { "src": "/pb-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/pb-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/pb-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/pb-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pb-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pb-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
