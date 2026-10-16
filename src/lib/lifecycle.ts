@@ -1,7 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { addSystemMessage } from "@/lib/messages";
 import { getOrderById } from "@/lib/orders";
-import { sendCompletionReceipt } from "@/lib/receipt";
 import { logEvent } from "@/lib/audit";
 import { pushToAdmins } from "@/lib/push";
 
@@ -35,7 +34,6 @@ export async function completeAsReceived(orderId: string, by: "customer" | "auto
   await addSystemMessage(orderId, by === "auto" ? SYSTEM_TEXT.autoReceived : SYSTEM_TEXT.received);
   const order = await getOrderById(orderId);
   if (order) {
-    await sendCompletionReceipt(order).catch((e) => console.error("Receipt email failed", e));
     if (by === "customer") await pushToAdmins({ title: `${order.order_number} received`, body: "The customer confirmed they got everything.", url: `/admin?order=${orderId}`, tag: `received-${orderId}`, kind: "info" });
   }
   return true;

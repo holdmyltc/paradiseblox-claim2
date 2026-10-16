@@ -306,13 +306,6 @@ export function AdminClient() {
     finally { setDownloading(false); }
   }
 
-  async function resendReceipt() {
-    if (!s) return;
-    const r = await fetch(`/api/admin/orders/${s.id}/receipt`, { method: "POST", headers: auth });
-    const d = await r.json().catch(() => ({}));
-    flash(r.ok ? "Receipt email sent" : d.error || "Receipt couldn't be sent", r.ok ? "ok" : "err");
-  }
-
   /* ---------- alerts ---------- */
   useEffect(() => {
     if (!token) return;
@@ -505,7 +498,6 @@ export function AdminClient() {
 
             {s.status === "completed" && <div className="stack">
               <p className="hint">Completed {fullTime(s.completedAt)} {s.completedBy === "auto" ? "automatically" : s.completedBy === "customer" ? "by the customer" : "by you"}.</p>
-              <button className="btn btn-ghost btn-block" type="button" onClick={resendReceipt}>Resend receipt email</button>
               <button className="btn btn-ghost btn-block" type="button" onClick={() => setStatus("in_progress")} disabled={busy}>Reopen</button>
             </div>}
 

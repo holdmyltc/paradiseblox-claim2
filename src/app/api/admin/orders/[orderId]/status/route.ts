@@ -3,7 +3,6 @@ import { z } from "zod";
 import { requireAdmin, supabaseAdmin } from "@/lib/supabase/server";
 import { getOrderById, publicOrder } from "@/lib/orders";
 import { addSystemMessage } from "@/lib/messages";
-import { sendCompletionReceipt } from "@/lib/receipt";
 import { logEvent } from "@/lib/audit";
 
 /**
@@ -120,9 +119,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
     const reopened = input.status === "in_progress" && (order.status === "completed" || order.status === "cancelled" || order.status === "delivered");
     await logEvent(orderId, "admin", reopened ? "admin_reopened" : input.status === "in_progress" ? "admin_started" : `admin_${input.status}`, request, input.reason ? { reason: input.reason.trim() } : {});
 
+    // No email when an order completes. The customer can open the order any time to see it.
     const updated = await getOrderById(orderId);
-    if (input.status === "completed")
-      await sendCompletionReceipt(updated).catch((error) => console.error("Receipt email failed", error));
 
     return NextResponse.json({ order: publicOrder(updated, { admin: true }) });
   } catch (e) {

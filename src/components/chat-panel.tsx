@@ -325,7 +325,7 @@ export function ChatPanel({
             {m.body && <div className="msg-bubble">{m.body}</div>}
             {groupEnd && <div className="msg-meta">
               {m.pending ? "Sending..." : m.failed ? <button type="button" className="msg-retry" onClick={() => retry(m)}>Not sent. Tap to try again</button> : timeLabel(m.createdAt)}
-              {m.id === seenId && !m.pending && !m.failed && <span className="msg-seen">Seen</span>}
+              {mode === "admin" && m.id === seenId && !m.pending && !m.failed && <span className="msg-seen">Seen</span>}
             </div>}
           </div>
         </div>;
