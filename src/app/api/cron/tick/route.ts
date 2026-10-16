@@ -10,14 +10,14 @@ import { logEvent } from "@/lib/audit";
 export const maxDuration = 60;
 
 /** Keep chat screenshots and proof for this long, then delete them. */
-const KEEP_FILES_DAYS = 365;
+const KEEP_FILES_DAYS = 120;
 
 /**
  * Runs every couple of minutes from a Supabase scheduled job:
  *   - marks delivered orders received after 24 hours
  *   - re-checks orders Shopify was still assessing
  *   - emails customers and you about unread messages
- *   - once a day, deletes screenshots older than a year
+ *   - once a day, deletes screenshots older than 120 days (chat text and the activity log are kept)
  */
 async function authorised(request: Request) {
   const secret = process.env.CRON_SECRET;

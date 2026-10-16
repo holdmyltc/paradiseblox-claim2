@@ -70,7 +70,7 @@ Keep `claim2.paradiseblox.com` added in Vercel too, so links in older emails sti
 1. Supabase → **SQL Editor** → **New query**.
 2. Paste `supabase/go-live/01-scheduler.sql`, replace `PASTE_CRON_SECRET_HERE` with your `CRON_SECRET`, and **Run**.
 
-This runs every 2 minutes: auto Received 24 hours after delivery, risk re-checks, "you have a new message" emails, and deleting screenshots older than 1 year.
+This runs every 2 minutes: auto Received 24 hours after delivery, risk re-checks, "you have a new message" emails, and deleting screenshots older than 120 days (the chat text and activity log are kept).
 
 ### 4. Screenshots only
 

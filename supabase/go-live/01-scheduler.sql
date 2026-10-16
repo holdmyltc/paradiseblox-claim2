@@ -1,6 +1,6 @@
 -- Runs the background jobs every 2 minutes:
 -- auto Received after 24 hours, risk re-checks, unread-message emails,
--- and the daily clean-up of screenshots older than 1 year.
+-- and the daily clean-up of screenshots older than 120 days.
 --
 -- Before running: replace PASTE_CRON_SECRET_HERE with the CRON_SECRET you added in Vercel.
 -- Safe to run again. It replaces the old schedule.
