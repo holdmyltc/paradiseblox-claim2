@@ -29,6 +29,8 @@
   --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.5);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --gutter: 16px;
+  --content: 1120px;
+  --content-home: 1120px;
   --font: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 @media (min-width: 750px) { :root { --gutter: 24px; } }
@@ -51,7 +53,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 
 /* ---------- Layout ---------- */
 .app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
-.page { width: 100%; max-width: calc(1400px + var(--gutter) * 2); margin: 0 auto; padding: 18px var(--gutter) 40px; flex: 1; }
+.page { width: 100%; max-width: calc(var(--content) + var(--gutter) * 2); margin: 0 auto; padding: 18px var(--gutter) 40px; flex: 1; }
 .page-narrow { max-width: calc(600px + var(--gutter) * 2); }
 @media (min-width: 750px) { .page { padding-top: 26px; } }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px; }
@@ -134,7 +136,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 
 /* ---------- Header ---------- */
 .topbar { position: sticky; top: 0; z-index: 50; background: rgba(20, 21, 27, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
-.topbar-inner { max-width: calc(1400px + var(--gutter) * 2); margin: 0 auto; padding: 0 var(--gutter); height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.topbar-inner { max-width: calc(var(--content) + var(--gutter) * 2); margin: 0 auto; padding: 0 var(--gutter); height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .brand img { height: 20px; width: auto; }
 @media (min-width: 750px) { .brand img { height: 24px; } }
 .topbar-nav { display: flex; align-items: center; gap: 4px; min-width: 0; }
@@ -146,7 +148,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 @media (min-width: 600px) { .me { display: inline-flex; } }
 
 /* ---------- Claim home ---------- */
-.home { width: 100%; max-width: calc(1400px + var(--gutter) * 2); margin: 0 auto; padding: 22px var(--gutter) 40px; display: grid; gap: 16px; align-content: start; flex: 1; position: relative; }
+.home { width: 100%; max-width: calc(var(--content-home) + var(--gutter) * 2); margin: 0 auto; padding: 22px var(--gutter) 40px; display: grid; gap: 16px; align-content: start; flex: 1; position: relative; }
 .home::before { content: ""; position: absolute; top: 0; left: 50%; width: 100vw; transform: translateX(-50%); height: 460px; background: radial-gradient(760px 300px at 30% 0%, rgba(var(--accent-rgb), 0.18), transparent 70%); pointer-events: none; z-index: -1; }
 .home-hero { display: grid; gap: 8px; }
 .home-title { font-size: 28px; line-height: 1.08; font-weight: 900; letter-spacing: -0.025em; }
@@ -169,14 +171,13 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .home-trust span { display: grid; gap: 1px; font-size: 12px; color: var(--muted); line-height: 1.35; }
 .home-trust strong { color: var(--text); font-size: 13.5px; }
 @media (min-width: 900px) {
-  .home { grid-template-columns: minmax(0, 1fr) minmax(400px, 480px); grid-template-areas: "hero card" "how card" "trust card"; column-gap: 72px; row-gap: 22px; padding-top: 72px; padding-bottom: 72px; align-content: center; }
+  .home { grid-template-columns: minmax(0, 1fr) minmax(380px, 440px); grid-template-areas: "hero card" "how card" "trust card"; column-gap: 56px; row-gap: 22px; padding-top: 72px; padding-bottom: 72px; align-content: center; }
   .home-hero { grid-area: hero; gap: 12px; }
   .home-card { grid-area: card; align-self: center; }
   .home-how { grid-area: how; background: none; border: 0; padding: 0; }
   .home-trust { grid-area: trust; max-width: 620px; }
   .home-title { font-size: 46px; }
   .home-text { font-size: 17px; }
-  .home-trust li { justify-items: start; text-align: left; grid-template-columns: auto 1fr; align-items: center; gap: 10px; padding: 14px; }
 }
 /* ---------- Order page ---------- */
 .order-grid { display: grid; gap: 16px; align-items: start; }
@@ -519,4 +520,11 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
   .received { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
   .received .form-error { grid-column: 1 / -1; }
   .received .btn-row { width: 340px; }
+}
+
+/* ---------- Eldorado-style width on computers (same as the store) ----------
+   Header runs the full width, content sits in a centred column. */
+@media (min-width: 1200px) {
+  :root { --content: clamp(1120px, 78vw, 1320px); --content-home: clamp(920px, 64vw, 1180px); }
+  .topbar-inner { max-width: none; padding-left: 32px; padding-right: 32px; }
 }
