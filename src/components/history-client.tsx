@@ -148,7 +148,7 @@ function Login() {
       {error && <div className="form-error" role="alert">{error}</div>}
       <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={!email.trim() || loading}>{loading ? <span className="spinner" /> : "Send my code"}</button>
     </form> : <form className="verify" onSubmit={verify}>
-      <div className="notice notice-info"><div>We sent a code to <strong>{email}</strong>. Check your spam folder if you can't see it.</div></div>
+      <div className="notice notice-info"><div>We sent a code to <b style={{ color: "var(--text)" }}>{email}</b>. Check your spam folder if you can't see it.</div></div>
       <label className="field"><span className="field-label">6-digit code</span>
         <input className="input input-code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} placeholder="000000" autoFocus /></label>
       <label className="check"><input type="checkbox" checked={subscribe} onChange={(e) => setSubscribe(e.target.checked)} /><span>Email me Paradise Blox deals and new items. This is optional.</span></label>

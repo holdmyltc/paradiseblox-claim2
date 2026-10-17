@@ -94,13 +94,13 @@ const ORDER_FIELDS = `
   id name email createdAt cancelledAt displayFinancialStatus displayFulfillmentStatus
   currentTotalPriceSet { shopMoney { amount currencyCode } }
   customer { id email }
-  lineItems(first: 100) {
+  lineItems(first: 50) {
     nodes {
       id name title variantTitle quantity sku
       customAttributes { key value }
       image { url altText }
       variant { image { url altText } }
-      product { id title handle collections(first: 20) { nodes { handle title } } }
+      product { id title handle collections(first: 10) { nodes { handle title } } }
     }
   }
 `;
@@ -113,11 +113,32 @@ export async function findShopifyOrder(orderNumber: string) {
   return data.orders.nodes[0] || null;
 }
 
-export async function findShopifyOrdersByEmail(email: string) {
-  const data = await shopifyGraphql<{ orders: { nodes: ShopifyOrderNode[] } }>(`
-    query FindOrders($query: String!) { orders(first: 100, sortKey: CREATED_AT, reverse: true, query: $query) { nodes { ${ORDER_FIELDS} } } }
-  `, { query: `email:${JSON.stringify(email.trim().toLowerCase())}` });
-  return data.orders.nodes;
+/** Light list of an email's order ids. Full details are fetched one order at a time,
+ *  because asking for many full orders at once goes over Shopify's query cost limit. */
+export async function listShopifyOrderIdsByEmail(email: string, limit = 50): Promise<string[]> {
+  const data = await shopifyGraphql<{ orders: { nodes: Array<{ id: string }> } }>(`
+    query ListOrderIds($query: String!, $first: Int!) { orders(first: $first, sortKey: CREATED_AT, reverse: true, query: $query) { nodes { id } } }
+  `, { query: `email:${JSON.stringify(email.trim().toLowerCase())}`, first: limit });
+  return data.orders.nodes.map((n) => n.id);
+}
+
+export async function getShopifyOrderById(id: string): Promise<ShopifyOrderNode | null> {
+  const data = await shopifyGraphql<{ order: ShopifyOrderNode | null }>(`
+    query OrderById($id: ID!) { order(id: $id) { ${ORDER_FIELDS} } }
+  `, { id });
+  return data.order;
+}
+
+/** Orders for this email that the site hasn't saved yet (up to `max`). */
+export async function findShopifyOrdersByEmail(email: string, knownGids: Set<string> = new Set(), max = 15) {
+  const ids = await listShopifyOrderIdsByEmail(email);
+  const missing = ids.filter((id) => !knownGids.has(id)).slice(0, max);
+  const nodes: ShopifyOrderNode[] = [];
+  for (const id of missing) {
+    const node = await getShopifyOrderById(id).catch((e) => { console.error("Shopify order fetch failed", id, e); return null; });
+    if (node) nodes.push(node);
+  }
+  return nodes;
 }
 
 export function mapShopifyOrder(node: ShopifyOrderNode) {
