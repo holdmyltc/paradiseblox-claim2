@@ -359,7 +359,7 @@ export function AdminClient() {
 
   if (!token) return <div className="app admin-login">
     <form className="panel login-card" onSubmit={login}>
-      <img className="login-logo" src="/pb-wordmark.png" alt="Paradise Blox" width={1115} height={169} />
+      <img className="login-logo" src="/pb-wordmark.png" alt="Paradise Blox" width={1200} height={165} />
       <h1 className="status-title">Admin sign in</h1>
       <label className="field"><span className="field-label">Email</span><input className="input" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
       <label className="field"><span className="field-label">Password</span><input className="input" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
@@ -374,7 +374,7 @@ export function AdminClient() {
 
   return <div className="app admin">
     <header className="admin-top">
-      <div className="admin-brand"><img src="/pb-wordmark.png" alt="Paradise Blox" width={1115} height={169} /><span>Admin</span></div>
+      <div className="admin-brand"><img src="/pb-wordmark.png" alt="Paradise Blox" width={1200} height={165} /><span>Admin</span></div>
       <div className="admin-top-actions">
         <button type="button" className={`switch ${storeStatus === "online" ? "is-on" : ""}`} onClick={() => setStore(storeStatus === "online" ? "offline" : "online")} aria-pressed={storeStatus === "online"}>
           <span className="switch-track"><span className="switch-thumb" /></span>

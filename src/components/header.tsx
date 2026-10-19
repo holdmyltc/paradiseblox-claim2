@@ -8,7 +8,7 @@ export function Header({ account }: { compact?: boolean; account?: RobloxProfile
     <header className="topbar">
       <div className="topbar-inner">
         <Link className="brand" href="/" aria-label="Paradise Blox orders home">
-          <img src="/pb-wordmark.png" alt="Paradise Blox" width={1115} height={169} />
+          <img src="/pb-wordmark.png" alt="Paradise Blox" width={1200} height={165} />
         </Link>
         <nav className="topbar-nav" aria-label="Orders">
           {account && <span className="me" aria-label="Linked Roblox account">

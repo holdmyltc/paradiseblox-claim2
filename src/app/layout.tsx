@@ -16,7 +16,10 @@ export const metadata: Metadata = {
   title: "Your Paradise Blox Order",
   description: "Open your order, link your Roblox account and chat with Paradise Blox while we deliver your items.",
   icons: {
-    icon: "/pb-icon-192.png",
+    icon: [
+      { url: "/pb-icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/pb-icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
     apple: "/pb-apple-touch-icon.png",
   },
   manifest: "/manifest.webmanifest",
